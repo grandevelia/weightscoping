@@ -1,0 +1,120 @@
+#third-wrap{
+	text-align: center;
+}
+form{
+	width: 60%;
+	margin: auto;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+form p{
+	display: flex;
+	justify-content: space-between;
+	margin: 1.25% 0;
+	min-height: 2rem;
+	align-items: center;
+}
+#third-wrap select{
+	width: 30%;
+}
+#biological-sex span#sex-button-area{
+	flex-basis: 30%;
+	display: flex;
+}
+#biological-sex span#sex-title{
+	flex-basis: 50%;
+	text-align: left;
+}
+#biological-sex input{
+	display: none;
+}
+#biological-sex label{
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background-color: rgb(26,37,245);
+	height: 2rem;
+	flex: 1;
+	color: white;
+	text-align: center;
+	font-size: 0.8em;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+#sex-female+label{
+	margin-right: 0.5%;
+}
+#sex-male+label{
+	margin-left: 0.625%;
+	margin-right: 0.5%;
+}
+#sex-other+label{
+	margin-left: 0.5%;
+}
+#biological-sex label:hover{
+	cursor: pointer;
+	background-color: rgb(16,27,205);
+}
+#sex-about{
+	height: 0.5rem !important;
+	font-size: 0.6em;
+	margin: 0 0 2.5% 0;
+	text-align: right;
+}
+#sex-about:hover{
+	cursor: pointer;
+}
+#sex-about-lightbox{
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
+	background-color: rgb(40,40,40);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	line-height: 1.5em;
+	width: 70%;
+	z-index: 99;
+	padding: 2.5% 5%;
+}
+#sex-about-lightbox p{
+	margin: 2.5%;
+}
+#close-sex-about{
+	position: absolute;
+	top: 1.25%;
+	right: 1.25%;
+}
+#close-sex-about:hover{
+	cursor: pointer;
+	color: red;
+}
+input:checked+label{
+	box-shadow: 0px 0px 2px 2px rgb(87,187,240) !important;
+}
+#height-title{
+	text-align: left;
+	flex-basis: 70%;
+}
+#height span#height-buttons{
+	flex-basis: 30%;
+	width: 30%;
+	justify-content: space-between;
+	display: flex;
+	height: 2rem;
+}
+#height input{
+	box-shadow: 0 1px 2px 1px rgba(0,0,0,0.3);
+	border: none;
+	outline: none;
+	width: 45%;
+}
+#height input#metric{
+	width: 100%;
+}
+#weight-area{
+	margin: 2.5% 0;
+}

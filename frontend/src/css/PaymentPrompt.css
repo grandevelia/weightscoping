@@ -1,0 +1,29 @@
+#payment-prompt-page{
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	width: 40%;
+	text-align: center;
+	box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.25);
+	margin-top: 2.5%;
+	padding: 2.5%;
+	border-radius: 5px;
+}
+#payment-prompt-title{
+	margin-top: 0;
+	font-weight: bold;
+	font-size: 1.125em;
+}
+#payment-prompt-info{
+	margin: 5% 10%;
+	font-size: 0.85em;
+}
+#payment-prompt-page input{
+	transition: 0.25s;
+	width: 30% !important;
+}
+#payment-prompt-page input:focus{
+	transition: 0.25s;
+	width: 60% !important;
+	box-shadow: 0px 0px 2px 1px rgb(37, 172, 198);
+}

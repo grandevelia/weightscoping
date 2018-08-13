@@ -1,0 +1,41 @@
+#option-page{
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	width: 60%;
+	margin: auto;
+	padding: 2.5%;
+}
+#payment-stem input{
+	width: 5rem;
+	border: none;
+	outline: none;
+	height: 1.25rem;
+	box-shadow: 0 0px 1px 1px rgba(0,0,0,0.3);
+}
+#payment-system-info{
+	padding: 0 2.5% 0% 2.5%;
+	font-size: 0.85em;
+}
+#payment-info-area{
+	width: 50%;
+	margin: auto;
+}
+.payment-amount{
+	font-size: 0.85em;
+	margin-bottom: 2.5%;
+}
+#no-payment{
+	box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+	background-color: rgb(57, 198, 78);
+	color: white;
+	height: 2rem;
+	line-height: 2rem;
+	margin: 2.5% auto;
+	font-size: 0.8em;
+	width: 75%;
+}
+#no-payment:hover{
+	cursor: pointer;
+	background-color: rgb(27, 158, 48);
+}

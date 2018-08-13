@@ -1,0 +1,57 @@
+#second-wrap{
+	text-align: center;
+}
+#interaction-area{
+	display: flex;
+	justify-content: space-around;
+	padding-bottom: 2.5%;
+}
+#carb-places{
+	display: flex;
+	flex-direction: column;
+	flex-basis: 60%;
+}
+.target-area{
+	margin: 0.25rem;
+	display: flex;
+	height: 2.75rem;
+	position: relative;
+	align-items: stretch;
+}
+.target-area span{
+	position: relative;
+	display: flex;
+	margin: 0 2.5% 0 0;
+  	justify-content: center;
+  	flex-direction: column;
+ 	text-align: center;
+}
+.selection-number{
+	text-align: left;
+	margin-left: 0.25%;
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.3);
+	position: relative;
+	display: flex;
+	flex: 1;
+}
+.carb-option{
+	text-align: center;
+	padding: 0.75rem;
+	margin: 0.25rem;
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.3);
+}
+.target-hover-child{
+    opacity: 0.5;
+    border: 2px solid rgba(37, 250, 67);
+}
+.selected-option{
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: flex;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	flex-direction: column;
+	text-align: center;
+}

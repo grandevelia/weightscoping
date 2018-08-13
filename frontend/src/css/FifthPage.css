@@ -1,0 +1,174 @@
+#fifth-page{
+	width: 90%;
+	margin: auto;
+	text-align: center;
+}
+#signup-area{
+	text-align: center;
+}
+#signup-area input{
+	height: 2rem;
+	margin-bottom: 1.25%;
+}
+#signup-area button{
+	height: 2rem;
+	margin-bottom: 1.25%;
+	background-color: rgba(37, 172, 198, 0.9);
+	color: white;
+}
+#signup-area button:hover{
+	cursor: pointer;
+	background-color: rgb(37, 172, 198);
+}
+#payment-area{
+	display: flex;
+	flex-direction: column;
+	padding: 2.5%;
+	align-items: center;
+}
+#option-area{
+	display: flex;
+	text-align: center;
+	justify-content: space-between;
+}
+#payment-explanation{
+	text-align: center;
+	margin-bottom: 2.5%;
+}
+.payment-option{
+	display: flex;
+	flex-direction: column;
+	flex-basis: 30%;
+	margin: 1.25%;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+	padding: 5%;
+	text-align: center;
+}
+.option-header{
+	font-weight: bold;
+	margin-bottom: 5%;
+	font-size: 1.125em;
+}
+.option-text{
+	margin-bottom: 5%;
+	flex: 1;
+}
+.option-select{
+	height: 2rem;
+	line-height: 2rem;
+	font-size: 0.9em;
+	color: white;
+	background-color: rgba(37, 172, 198, 0.9);
+	border: 1px solid rgba(80,80,80,0.1);
+}
+.option-select:hover{
+	cursor: pointer;
+	background-color: rgb(37, 172, 198);
+}
+/***Confirmation Area****/
+#confirmation-area{
+	position: relative;
+}
+#account-confirmation{
+	display: flex;
+	flex-direction: column;
+	width: 37.5%;
+	height: 100%;
+	margin: auto;
+	justify-content: space-between;
+	box-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+	background-color: rgb(172, 255, 198);
+	border: 10px solid rgba(0,0,0,0.175);
+	padding: 3%;
+	margin-top: 2.5%;
+	border-radius: 10px;
+	font-weight: bold;
+}
+#registration-title{
+	font-size: 1.75em;
+	margin-bottom: 2.5%;
+}
+#check-area{
+	flex-basis: 70%;
+	flex: 1;
+	min-height: 9rem;
+	margin-bottom: 2.5%;
+	display: flex;
+	justify-content: center;
+	align-items: center; 
+}
+#confirmation-info{
+	font-size: 0.825em;
+	margin-bottom: 2.5%;
+	flex-basis: 15%;
+	color: rgb(33, 188, 85);
+}
+/***Confirmation Check****/
+#check-outer-wrap{
+	height: 8.5rem;
+	width: 8.5rem;
+	display: inline-block;
+	position: relative;
+	font-size: 6rem;
+	color: rgb(53, 198, 125);
+}
+#halfclip {
+	width: 50%;
+	height: 100%;
+	right: 0px;
+	position: absolute;
+	overflow: hidden;
+	transform-origin: left center;
+	transform: rotate(20deg);
+	animation: cliprotate 0.125s steps(1, end) 1 forwards;
+	-webkit-animation:cliprotate 0.125s steps(1, end) 1 forwards;
+}
+.halfcircle{
+	height: 100%;
+	border-radius: 50%;
+	border: solid 0.75rem transparent;
+	border-top-color: rgb(53, 198, 125);;
+	border-left-color: rgb(53, 198, 125);;
+	position: absolute;
+	right: 0px;
+}
+#clipped{
+	width: 200%;
+	animation: rotate 0.125s linear 2 forwards;
+	-webkit-animation:rotate 0.125s linear 2 forwards;
+}
+#fixed{
+	width: 100%;
+  	transform: rotate(195deg);
+	display:inline-block;
+  	animation: showfixed 0.25s steps(2) 1;
+    -webkit-animation:showfixed 0.25s linear 1;
+}
+@-webkit-keyframes rotate {
+	 0% {transform: rotate(15deg);}
+ 	100% {transform: rotate(135deg);}
+}
+@keyframes rotate {
+ 	0% {transform: rotate(15deg);}
+ 	100% {transform: rotate(135deg);}
+}
+@-webkit-keyframes cliprotate {
+ 	0% {transform: rotate(60deg);}
+ 	100% {transform: rotate(240deg);}
+}
+@keyframes cliprotate {
+ 	0% {transform: rotate(60deg);}
+ 	100% {transform: rotate(240deg);}
+}
+@-webkit-keyframes showfixed {
+ 	0% {opacity: 0;}
+ 	49.9% {opacity: 0;}
+ 	50% {opacity: 1;}
+	100% {opacity: 1;}
+}
+.fa-check{
+	position: absolute;
+	top: 55%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
