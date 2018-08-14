@@ -16,10 +16,10 @@ const getClientEnvironment = require('./env');
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
 
-const publicPath = paths.servedPath;
-/*const BundleTracker = require('webpack-bundle-tracker');
+//const publicPath = paths.servedPath;
+const BundleTracker = require('webpack-bundle-tracker');
 const publicPath = "/static/bundles/";
-const cssFilename = 'css/[name].[contenthash:8].css';*/
+const cssFilename = 'css/[name].[contenthash:8].css';
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
@@ -146,7 +146,8 @@ module.exports = {
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: 'static/media/[name].[hash:8].[ext]',
+              //name: 'static/media/[name].[hash:8].[ext]',
+              name: 'media/[name].[hash:8].[ext]',
             },
           },
           // Process JS with Babel.
@@ -335,8 +336,8 @@ module.exports = {
     // solution that requires the user to opt into importing specific locales.
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    //new BundleTracker({path: paths.statsRoot, filename: 'webpack-stats.prod.json'}),
+    //new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new BundleTracker({path: paths.statsRoot, filename: 'webpack-stats.prod.json'}),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
