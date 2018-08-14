@@ -8,7 +8,7 @@ from django.contrib.auth import login
 
 from .serializers import UpdateUserSerializer, WeightSerializer, CreateUserSerializer, ConfirmUserSerializer, UserSerializer, LoginUserSerializer
 from .notification_utils import send_email
-from models import Profile, WeightInput
+from .models import Profile, WeightInput
 
 import hashlib, random, datetime
 
