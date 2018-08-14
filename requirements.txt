@@ -5,3 +5,5 @@ django-rest-auth==0.9.3
 django-allauth==0.36.0
 django-webpack-loader==0.6.0
 django-rest-knox==3.1.4
+psycopg2==2.7.3.2
+psycopg2-binary==2.7.5
