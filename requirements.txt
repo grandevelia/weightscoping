@@ -4,3 +4,4 @@ djangorestframework==3.8.2
 django-rest-auth==0.9.3
 django-allauth==0.36.0
 django-webpack-loader==0.6.0
+django-rest-knox==3.1.4
