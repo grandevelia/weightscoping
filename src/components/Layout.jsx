@@ -6,6 +6,7 @@ import { logo } from '../css/images/logo.svg'
 import "../css/Layout.css";
 export default class Layout extends Component {
 	render(){
+		console.log("production")
 		return(
 			<div className='content'>
 				<style>

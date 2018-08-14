@@ -4,7 +4,6 @@ from .api import RegistrationAPI, ConfirmationAPI, LoginAPI, UserAPI, WeightView
 
 router = routers.DefaultRouter()
 router.register('weights', WeightViewSet, 'weights')
-#router.register('updateUser', UpdateUserViewset, 'updateUser')
 
 urlpatterns = [
 	url(r'^', include(router.urls)),
