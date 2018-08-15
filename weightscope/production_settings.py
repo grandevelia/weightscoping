@@ -24,8 +24,8 @@ SECRET_KEY = '^2xvl3%y=22!11ntr6l%8xzns9gq&i6$%x_n=mn6-90+ki6320'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 ALLOWED_HOSTS = ['weightscoping.herokuapp.com', '127.0.0.1:8000', 'localhost']
 

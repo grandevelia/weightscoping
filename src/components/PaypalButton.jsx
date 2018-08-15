@@ -8,7 +8,7 @@ export default class PaypalButton extends Component {
    constructor() {
       super();
       this.state = {
-         env: 'sandbox',
+         env: 'production',
          client: {
             sandbox: 'AR8y52YtGCj1faskzMSebDLCNO_KRFZ7ZUiSbpFUWwLl6XZqxAsKl2oNToD0NEH_ivp47ErFlhZ8FFH3',
             production: 'AbksGjrbt7HddUw1s_SYlzlQFRr0DovIU4jI1odtJZagBGXifaGPhXiZBTu-opCTK2S2EN4-lk1cd22w',
