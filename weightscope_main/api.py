@@ -49,8 +49,7 @@ class RegistrationAPI(generics.GenericAPIView):
 
 		send_email(data)
 		user = serializer.save()
-
-		initial_weight = WeightInput.objects.create(user=user, weight_kg=initial_weight_kg)
+		WeightInput.objects.create(user=user, weight_kg=initial_weight_kg)
 
 		return Response({
 			"user": UserSerializer(user, context=self.get_serializer_context()).data,

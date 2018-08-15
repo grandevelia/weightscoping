@@ -44,7 +44,7 @@ export default class SignupOption extends Component {
 						<div className='option-header'>{optionHeader}</div>
 						<div className='option-text'>{optionText}</div>
 						<div className='payment-amount'>Down payment: {currency+""+parseFloat(Math.round(paymentAmount*100)/100, 10).toFixed(2)}</div>
-						<Link id='no-payment' to='/UserDashboard' >Go to your Dashboard</Link>
+						<Link id='no-payment' to='/Login' >Login</Link>
 					</div>
 				</div>
 			</div>

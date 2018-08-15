@@ -6,8 +6,8 @@ BASE = getattr(settings, "BASE_DIR", None)
 
 def send_email(data):
     link = data['activation_key']
-    c = {'key':link, 'basename':'https://weightscoping.herokuapp.com'}
-    #c = {'key':link, 'basename':'localhost:8000'}
+    #c = {'key':link, 'basename':'https://weightscoping.herokuapp.com'}
+    c = {'key':link, 'basename':'localhost:8000'}
     c = merge_two_dicts(c, data)
 
     subject = data['email_subject']

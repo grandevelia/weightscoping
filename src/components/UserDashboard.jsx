@@ -87,7 +87,6 @@ class UserDashboard extends Component {
 		let maxWeight = Math.max(...weights);
 		let minWeight = Math.min(...weights);
 		let weightRange = minWeight - maxWeight;
-		//console.log(this.props.auth.user)
 	/*	let currentdate = new Date(); 
 		let datetime = currentdate.getFullYear() + "-"
                 + this.zeroPad(currentdate.getMonth()+1,2)  + "-" 
@@ -96,10 +95,10 @@ class UserDashboard extends Component {
                 + currentdate.getMinutes() + ":" 
                 + currentdate.getSeconds();
                 */
-        console.log(user)
         let level = Math.floor((initialWeight-currentWeight)/((initialWeight - user.ideal_weight_kg)/6));
         let totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
-        let remainingOwed = totalOwed-user.amount_paid/100;
+		let remainingOwed = totalOwed-user.amount_paid/100;
+		console.log(weights)
 		return (
 			<div id='dashboard-wrap'>
 				<div id='top-area'>
@@ -155,8 +154,11 @@ class UserDashboard extends Component {
 					<div id='lower-area'>
 						<div id='lower-area-main'>
 							<div id='left-area'>
-								<IncentiveLayer initialWeightKg={initialWeight} idealWeightKg={user.ideal_weight_kg} carbRanks={user.carb_ranks} alcohol={user.alcohol} weightUnits={user.weight_units} currentWeightKg={currentWeight} />
-							</div>
+								{	this.props.weights.length < 1 ? <div id='incentives-loading-indicator'>Loading Incentives...</div>
+									:
+									<IncentiveLayer initialWeightKg={initialWeight} idealWeightKg={user.ideal_weight_kg} carbRanks={user.carb_ranks} alcohol={user.alcohol} weightUnits={user.weight_units} currentWeightKg={currentWeight} />
+								}
+								</div>
 							<div id='graph-area'>
 								<div id='graph-top'>
 									Progress
@@ -183,6 +185,8 @@ class UserDashboard extends Component {
 								</div>
 								<div id='x-labels'>
 									{
+										this.props.weights.length < 1 ? <div id='loading-weights-indicator'>Loading weights...</div>
+										:
 										labelsMap.map((x, k )=> {
 											let j = Math.round(weightLen - weightLen/(x+1));
 											return <div key={"xlabel"+k} className='x-label'>{ this.props.weights[j]['date_added'].substring(5,10)}</div>

@@ -8,7 +8,7 @@ export default function weights(state=initialState, action){
 	switch (action.type) {
 
 		case 'FETCH_WEIGHTS':
-			return [...state, ...action.weights];
+			return [...action.weights];
 
 		case 'ADD_WEIGHT':
 			return [...state, action.weight];
