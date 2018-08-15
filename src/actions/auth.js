@@ -98,8 +98,8 @@ export const register = (email, password, alcohol, carb_ranks, weight_units, hei
 			"Content-Type": "application/json"
 		};
 		monetary_value = Math.round(parseInt(monetary_value*100,10));
-		//let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
-		let body = JSON.stringify({"email":"test@test.com","password":"test","alcohol":false,"carb_ranks":[2,0,3,5,1,4,6],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":"200","weight_kg":100,"sex":"male"});
+		let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
+		//let body = JSON.stringify({"email":"test2@test.com","password":"test","alcohol":false,"carb_ranks":[2,0,3,5,1,4,6],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":"200","weight_kg":100,"sex":"male"});
 		return fetch("/api/auth/register/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){

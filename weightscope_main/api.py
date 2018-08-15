@@ -35,7 +35,7 @@ class RegistrationAPI(generics.GenericAPIView):
 		initial_weight_kg = data['weight_kg']
 		del data['weight_kg']
 
-		salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+		salt = hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()[:5]
 		email_salt = data['email']
 		if isinstance(email_salt, unicode):
 			email_salt = email_salt.encode('utf8')

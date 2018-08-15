@@ -15,7 +15,6 @@ class FifthPage extends Component {
 		this.props.register(this.state.email, this.state.password, this.props.intro.alcohol, this.props.intro.carbRanks, this.props.intro.weightUnits, this.props.intro.heightUnits, this.props.intro.heightInches, this.props.intro.weightKg, this.props.intro.idealWeightKg, this.props.intro.idealWeightValue, this.props.intro.sex);
 	}
 	render(){
-		console.log(this.props)
 		/*if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
