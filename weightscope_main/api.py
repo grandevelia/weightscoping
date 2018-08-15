@@ -38,7 +38,7 @@ class RegistrationAPI(generics.GenericAPIView):
 		salt = hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()[:5]
 		email_salt = data['email']
 
-		data['activation_key'] = hashlib.sha1(salt + email_salt).hexdigest()
+		data['activation_key'] = hashlib.sha1((salt + email_salt).encode('utf-8')).hexdigest()
 		data['key_expires'] = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=2), "%Y-%m-%d %H:%M:%S")
 		data['email_path'] = "/ActivationEmail"
 		data['email_subject'] = "Weightscoping Account Activation"
