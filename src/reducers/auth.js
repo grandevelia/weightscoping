@@ -7,6 +7,8 @@ const initialState = {
 	key: null,
 	user: null,
 	email: null,
+	reset: null,
+	resetKey: "",
 	errors: {},
 };
 
@@ -14,23 +16,16 @@ export default function auth(state=initialState, action){
 	switch (action.type) {
 
 		case 'USER_LOADING':
-
-			//console.log("user loading", action)
 			return {...state, isLoading: true};
 
 		case 'USER_LOADED':
-
-			//console.log("user loaded", action)
 			return {...state, isAuthenticated:true, userConfirmed:action.user.is_active, isLoading: false, user:action.user};
 
 		case 'LOGIN_SUCCESSFUL':
-
-			//console.log("login successful", action)
 			localStorage.setItem("token", action.data.token);
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 
 		case 'CONFIRMATION_SUCCESSFUL':
-			//console.log("confirmation successful", action)
 			localStorage.setItem("token", action.data.token);
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 
@@ -48,8 +43,6 @@ export default function auth(state=initialState, action){
 			return {...initialState};	
 
 		case 'REGISTRATION_SUCCESSFUL':
-			
-			//console.log("registration successful", action)
 			localStorage.setItem("token", action.data.token);
     		return {...state, userConfirmed: false, email:action.data.email, confirmationSent:true, isAuthenticated: true};
 
@@ -61,6 +54,23 @@ export default function auth(state=initialState, action){
 
 		case 'SETTING_CHANGE':
 			return {...state, ...action.user}
+
+		case 'RESET_PASSWORD':
+			let key = "";
+			if (action.key){
+				key = action.key;
+			}
+			return {...state, reset: action.status, email: action.email, key:key}
+
+		case 'CONFIRM_RESET':
+			return {...state, reset: action.status}
+		
+		case 'UPDATE_PASSWORD':
+			let errors = {};
+			if (action.reason){
+				errors = {error: action.reason[0]};
+			}
+			return {...state, reset: action.status, errors:errors}
 
 		default:
 			return state;

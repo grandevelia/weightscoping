@@ -11,6 +11,7 @@ import weightScoping from './reducers';
 import Intro from './components/Intro';
 import NotFound from './components/NotFound';
 import UserDashboard from './components/UserDashboard';
+import UserSettings from './components/UserSettings';
 
 let store = createStore(weightScoping, applyMiddleware(thunk))
 
@@ -19,15 +20,15 @@ class RootContainerComponent extends Component {
     this.props.loadUser();
   }
   render(){
-   // console.log(this.props.auth)
     return (
         <BrowserRouter>
             <Switch>
-                <Route path="/UserDashboard" component={UserDashboard} />
-                <Route path="/" render={() => 
-                  <Intro auth={this.props.auth} />} 
+                <Route path="/UserDashboard" component={ UserDashboard } />
+                <Route path="/UserSettings" component={ UserSettings } />
+                <Route path="/" render={ () => 
+                  <Intro auth={ this.props.auth } />} 
                 />
-                <Route component={NotFound} />
+                <Route component={ NotFound } />
             </Switch>
         </BrowserRouter>
     );

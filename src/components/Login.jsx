@@ -47,7 +47,7 @@ class Login extends Component {
 			              	this.setState({password: e.target.value})
 			              }} />
 
-		         		<Link id='forgot-pass' to="/register">Forgot your password?</Link>
+		         		<Link id='forgot-pass' to="/ForgotPassword">Forgot your password?</Link>
 		            </div>
 		            <button id='login-submit' type="submit">Login</button>
 				</form>

@@ -40,3 +40,58 @@
 	cursor: pointer;
 	background-color: rgb(11,164,27);
 }
+.forgot-container{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding: 2.5%;
+	margin-top: 5%;
+}
+#forgot-input-area input{
+	height: 2rem;
+}
+#forgot-pass-email{
+	margin-left: -5%;
+	flex-basis: 60%;
+	border: 1px solid rgba(0,0,0,0.2);
+}
+#forgot-pass-submit{
+	flex-basis: 10%;
+	color: white;
+	border: none;
+	background-color: rgb(67, 240, 98);
+}
+#forgot-pass-submit:hover{
+	cursor: pointer;
+	background-color: rgb(27, 205, 78);
+}
+.reset-ok{
+	color: rgb(47, 200, 78);
+	background-color: rgba(67, 240, 98, 0.2);
+}
+.reset-failed{
+	color: rgb(200, 47, 78);
+	background-color: rgba(240, 67, 98, 0.2);
+}
+#update-password-submit{
+	height: 2rem;
+	border: none;
+	background-color: rgb(67, 225, 98);
+	color: white;
+}
+#reset-input-area{
+	margin-top: 5%;
+}
+#reset-input-area input{
+	height: 2rem;
+	margin: 1.25% 0;
+}
+#update-password-submit:hover{
+	cursor: pointer;
+	background-color: rgb(27, 205, 58);
+}
+#reset-complete{
+	display: flex;
+	flex-direction: column;
+}

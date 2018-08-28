@@ -9,10 +9,19 @@ class FifthPage extends Component {
 	state = {
 		email: "",
 		password: "",
+		passwordConfirm: "",
 	}
 	onSubmit = e => {
 		e.preventDefault();
-		this.props.register(this.state.email, this.state.password, this.props.intro.alcohol, this.props.intro.carbRanks, this.props.intro.weightUnits, this.props.intro.heightUnits, this.props.intro.heightInches, this.props.intro.weightKg, this.props.intro.idealWeightKg, this.props.intro.idealWeightValue, this.props.intro.sex);
+		if (this.state.password.length){
+			if (this.state.password === this.state.passwordConfirm){
+				this.props.register(this.state.email, this.state.password, this.props.intro.alcohol, this.props.intro.carbRanks, this.props.intro.weightUnits, this.props.intro.heightUnits, this.props.intro.heightInches, this.props.intro.weightKg, this.props.intro.idealWeightKg, this.props.intro.idealWeightValue, this.props.intro.sex);
+			} else {
+				alert("Password fields don't match");
+			}
+		} else {
+			alert("Password is required");
+		}
 	}
 	render(){
 		/*if (this.props.alcohol === null){
@@ -47,6 +56,11 @@ class FifthPage extends Component {
 							type="password" id="password" placeholder='Password'
 							onChange={e => {
 								this.setState({password: e.target.value})
+							}} />
+							<input
+							type="password" id="confirm-password" placeholder='Confirm Password'
+							onChange={e => {
+								this.setState({passwordConfirm: e.target.value})
 							}} />
 							<button className='form-submit' type="submit">Submit</button>
 						</form>

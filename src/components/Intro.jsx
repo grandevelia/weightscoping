@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import { connect } from 'react-redux';
 import { intro } from "../actions";
 import Layout from './Layout';
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import FirstPage from './FirstPage';
 import SecondPage from './SecondPage';
 import ThirdPage from './ThirdPage';
@@ -15,6 +15,8 @@ import SignupOption from './SignupOption';
 import Login from './Login';
 import RegistrationConfirmation from './RegistrationConfirmation';
 import CompleteRegistration from './CompleteRegistration';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 
 class Intro extends Component {
 	updateIntroState(update){
@@ -49,7 +51,9 @@ class Intro extends Component {
 				/>
 				<Route path="/RegistrationConfirmation" component={ RegistrationConfirmation } />
 				<Route path="/CompleteRegistration" component={ CompleteRegistration } />
-				<Route path='/Login' component={Login} />
+				<Route path='/Login' component={ Login } />
+                <Route path="/ForgotPassword" component={ ForgotPassword } />
+                <Route path="/ResetPassword" component={ ResetPassword } />
 			</Layout>
 		);
 	}

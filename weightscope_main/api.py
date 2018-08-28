@@ -6,7 +6,7 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.contrib.auth import login
 
-from .serializers import UpdateUserSerializer, WeightSerializer, CreateUserSerializer, ConfirmUserSerializer, UserSerializer, LoginUserSerializer
+from .serializers import UpdatePasswordSerializer, ConfirmResetSerializer, UpdateUserSerializer, WeightSerializer, CreateUserSerializer, ConfirmUserSerializer, UserSerializer, LoginUserSerializer, ResetPasswordSerializer
 from .notification_utils import send_email
 from .models import Profile, WeightInput
 
@@ -57,6 +57,44 @@ class RegistrationAPI(generics.GenericAPIView):
 			"email": data['email'],
 		})
 
+class UpdatePasswordAPI(generics.GenericAPIView):
+	serializer_class = UpdatePasswordSerializer
+
+	def post(self, request, *args, **kwargs):
+		serializer=self.get_serializer(data=request.data)
+		user = serializer.update_password(data=request.data)
+		return Response({"status":True})
+
+class ResetPasswordAPI(generics.GenericAPIView):
+	serializer_class = ResetPasswordSerializer
+
+	def post(self, request, *args, **kwargs):
+		email = request.data
+		data = {"email": email}
+		salt = hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()[:5]
+		email_salt = data['email']
+
+		key = hashlib.sha1((salt + email_salt).encode('utf-8')).hexdigest()
+		serializer = self.get_serializer(request)
+
+		user = serializer.validate(email=data['email'], key=key)
+		email_data={"email": data['email'], "activation_key": key, "email_path": "/ResetPassword", "email_subject":"Weightscoping Password Reset"}
+		send_email(email_data)
+
+		return Response({
+			"email": data['email']
+		})
+
+class ConfirmResetAPI(generics.GenericAPIView):
+	serializer_class = ConfirmResetSerializer
+
+	def post(self, request, *args, **kwargs):
+		serializer = self.get_serializer(data=request.data)
+		serializer.confirm_request(data=request.data)
+		return Response({
+			"status":True
+		})
+
 class LoginAPI(generics.GenericAPIView):
 	permission_classes = [permissions.AllowAny]
 	serializer_class = LoginUserSerializer
@@ -101,5 +139,3 @@ class WeightViewSet(viewsets.ModelViewSet):
 
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
-
-

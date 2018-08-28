@@ -6,17 +6,31 @@ body {
 	height: 100%;
 	margin: 0;
 }
-#logout{
+#dashboard-nav-links{
+	display: flex;
+	flex-direction: column;
 	position: absolute;
 	right: 0.5rem;
 	top: 0.5rem;
-	color: rgb(57, 228, 192);
 	font-size: 0.7em;
+}
+#logout{
+	color: rgb(57, 228, 192);
 	transition: ease-in-out 0.125s;
 }
 #logout:hover{
 	cursor: pointer;
 	color: white;
+	transition: ease-in-out 0.125s;
+}
+#settings-link{
+	margin-top: 2.5%;
+	padding: 2.5%;
+	color: white;
+}
+#settings-link:hover{
+	cursor: pointer;
+	color: rgb(57, 188, 222);
 	transition: ease-in-out 0.125s;
 }
 #dashboard-wrap{

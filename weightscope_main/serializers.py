@@ -54,6 +54,38 @@ class CreateUserSerializer(serializers.ModelSerializer):
 			raise serializers.ValidationError("That email is already being used")
 		return value
 
+class UpdatePasswordSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Profile
+	
+	def update_password(self, data):
+		print(data)
+		email = data['email']
+		key = data['key']
+		new_password = data['password']
+
+		try:
+			profile = Profile.objects.get(email=email, activation_key=key)
+			profile.password=password
+			profile.save()
+			return profile
+
+		except Profile.DoesNotExist:
+			raise serializers.ValidationError("We do not currently have a password reset request for the specified account")
+
+class ConfirmResetSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Profile
+	
+	def confirm_request(self, data):
+		email = data['email']
+		key = data['key']
+		try:
+			profile = Profile.objects.get(email=email, activation_key=key)
+			return profile
+		except Profile.DoesNotExist:
+			raise serializers.ValidationError("We do not currently have a password reset request for the specified account")
+
 class ConfirmUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Profile
@@ -98,6 +130,27 @@ class UserSerializer(serializers.ModelSerializer):
 			'sex',
 			'payment_option',
 		)
+class ResetPasswordSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Profile
+		fields = (
+			'email',
+			'is_active',
+			'activation_key'
+		)
+	
+	def validate(self, email, key):
+		try:
+			profile = Profile.objects.get(email=email)
+			if profile.is_active == True:
+				profile.activation_key = key
+				profile.save()
+				return profile
+			else:
+				raise serializers.ValidationError("Inactive Account")
+
+		except Profile.DoesNotExist:
+			raise serializers.ValidationError("That email is not associated with an account")
 
 class UpdateUserSerializer(serializers.ModelSerializer):
 	class Meta:

@@ -201,3 +201,78 @@ export const updateUserSettings = (key, value) => {
 		})
 	}
 }
+export const resetPassword = (email) => {
+	return dispatch => {
+		let headers = {"Content-Type": "application/json"};
+		let body = JSON.stringify(email);
+		return fetch ("/api/auth/reset_password/", {headers, body, method: "POST"})
+		.then(res => {
+			if (res.status < 500){
+				return res.json().then(data => {
+					return {status: res.status, data};
+				})
+			} else {
+				throw res;
+			}
+		})
+		.then(res => {
+			if (res.status === 200){
+				dispatch({type: "RESET_PASSWORD", email: res.data.email, status: true});
+				return res.data
+			} else {
+				dispatch({type: "RESET_PASSWORD", email: null, status: false})
+				throw res;
+			}
+		})
+	}
+}
+export const confirmReset = (email, key) => {
+	return dispatch => {
+		let headers = {"Content-Type": "application/json"};
+		let body = JSON.stringify({email, key});
+		return fetch ("/api/auth/confirm_reset/", {headers, body, method: "POST"})
+		.then(res => {
+			if (res.status < 500){
+				return res.json().then(data => {
+					return {status: res.status, data};
+				})
+			} else {
+				throw res;
+			}
+		})
+		.then(res => {
+			if (res.status === 200){
+				dispatch({type:"RESET_PASSWORD", status: true, email: email, key:key});
+				return res.data
+			} else {
+				dispatch({type: "RESET_PASSWORD", status: false, email: null});
+				throw res;
+			}
+		})
+	}
+}
+export const updatePassword = (email, key, password) => {
+	return dispatch => {
+		let headers = {"Content-Type": "application/json"};
+		let body = JSON.stringify({"email":email, "key":key, "password":password });
+		return fetch ("/api/auth/update_password/", {headers, body, method: "POST"})
+		.then(res => {
+			if (res.status < 500){
+				return res.json().then(data => {
+					return {status: res.status, data};
+				})
+			} else {
+				throw res;
+			}
+		})
+		.then(res => {
+			if (res.status === 200){
+				dispatch({type:"UPDATE_PASSWORD", status: true});
+				return res.data
+			} else {
+				dispatch({type: "UPDATE_PASSWORD", status: false, reason:res.data});
+				throw res;
+			}
+		})
+	}
+}

@@ -35,7 +35,7 @@ export default class IncentiveLayer extends Component {
 		}
 		return(
 			<div className='stage dashboard-stage'>
-				<div className='stage-title'>You are level {level} <br />Target Weight: {weightStringFromKg(this.props.initialWeightKg-(level+2)*(this.props.initialWeightKg - this.props.idealWeightKg)/6, this.props.weightUnits)}</div>
+				<div className='stage-title'>You are level {level} <br />Next Target Weight: {weightStringFromKg(this.props.initialWeightKg-(level+2)*(this.props.initialWeightKg - this.props.idealWeightKg)/6, this.props.weightUnits)}</div>
 				<div className='stage-description'><h5>You may have</h5> {
 					intArr.map( i => {
 						let current = levelMap[i];

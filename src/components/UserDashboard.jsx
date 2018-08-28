@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { auth, weights } from "../actions";
 import { weightStringFromKg, poundsToKg } from './utils';
 import IncentiveLayer from './IncentiveLayer';
+import DashboardHeader from './DashboardHeader';
 import PaypalButton from './PaypalButton';
 import '../css/UserDashboard.css';
 
@@ -19,9 +20,7 @@ class UserDashboard extends Component {
 		props.fetchWeights();
 		this.state = {
 			newWeightPrimary: null,
-			newWeightSecondary: null,
-			email: null,
-			monetary_value: null,
+			newWeightSecondary: null
 		}
 	}
 	addWeight(e){
@@ -61,13 +60,6 @@ class UserDashboard extends Component {
 	updateValue(e){
 		this.setState({monetary_value:e.target.value});
 	}
-	updateEmail(e){
-		let val = e.target.value;
-		this.setState({email: val})
-	}
-	updateSettings(key, value){
-		this.props.updateUserSettings(key, value);
-	}
 	render(){
 		if (!this.props.auth.isAuthenticated){
 			return <Redirect to="/Login" />
@@ -98,43 +90,10 @@ class UserDashboard extends Component {
         let level = Math.floor((initialWeight-currentWeight)/((initialWeight - user.ideal_weight_kg)/6));
         let totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
 		let remainingOwed = totalOwed-user.amount_paid/100;
-		console.log(weights)
+
 		return (
 			<div id='dashboard-wrap'>
-				<div id='top-area'>
-					<div id='logout' onClick={() => this.handleLogout()}>Logout</div>
-					<div className='top-section'>
-						<div className='top-label'>You started at</div>
-
-						<div className='top-entry'>
-						{
-							weightStringFromKg(initialWeight, user['weight_units'])
-						}
-						</div>
-					</div>
-					<div className='top-section'>
-						<div className='center-label top-label'>You're At</div>
-						<div className='top-entry'>
-						{
-							weightStringFromKg(currentWeight, user['weight_units'])
-						}
-						</div>
-						<div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
-						<div className='top-entry'>
-						{
-							weightStringFromKg(initialWeight - currentWeight, user['weight_units'])
-						}
-						</div>
-					</div>
-					<div className='top-section'>
-						<div className='top-label'>Ideal weight</div>
-						<div className='top-entry'>
-						{
-							weightStringFromKg(user['ideal_weight_kg'], user['weight_units'])
-						}
-						</div>
-					</div>
-				</div>
+				<DashboardHeader />
 				{user.amount_paid/100 < totalOwed ? 
 					<div id='payment-info-area'>
 						<div className='payment-option'>
@@ -194,58 +153,6 @@ class UserDashboard extends Component {
 									}
 								</div>
 							</div>
-							<div id='settings-area'>
-								<h4 id='settings-title'>Settings</h4>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Email</div>
-									<input onChange={(e) => this.updateEmail(e)} type='text' placeholder="Your Email" defaultValue={user.email} />
-									<button onClick={(e) => this.updateSettings("email", this.state.email)}>Submit</button>
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Drink Alcohol?</div>
-									<select onChange={(e) => this.updateSettings("alcohol", e.target.value)} value={user.alcohol} className='settings-option-input'>
-										<option value={true}>Yes</option>
-										<option value={false}>No</option>
-									</select>						
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Weight Units</div>
-									<select onChange={(e) => this.updateSettings("weight_units", e.target.value)} value={user.weight_units} className='settings-option-input'>
-										<option>Pounds</option>
-										<option>Stones</option>
-										<option>Kilograms</option>
-									</select>
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Height Units</div>
-									<select onChange={(e) => this.updateSettings("height_units", e.target.value)} value={user.height_units} className='settings-option-input'>
-										<option>Feet/Inches</option>
-										<option>Centimeters</option>
-									</select>
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Sex</div>
-									<select onChange={(e) => this.updateSettings("sex", e.target.value)} value={user.sex} className='settings-option-input'>
-										<option value="female">Female</option>
-										<option value="male">Male</option>
-										<option value="other">Other</option>
-									</select>
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Plan</div>
-									<select onChange={(e) => this.updateSettings("payment_option", e.target.value)} value={user.payment_option} className='settings-option-input'>
-										<option value={1}>{planTitles[0]}</option>
-										<option value={2}>{planTitles[1]}</option>
-										<option value={3}>{planTitles[2]}</option>
-									</select>
-								</div>
-								<div className='settings-option'>
-									<div className='settings-option-title'>Value</div>
-									<input onChange={(e) => this.updateValue(e)} defaultValue={user.monetary_value/100} className='settings-option-input' placeholder="Your ideal weight is worth:">
-									</input>
-									<button onClick={(e) => this.updateSettings("monetary_value", this.state.monetary_value)}>Submit</button>
-								</div>
-							</div>
 						</div>
 						<form id='submit-weight' onSubmit={(e) => this.addWeight(e)}>
 							<div id='submit-weight-title'>Today's Weight:</div>
@@ -266,7 +173,6 @@ class UserDashboard extends Component {
 
 const mapStateToProps = state => {
 	return {
-		intro: state.intro,
 		auth: state.auth,
 		weights: state.weights
 	}
@@ -282,9 +188,6 @@ const mapDispatchToProps = dispatch => {
 		},
 		addWeight: (weightKg) => {
 			return dispatch(weights.addWeight(weightKg))
-		},
-		updateUserSettings: (key, value) => {
-			return dispatch(auth.updateUserSettings(key, value))
 		}
 	}
 }
