@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import { auth, weights } from "../actions";
 import { weightStringFromKg, poundsToKg } from './utils';
 import IncentiveLayer from './IncentiveLayer';
-import DashboardHeader from './DashboardHeader';
 import PaypalButton from './PaypalButton';
 import '../css/UserDashboard.css';
 
-//let backendKeys = ["email","alcohol","weight_units","height_units","monetary_value","sex","payment_option"];
-let planTitles = ["Classic","Slow Burn", "I Don't Believe You"];
+let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 let numLabels = 5;
 let labelsMap = Array(numLabels).fill().map((x,i) => i);
 let paymentFracs = [0.25,0.1,0.0];
@@ -61,12 +58,6 @@ class UserDashboard extends Component {
 		this.setState({monetary_value:e.target.value});
 	}
 	render(){
-		if (!this.props.auth.isAuthenticated){
-			return <Redirect to="/Login" />
-		}
-		if (!this.props.auth.userConfirmed){
-			return <Redirect to="/CompleteRegistration" />
-		}
 		let user = this.props.auth.user;
 		let weights = Object.keys(this.props.weights).map(key => {
 			return this.props.weights[key]['weight_kg'];
@@ -93,7 +84,41 @@ class UserDashboard extends Component {
 
 		return (
 			<div id='dashboard-wrap'>
-				<DashboardHeader />
+				<div id='top-area'>
+					<div id='top-content'>
+						<div className='top-section'>
+							<div className='top-label'>You started at</div>
+
+							<div className='top-entry'>
+							{
+								weightStringFromKg(initialWeight, user['weight_units'])
+							}
+							</div>
+						</div>
+						<div className='top-section'>
+							<div className='center-label top-label'>You're At</div>
+							<div className='top-entry'>
+							{
+								weightStringFromKg(currentWeight, user['weight_units'])
+							}
+							</div>
+							<div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
+							<div className='top-entry'>
+							{
+								weightStringFromKg(initialWeight - currentWeight, user['weight_units'])
+							}
+							</div>
+						</div>
+						<div className='top-section'>
+							<div className='top-label'>Ideal weight</div>
+							<div className='top-entry'>
+							{
+								weightStringFromKg(user['ideal_weight_kg'], user['weight_units'])
+							}
+							</div>
+						</div>
+					</div>
+				</div>
 				{user.amount_paid/100 < totalOwed ? 
 					<div id='payment-info-area'>
 						<div className='payment-option'>

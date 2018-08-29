@@ -36,6 +36,7 @@
 }
 #main-area{
   display: flex;
+  min-height: 75vh;
 }
 #main-area > div:nth-of-type(2){
   flex: 1;

@@ -6,32 +6,9 @@ body {
 	height: 100%;
 	margin: 0;
 }
-#dashboard-nav-links{
-	display: flex;
-	flex-direction: column;
-	position: absolute;
-	right: 0.5rem;
-	top: 0.5rem;
-	font-size: 0.7em;
-}
-#logout{
-	color: rgb(57, 228, 192);
-	transition: ease-in-out 0.125s;
-}
-#logout:hover{
-	cursor: pointer;
-	color: white;
-	transition: ease-in-out 0.125s;
-}
-#settings-link{
-	margin-top: 2.5%;
-	padding: 2.5%;
-	color: white;
-}
-#settings-link:hover{
-	cursor: pointer;
-	color: rgb(57, 188, 222);
-	transition: ease-in-out 0.125s;
+#dashboard-content{
+	min-height: 85vh;
+	height: 100%;
 }
 #dashboard-wrap{
 	position: relative;
@@ -43,32 +20,15 @@ body {
 #top-area{
 	position: relative;
 	width: 100%;
-	height: 25vh;
-	background-color: #222;
+	height: 20vh;
 	box-shadow: 0 1px 1px rgba(0,0,0,.2);
-	display: flex;
-	padding: 2.5%;
-}
-.top-section{
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	text-align: center;
-	justify-content: space-around;
-}
-.top-label{
-	font-size: 1.25em;
-	color: rgb(57, 192, 228);
-}
-.top-entry{
-	color: white;
-}
-.center-label{
-	font-size: 1.125em;
+    display: flex;
+    flex-direction: column;
 }
 #lower-area{
 	display: flex;
 	flex-direction: column;
+	padding-bottom: 2.5%;
 }
 #lower-area-main{
 	min-height: 20rem;
@@ -82,6 +42,7 @@ body {
 .dashboard-stage{
 	padding: 5%;
 	text-align: left;
+	border: 1px solid rgb(57, 192, 228);
 }
 .you-may-have{
 	margin: 2.5% 0;
@@ -237,4 +198,32 @@ body {
 	cursor: pointer;
 	background-color: rgb(37, 172, 208);
 	box-shadow: 0 0 1px rgba(0,0,0,0.5);
+}
+
+#top-content{
+    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(0,0,0,0.05);
+    flex: 1;
+    padding: 1.25% 0;
+}
+.top-section{
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: space-around;
+}
+.top-label{
+    font-size: 1.125em;
+    font-weight: bold;
+	color: rgb(27, 172, 228);
+}
+.top-entry{
+    color: black;
+    font-size: 0.95em;
+}
+.center-label{
+	font-size: 1em;
 }

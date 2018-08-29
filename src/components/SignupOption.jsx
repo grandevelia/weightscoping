@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import '../css/SignupOption.css';
-import PaypalButton from './PaypalButton';
 import { idealWeightString } from './utils';
 
 export default class SignupOption extends Component {
@@ -21,7 +20,7 @@ export default class SignupOption extends Component {
 			optionText = "Some now, some at each target";
 			paymentModifier = 0.1;
 		} else {
-			optionHeader = "I Don't Believe You";
+			optionHeader = "I Need More Proof";
 			optionText = "Nothing until you reach your goal";
 			paymentModifier = 0.0;
 		}

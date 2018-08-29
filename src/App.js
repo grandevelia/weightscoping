@@ -9,9 +9,8 @@ import {auth} from "./actions";
 import weightScoping from './reducers';
 
 import Intro from './components/Intro';
+import Home from './components/Home';
 import NotFound from './components/NotFound';
-import UserDashboard from './components/UserDashboard';
-import UserSettings from './components/UserSettings';
 
 let store = createStore(weightScoping, applyMiddleware(thunk))
 
@@ -23,8 +22,7 @@ class RootContainerComponent extends Component {
     return (
         <BrowserRouter>
             <Switch>
-                <Route path="/UserDashboard" component={ UserDashboard } />
-                <Route path="/UserSettings" component={ UserSettings } />
+                <Route path="/Home" component={ Home } />
                 <Route path="/" render={ () => 
                   <Intro auth={ this.props.auth } />} 
                 />

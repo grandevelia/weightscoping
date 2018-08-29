@@ -16,7 +16,7 @@ class Login extends Component {
 	}
 	render(){
 		if (this.props.auth.isAuthenticated){
-			return <Redirect to='/UserDashboard' />
+			return <Redirect to='/Home/UserDashboard/' />
 		}
 		return (
 			<div id='login-wrap'>

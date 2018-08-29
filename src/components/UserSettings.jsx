@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
-import DashboardHeader from './DashboardHeader';
 import { auth, weights } from "../actions";
 import '../css/UserDashboard.css';
 
@@ -26,17 +24,9 @@ class UserSettings extends Component {
 		this.props.updateUserSettings(key, value);
 	}
     render(){
-		if (!this.props.auth.isAuthenticated){
-			return <Redirect to="/Login" />
-		}
-		if (!this.props.auth.userConfirmed){
-			return <Redirect to="/CompleteRegistration" />
-		}
-
         let user = this.props.auth.user;
         return (
 			<div id='dashboard-wrap'>
-                <DashboardHeader />
                 <div id='settings-area'>
                     <h4 id='settings-title'>Settings</h4>
                     <div className='settings-option'>

@@ -1,54 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { auth, weights } from "../actions";
+import { auth } from "../actions";
 import { Link } from 'react-router-dom';
-import { weightStringFromKg } from './utils';
-import '../css/UserDashboard.css';
+import '../css/DashboardHeader.css';
+
+let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 class DashboardHeader extends Component {
     render(){
 		let user = this.props.auth.user;
-		let weights = Object.keys(this.props.weights).map(key => {
-			return this.props.weights[key]['weight_kg'];
-		});
-
-		let weightLen = weights.length - 1;
-		let initialWeight  = weights[0];
-		let currentWeight = weights[weightLen];
         return (
-            <div id='top-area'>
-                <div id='dashboard-nav-links'>
-                    <div id='logout' onClick={() => this.handleLogout()}>Logout</div>
-                    <Link id='settings-link' to='/UserSettings'>{user.email.substring(0, user.email.indexOf('@'))}</Link>
+            <div id='dashboard-nav-links'>
+                <div className='nav-wrapper'>
+                    <Link to="/Home/UserDashboard" className="navbar-link" id='home-link'>Reductiscope</Link>
                 </div>
-                <div className='top-section'>
-                    <div className='top-label'>You started at</div>
-
-                    <div className='top-entry'>
-                    {
-                        weightStringFromKg(initialWeight, user['weight_units'])
-                    }
-                    </div>
+                <div className='nav-wrapper'>
+                    <Link to="/Home/Plans" className="navbar-link" id='plan-link'>Plan: {"\"" + planTitles[user.payment_option-1] + "\""}</Link>
                 </div>
-                <div className='top-section'>
-                    <div className='center-label top-label'>You're At</div>
-                    <div className='top-entry'>
-                    {
-                        weightStringFromKg(currentWeight, user['weight_units'])
-                    }
-                    </div>
-                    <div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
-                    <div className='top-entry'>
-                    {
-                        weightStringFromKg(initialWeight - currentWeight, user['weight_units'])
-                    }
-                    </div>
+                <div className='nav-wrapper'>
+                    <Link to="/Home/FAQ" className="navbar-link" id='faq-link'>FAQ</Link>
                 </div>
-                <div className='top-section'>
-                    <div className='top-label'>Ideal weight</div>
-                    <div className='top-entry'>
-                    {
-                        weightStringFromKg(user['ideal_weight_kg'], user['weight_units'])
-                    }
+                <div className='nav-wrapper'>
+                    <Link to="/Home/About" className="navbar-link" id='about-link'>About</Link>
+                </div>
+                <div className='nav-wrapper'></div><div className='nav-wrapper'></div>
+                <div className='nav-wrapper'>
+                    <Link to="/Home/UserSettings" className="navbar-link dropdown" id='settings-link'>{user.email.substring(0, user.email.indexOf('@'))}			
+                        <i className='fa fa-angle-down fa-lg'></i>
+                    </Link>
+                    <div className='dropdown-content'>
+                        <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
+                        <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
                     </div>
                 </div>
             </div>
@@ -58,8 +39,7 @@ class DashboardHeader extends Component {
 
 const mapStateToProps = state => {
 	return {
-		auth: state.auth,
-		weights: state.weights
+		auth: state.auth
 	}
 }
 
@@ -67,9 +47,6 @@ const mapDispatchToProps = dispatch => {
 	return {
 		logout: () => {
 			return dispatch(auth.logout())
-		},
-		fetchWeights: () => {
-			return dispatch(weights.fetchWeights())
 		}
 	}
 }
