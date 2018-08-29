@@ -6,6 +6,9 @@ import '../css/DashboardHeader.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 class DashboardHeader extends Component {
+	handleLogout(){
+		this.props.logout();
+	}
     render(){
 		let user = this.props.auth.user;
         return (

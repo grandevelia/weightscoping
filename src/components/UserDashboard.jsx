@@ -51,9 +51,6 @@ class UserDashboard extends Component {
 		}
 		return numString;
 	}
-	handleLogout(){
-		this.props.logout();
-	}
 	updateValue(e){
 		this.setState({monetary_value:e.target.value});
 	}
@@ -205,9 +202,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		logout: () => {
-			return dispatch(auth.logout())
-		},
 		fetchWeights: () => {
 			return dispatch(weights.fetchWeights())
 		},
