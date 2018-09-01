@@ -1,0 +1,17 @@
+#selected-plan{
+    border: 2px solid rgba(37, 172, 198, 0.9);
+    box-shadow: none;
+}
+.payment-option{
+    box-shadow: 0px 1px 2px 2px rgba(0,0,0,0.3);
+    align-items: center;
+    padding: 2.5%;
+}
+.payment-option > *{
+    margin: 1.25% 0;
+}
+.option-select{
+    width: 30%;
+    max-width: 10rem;
+    
+}

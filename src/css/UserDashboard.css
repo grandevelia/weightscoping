@@ -44,6 +44,18 @@ body {
 	text-align: left;
 	border: 1px solid rgb(57, 192, 228);
 }
+.dashboard-stage .stage-title{
+	line-height: 1.5em;
+}
+.dashboard-stage .stage-description{
+	flex-direction: column;
+}
+.dashboard-stage .section{
+	margin: 2.5% 0;
+}
+.dashboard-stage .section-header{
+	text-align: left;
+}
 .you-may-have{
 	margin: 2.5% 0;
 }

@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import '../css/FourthPage.css';
 
-import { poundsToKg, idealWeightString, weightStringFromKg } from './utils';
-
-let carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
+import { poundsToKg, idealWeightString, weightStringFromKg, allowedCarbs, disallowedCarbs } from './utils';
 export default class FourthPage extends Component {
 	state={
 		primary: "",
@@ -34,13 +32,14 @@ export default class FourthPage extends Component {
 		return this.state.primary;
 	}
 	render(){
+		/*
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
 			return <Redirect to="/SecondPage" />
 		} else if (this.props.heightInches === null){
 			return <Redirect to="/ThirdPage" />
-		}
+		}*/
 		let toLoseKg = this.props.weightKg - this.props.idealWeightKg;
 		let incrementKg = toLoseKg/7;
 		let carbRanks = [0,7,1,6,2,5,3,4];//this.props.carbRanks;
@@ -75,44 +74,117 @@ export default class FourthPage extends Component {
 			        	<div id='incentive-layers'>
 			        		<div id='incentive-layers'>
 								<div className='stage'>
-									<div className='stage-title'>Stage 1: Target Weight: {weightStringFromKg(this.props.weightKg-2*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: Anything other than any incentive food. Eat as much as you want, but if you do you’ll never eat any incentive foods again.</div>
+									<div className='stage-title'>Stage 1</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-2*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												Anything other than any incentive food. Eat as much as you want, but if you do you’ll never eat any incentive foods again.
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(0, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 2: Target Weight: {weightStringFromKg(this.props.weightKg-3*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-title'>Stage 2</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-3*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												{ allowedCarbs(1, carbRanks) }
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(1, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 3: Target Weight: {weightStringFromKg(this.props.weightKg-4*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[0]] + " and " + carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-title'>Stage 3</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-4*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												{ allowedCarbs(2, carbRanks) }
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(2, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 4: Target Weight: {weightStringFromKg(this.props.weightKg-5*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[4]] + ", "+ carbOptions[carbRanks[0]] + ", and "+ carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-title'>Stage 4</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-5*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												{ allowedCarbs(3, carbRanks) }
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(3, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 5: Target Weight: {weightStringFromKg(this.props.weightKg-6*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[1]] + ", "+ carbOptions[carbRanks[4]] + ", "+ carbOptions[carbRanks[0]] + ", and "+ carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-title'>Stage 5</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-6*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												{ allowedCarbs(4, carbRanks) }
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(4, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 6: Target Weight: {weightStringFromKg(this.props.weightKg-7*incrementKg, this.props.weightUnits)}</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[6]] + ", "+ carbOptions[carbRanks[1]] + ", "+ carbOptions[carbRanks[4]] + ", "+ carbOptions[carbRanks[0]] + ", and "+ carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-title'>Stage 6</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-7*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>
+												{ allowedCarbs(5, carbRanks) }
+											</div>
+										</div>
+										<div className='section'>
+											<div className='section-header'>You may not have</div>
+											<div className='section-description'>
+												{ disallowedCarbs(5, carbRanks) }
+											</div>
+										</div>
+									</div>
 								</div>
 								<div className='stage'>
 									<div className='stage-title'>Stage 7: Target Weight Achieved. Incentives Change.</div>
-									<div className='stage-description'>You may have: {
-										carbOptions[carbRanks[4]] + ", " + carbOptions[carbRanks[7]] + ", " + carbOptions[carbRanks[7]] + ", " + carbOptions[carbRanks[2]] + ", " + carbOptions[carbRanks[6]] + ", "+ carbOptions[carbRanks[1]] + ", "+ carbOptions[carbRanks[4]] + ", "+ carbOptions[carbRanks[0]] + ", and "+ carbOptions[carbRanks[5]]
-									}</div>
+									<div className='stage-description'>
+										<div className='section'>
+											<div className='section-header'>You may have</div>
+											<div className='section-description'>
+												Whatever you want
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 			        	</div>

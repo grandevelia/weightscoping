@@ -32,3 +32,34 @@
 #intro-wrap input.alcohol-selected+label{
 	box-shadow: 0px 0px 2px 2px rgb(87,187,240);
 }
+.login-or-register-option{
+	box-shadow: 0px 1px 1px rgba(0,0,0,0.3);
+	font-size: 1em;
+	padding: 2.5% 5%;
+	color: white;
+	border: none;
+	margin: 0 2.5%;
+}
+#login-or-register{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 40%;
+	margin: auto;
+}
+.login-or-register-option:hover{
+	cursor: pointer;
+}
+#first-page-register{
+	background-color: rgb(57, 192, 228);
+}
+#first-page-login{
+	background-color: rgb(57, 228, 192);
+}
+#first-page-register:hover{
+	background-color: rgb(27, 152, 202);
+}
+#first-page-login:hover{
+	background-color: rgb(27, 202, 195);
+}

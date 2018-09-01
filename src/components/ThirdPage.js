@@ -15,6 +15,10 @@ export default class ThirdPage extends Component {
 		})
 	}
 	enterHeight(e, unit){
+		if (e.target.value < 0){
+			alert("Height must be positive");
+			return;
+		}
 		if (unit === "PRIMARY"){
 			this.setState({
 				primary: e.target.value
@@ -31,11 +35,12 @@ export default class ThirdPage extends Component {
 		})
 	}
 	render(){
+		/*
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
 			return <Redirect to="/SecondPage" />
-		}
+		}*/
 		let femaleChecked = "";
 		let maleChecked = "checked";
 		let otherChecked = "";
@@ -90,11 +95,11 @@ export default class ThirdPage extends Component {
 			            <span id='height-title'>Height:</span>
 			            {this.props.heightUnits === "Feet / Inches"?
 				            <span id='height-buttons'>
-					            <input type='number' onChange={(e) => this.enterHeight(e, "PRIMARY")} placeholder='Feet'/>
-					            <input type='number' onChange={(e) => this.enterHeight(e, "SECONDARY")} placeholder='Inches'/>
+					            <input type='number' value={this.state.primary} onChange={(e) => this.enterHeight(e, "PRIMARY")} placeholder='Feet'/>
+					            <input type='number' value={this.state.secondary} onChange={(e) => this.enterHeight(e, "SECONDARY")} placeholder='Inches'/>
 				            </span> :
 				            <span id='height-buttons'>
-					            <input type='number' id='metric' onChange={(e) => this.enterHeight(e, "PRIMARY")} placeholder='Centimeters'/>
+					            <input type='number' id='metric' value={this.state.primary} onChange={(e) => this.enterHeight(e, "PRIMARY")} placeholder='Centimeters'/>
 				            </span> 
 				        }	
 			        </p>

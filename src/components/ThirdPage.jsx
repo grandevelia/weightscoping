@@ -37,7 +37,6 @@ export default class ThirdPage extends Component {
 		this.setState({idealWeight: averageAlgs((parseInt(heightInches,10) * 12 + parseInt(heightInches,10)), this.state.sex)});
 	}
 	render(){
-		console.log(this.props.sex)
 		let sexChecked = "checked";
 		let femaleChecked = "";
 		let maleChecked = "";
@@ -94,7 +93,7 @@ export default class ThirdPage extends Component {
 			            {this.state.heightUnits === "Feet / Inches"?
 				            <span id='height-buttons'>
 					            <input type='number' onChange={(e) => this.enterHeight(e, "FEET")} placeholder='Feet'/>
-					            <input type='number' onChange={(e) => this.enterHeight(e, "INCHES")} placeholder='Inches'/>
+					            <input type='number' onChange={(e) => this.enterHeight(e, "INCHES")} placeholder='Inches' min='0'/>
 				            </span> :
 				            <span id='height-buttons'>
 					            <input type='number' id='metric' onChange={(e) => this.enterHeight(e, "CM")} placeholder='Centimeters'/>

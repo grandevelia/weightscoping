@@ -1,3 +1,5 @@
+const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
+const carbOrder = [5,0,4,1,6,2,3,7,8];
 export function calcRobinson(heightInches, sex){
 	let baseHeight;
 	let baseWeight;
@@ -106,4 +108,30 @@ export function	calcHeightInches(units, primary, secondary){
 	} else{
 		return  parseInt(primary,10)/2.54;
 	}
+}
+export const disallowedCarbs = (start, carbRanks) => {
+	let disallowed = "";
+	for (let i = start; i < carbRanks.length; i ++){
+		if (i !== carbRanks.length - 1){
+			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
+		} else if (start !== carbRanks.length - 1) {
+			disallowed += " or " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
+		} else {
+			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ];
+		}
+	}
+	return disallowed;
+}
+export const allowedCarbs = (end, carbRanks) => {
+	let allowed = "";
+	for (let i = end-1; i >= 0; i --){
+		if (i !== 0){
+			allowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
+		} else if (end !== 1) {
+			allowed += " and " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
+		} else {
+			allowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ];
+		}
+	}
+	return allowed;
 }

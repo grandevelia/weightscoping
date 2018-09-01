@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { auth, weights } from "../actions";
+import { weights } from "../actions";
 import { weightStringFromKg, poundsToKg } from './utils';
 import IncentiveLayer from './IncentiveLayer';
 import PaypalButton from './PaypalButton';

@@ -3,11 +3,11 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 BASE = getattr(settings, "BASE_DIR", None)
+EMAIL_BASE = getattr(settings, "EMAIL_BASE", None)
 
 def send_email(data):
     link = data['activation_key']
-    #c = {'key':link, 'basename':'https://weightscoping.herokuapp.com'}
-    c = {'key':link, 'basename':'localhost:8000'}
+    c = {'key':link, 'basename':EMAIL_BASE}
     c = merge_two_dicts(c, data)
 
     subject = data['email_subject']
