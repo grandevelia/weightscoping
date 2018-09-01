@@ -28,7 +28,7 @@ EMAIL_HOST_PASSWORD = '7hcnsylt8202'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-ALLOWED_HOSTS = ['weightscoping.herokuapp.com', '127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'reductiscope.com', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition
