@@ -192,7 +192,7 @@ export const updateUserSettings = (key, value) => {
 		.then(res => {
 			if (res.status === 200){
 				dispatch({type: 'SETTING_CHANGE', user:res.data});
-				alert("Settings Saved");
+				alert("Your settings have been updated.");
 				return res.data;
 			} else if (res.status >= 400 && res.status < 500){
 				dispatch({type:'AUTHENTICATION_ERROR', data:res.data});

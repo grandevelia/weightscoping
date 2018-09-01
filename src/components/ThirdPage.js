@@ -35,12 +35,12 @@ export default class ThirdPage extends Component {
 		})
 	}
 	render(){
-		/*
+		
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
 			return <Redirect to="/SecondPage" />
-		}*/
+		}
 		let femaleChecked = "";
 		let maleChecked = "checked";
 		let otherChecked = "";

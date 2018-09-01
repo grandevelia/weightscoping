@@ -24,7 +24,7 @@ class FifthPage extends Component {
 		}
 	}
 	render(){
-		/*if (this.props.alcohol === null){
+		if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
 			return <Redirect to="/SecondPage" />
@@ -32,7 +32,7 @@ class FifthPage extends Component {
 			return <Redirect to="/ThirdPage" />
 		} else if (this.props.weightKg === null){
 			return <Redirect to="/FourthPage/" />;
-		}*/
+		}
 		return(
 			<div id='fifth-page'>
 				<div>

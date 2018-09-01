@@ -32,17 +32,17 @@ export default class FourthPage extends Component {
 		return this.state.primary;
 	}
 	render(){
-		/*
+		
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
 		} else if (this.props.carbRanks.indexOf(null) >= 0){
 			return <Redirect to="/SecondPage" />
 		} else if (this.props.heightInches === null){
 			return <Redirect to="/ThirdPage" />
-		}*/
+		}
 		let toLoseKg = this.props.weightKg - this.props.idealWeightKg;
 		let incrementKg = toLoseKg/7;
-		let carbRanks = [0,7,1,6,2,5,3,4];//this.props.carbRanks;
+		let carbRanks =  this.props.carbRanks;
 		return (
 			<div id='fourth-wrap'>
 				<p className='page-title'>
