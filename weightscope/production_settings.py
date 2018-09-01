@@ -24,7 +24,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'app105410228@heroku.com'
-EMAIL_HOST_PASSWORD = 'uj4uvxrj9262'
+EMAIL_HOST_PASSWORD = '7hcnsylt8202'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
