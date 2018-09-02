@@ -4,6 +4,7 @@ import { weights } from "../actions";
 import { weightStringFromKg, poundsToKg } from './utils';
 import IncentiveLayer from './IncentiveLayer';
 import PaypalButton from './PaypalButton';
+import ProgressSummary from './ProgressSummary';
 import '../css/UserDashboard.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
@@ -61,7 +62,7 @@ class UserDashboard extends Component {
 		});
 
 		let weightLen = weights.length - 1;
-		let initialWeight  = weights[0];
+		let initialWeight  = weights[user.starting_weight];
 		let currentWeight = weights[weightLen];
 
 		let maxWeight = Math.max(...weights);
@@ -81,41 +82,7 @@ class UserDashboard extends Component {
 
 		return (
 			<div id='dashboard-wrap'>
-				<div id='top-area'>
-					<div id='top-content'>
-						<div className='top-section'>
-							<div className='top-label'>You started at</div>
-
-							<div className='top-entry'>
-							{
-								weightStringFromKg(initialWeight, user['weight_units'])
-							}
-							</div>
-						</div>
-						<div className='top-section'>
-							<div className='center-label top-label'>You're At</div>
-							<div className='top-entry'>
-							{
-								weightStringFromKg(currentWeight, user['weight_units'])
-							}
-							</div>
-							<div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
-							<div className='top-entry'>
-							{
-								weightStringFromKg(initialWeight - currentWeight, user['weight_units'])
-							}
-							</div>
-						</div>
-						<div className='top-section'>
-							<div className='top-label'>Ideal weight</div>
-							<div className='top-entry'>
-							{
-								weightStringFromKg(user['ideal_weight_kg'], user['weight_units'])
-							}
-							</div>
-						</div>
-					</div>
-				</div>
+				<ProgressSummary />
 				{user.amount_paid/100 < totalOwed ? 
 					<div id='payment-info-area'>
 						<div className='payment-option'>

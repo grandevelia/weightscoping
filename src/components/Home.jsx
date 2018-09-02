@@ -45,7 +45,9 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => {
-	return {}
+	return {
+
+	}
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Home));

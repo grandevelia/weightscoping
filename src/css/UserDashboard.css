@@ -10,8 +10,6 @@ body {
 	min-height: 85vh;
 	height: 100%;
 	display: flex;
-	justify-content: center;
-	align-items: center;
 }
 #dashboard-wrap{
 	position: relative;
@@ -147,12 +145,21 @@ body {
 	flex: 1;
 	font-size: 0.6em;
 }
+#settings-outer{
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
 #settings-area{
 	width: 80%;
 	border: 1px solid rgb(57, 192, 228);
 	padding: 1.25%;
-	align-self: flex-start;
 	margin-top: 2.5%;
+	margin-right: 2.5%;
+	align-self: flex-end;
+	display: flex;
+	flex-direction: column;
 }
 #settings-title{
 	margin-top: 1.25%;
@@ -160,7 +167,7 @@ body {
 .settings-option{
 	display: flex;
 	justify-content: space-between;
-	margin: 2.5% 0;
+	margin: 1.25% 0;
 }
 .settings-option-title{
 	white-space: nowrap;
@@ -180,6 +187,20 @@ body {
 	outline: none;
 }
 .settings-option button:hover{
+	background-color: rgb(27, 152, 188);
+	cursor: pointer;
+}
+#level-reset-button{
+	width: 50%;
+	padding: 2%;
+	margin-top: 2.5%;
+	font-size: 0.9em;
+	align-self: flex-end;
+	color: rgb(245,245,245);
+	background-color: rgb(57, 192, 228);
+	outline: none;
+}
+#level-reset-button:hover{
 	background-color: rgb(27, 152, 188);
 	cursor: pointer;
 }

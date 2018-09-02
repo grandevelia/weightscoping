@@ -16,6 +16,7 @@ class Login extends Component {
 	}
 	render(){
 		if (this.props.auth.isAuthenticated){
+			//return <Redirect to='/Home/UserSettings/' />
 			return <Redirect to='/Home/UserDashboard/' />
 		}
 		return (

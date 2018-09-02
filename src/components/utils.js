@@ -1,5 +1,6 @@
-const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
-const carbOrder = [5,0,4,1,6,2,3,7,8];
+export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
+export const carbOrder = [5,0,4,1,6,2,3,7,8];
+export const planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 export function calcRobinson(heightInches, sex){
 	let baseHeight;
 	let baseWeight;
