@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Profile(AbstractUser):
 	username=None
@@ -60,6 +61,7 @@ class Profile(AbstractUser):
 		choices=PAYMENT_CHOICES,
 		default='3'
 	)
+	starting_weight = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 	REQUIRED_FIELDS=[]
 
 	def get_username(self):

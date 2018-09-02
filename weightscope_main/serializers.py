@@ -129,6 +129,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'monetary_value',
 			'sex',
 			'payment_option',
+			'starting_weight',
 		)
 class ResetPasswordSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -166,6 +167,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 			'monetary_value',
 			'sex',
 			'payment_option',
+			'starting_weight',
 		)
 
 	def validate(self, request):
@@ -179,6 +181,11 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 			if (key == 'amount_paid'):
 				already_paid = profile.amount_paid
 				value = value + already_paid
+			elif (key == 'starting_weight'):
+				weight_count = WeightInput.objects.filter(user=request.user).count()
+				print(weight_count)
+				if (value < 0 or value >= weight_count):
+					raise Serializers.ValidationError("Weight Index out of range")
 
 			setattr(profile, key, value)
 
