@@ -249,11 +249,16 @@ class UserDashboard extends Component {
 									</div>
 									<div id='graph-title'>Progress</div>
 									<div id='graph-top-right'>
-										<div className='toggle-section'>
-											<div className='toggle-section-header'>Graph View:</div>
-											<div className={this.state.wholeGraph ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(true)}>History</div>
-											<div className={this.state.wholeGraph ? 'toggle-option' : 'toggle-option active'} onClick={() => this.changeDisplay(false)}>Current</div>
-										</div>
+
+										{user.starting_weight !== 0 ?
+											<div className='toggle-section'>
+												<div className='toggle-section-header'>Graph View:</div>
+												<div className={this.state.wholeGraph ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(true)}>History</div>
+													<div className={this.state.wholeGraph ? 'toggle-option' : 'toggle-option active'} onClick={() => this.changeDisplay	(false)}>Current</div>
+											</div>
+
+											: null
+										}
 										<div className='toggle-section'>
 											<div className='toggle-section-header'>Zero Weight:</div>
 											<div className={this.state.zeroIdeal ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeZero(true)}>Ideal</div>
