@@ -25,6 +25,17 @@ class ProgressSummary extends Component {
             <div id='top-area'>
                 <div id='top-content'>
                     <div className='top-section'>
+                        <div className='top-label'>Current Stage:</div>
+                        <div className='top-entry'>
+                        {
+                            currentWeight < user['ideal_weight_kg'] + initialWeight/7 ?
+                                "Maintenance"
+                            :
+                                "Weight Loss"
+                        }
+                        </div>
+                    </div>
+                    <div className='top-section'>
                         <div className='top-label'>You started at</div>
 
                         <div className='top-entry'>

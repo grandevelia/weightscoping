@@ -74,7 +74,7 @@ export default class FourthPage extends Component {
 			        	<div id='incentive-layers'>
 			        		<div id='incentive-layers'>
 								<div className='stage'>
-									<div className='stage-title'>Stage 1</div>
+									<div className='stage-title'>Level 1</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-2*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -91,7 +91,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 2</div>
+									<div className='stage-title'>Level 2</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-3*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -108,7 +108,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 3</div>
+									<div className='stage-title'>Level 3</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-4*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -125,7 +125,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 4</div>
+									<div className='stage-title'>Level 4</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-5*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -142,7 +142,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 5</div>
+									<div className='stage-title'>Level 5</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-6*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -159,7 +159,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 6</div>
+									<div className='stage-title'>Level 6</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>If you are over {weightStringFromKg(this.props.weightKg-7*incrementKg, this.props.weightUnits)}, you may have</div>
@@ -176,7 +176,7 @@ export default class FourthPage extends Component {
 									</div>
 								</div>
 								<div className='stage'>
-									<div className='stage-title'>Stage 7: Target Weight Achieved. Incentives Change.</div>
+									<div className='stage-title'>Level 7: Target Weight Achieved. Incentives Change.</div>
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>You may have</div>

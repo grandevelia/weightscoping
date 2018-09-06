@@ -1,14 +1,14 @@
 #third-wrap{
 	text-align: center;
 }
-form{
+#third-wrap form{
 	width: 60%;
 	margin: auto;
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
 }
-form p{
+#third-wrap form p{
 	display: flex;
 	justify-content: space-between;
 	margin: 1.25% 0;

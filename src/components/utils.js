@@ -1,4 +1,5 @@
 export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
+export const iconIndex = ["breads","pasta","potatoes","dessert","soft-drinks","snack-carbs","cereals","hard-alcohol","soft-alcohol"];
 export const carbOrder = [5,0,4,1,6,2,3,7,8];
 export const planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 export function calcRobinson(heightInches, sex){
@@ -124,14 +125,15 @@ export const disallowedCarbs = (start, carbRanks) => {
 	return disallowed;
 }
 export const allowedCarbs = (end, carbRanks) => {
-	let allowed = "";
+	let allowed = "All non-incentive food";
+	if (end !== 0){
+		allowed += ", ";
+	}
 	for (let i = end-1; i >= 0; i --){
 		if (i !== 0){
 			allowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
-		} else if (end !== 1) {
-			allowed += " and " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
 		} else {
-			allowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ];
+			allowed += " and " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
 		}
 	}
 	return allowed;
