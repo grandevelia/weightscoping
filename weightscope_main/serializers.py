@@ -216,12 +216,12 @@ class WeightSerializer(serializers.ModelSerializer):
 			'id',
 		)
 
-		'''validators = [
+		validators = [
 			UniqueTogetherValidator(
 				queryset=WeightInput.objects.all(),
 				fields=('date_added', 'user')
 			)
-		]'''
+		]
 	
 	def validate_date_added(self, input_day):
 		today = date.today()
