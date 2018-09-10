@@ -1,9 +1,11 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import authenticate
 from .models import Profile, WeightInput
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from datetime import date
 
 class CreateUserSerializer(serializers.ModelSerializer):
 
@@ -183,9 +185,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 				value = value + already_paid
 			elif (key == 'starting_weight'):
 				weight_count = WeightInput.objects.filter(user=request.user).count()
-				print(weight_count)
 				if (value < 0 or value >= weight_count):
-					raise Serializers.ValidationError("Weight Index out of range")
+					raise serializers.ValidationError("Weight Index out of range")
 
 			setattr(profile, key, value)
 
@@ -204,15 +205,28 @@ class LoginUserSerializer(serializers.Serializer):
 		if user:
 			return user
 		raise serializers.ValidationError("Unable to log in with provided credentials")
-
-
+		
 class WeightSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = WeightInput
 		fields = (
 			'weight_kg',
 			'date_added',
+			'user',
+			'id',
 		)
 
+		validators = [
+			UniqueTogetherValidator(
+				queryset=WeightInput.objects.all(),
+				fields=('date_added', 'user')
+			)
+		]
+	
+	def validate_date_added(self, input_day):
+		today = date.today()
+		if input_day > today:
+			raise serializers.ValidationError("Date can't be in the future")
+		return input_day
 
 

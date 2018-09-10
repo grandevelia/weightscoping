@@ -5,7 +5,10 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from datetime import datetime, date
+from django.utils import timezone
 
 class Profile(AbstractUser):
 	username=None
@@ -67,9 +70,12 @@ class Profile(AbstractUser):
 	def get_username(self):
 		return self.email
 
+def ensure_past(input_day):
+	today = date.today()
+	if input_day > today:
+		raise ValidationError("Date can't be in the future")
+
 class WeightInput(models.Model):
 	weight_kg = models.FloatField()
-	date_added = models.DateTimeField(auto_now_add=True, )
+	date_added = models.DateField(validators=[ensure_past])
 	user = models.ForeignKey(Profile, related_name='weights', on_delete=models.CASCADE)
-
-

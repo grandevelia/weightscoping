@@ -25,7 +25,7 @@ class ProgressSummary extends Component {
             <div id='top-area'>
                 <div id='top-content'>
                     <div className='top-section'>
-                        <div className='top-label'>Current Stage:</div>
+                        <div className='top-label'>Mode:</div>
                         <div className='top-entry'>
                         {
                             currentWeight < user['ideal_weight_kg'] + initialWeight/7 ?
@@ -54,7 +54,8 @@ class ProgressSummary extends Component {
                         <div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
                         <div className='top-entry'>
                         {
-                            weightStringFromKg(initialWeight - currentWeight, user['weight_units'])
+                            initialWeight - currentWeight >= 0 ? weightStringFromKg(initialWeight - currentWeight, user['weight_units']) :
+                            weightStringFromKg(currentWeight - initialWeight, user['weight_units'])
                         }
                         </div>
                     </div>

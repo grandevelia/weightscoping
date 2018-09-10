@@ -5,6 +5,11 @@ import { weightStringFromKg, poundsToKg, iconIndex, carbOrder, carbOptions } fro
 import IncentiveLayer from './IncentiveLayer';
 import PaypalButton from './PaypalButton';
 import ProgressSummary from './ProgressSummary';
+
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+ 
+import 'react-datepicker/dist/react-datepicker.css';
 import '../css/UserDashboard.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
@@ -15,10 +20,11 @@ class UserDashboard extends Component {
 		super(props);
 		props.fetchWeights();
 		this.state = {
+			weightDate: null,
 			newWeightPrimary: null,
 			newWeightSecondary: null,
 			wholeGraph: true,
-			zeroIdeal: true 
+			zeroIdeal: true
 		}
 	}
 	changeDisplay(status){
@@ -29,7 +35,23 @@ class UserDashboard extends Component {
 	}
 	addWeight(e){
 		e.preventDefault();
-		this.props.addWeight(this.convertWeight());
+		if (this.state.weightDate){
+			let dateString = moment(this.state.weightDate.utc()._d).format("YYYY-MM-DD");
+			for (let i = 0; i < this.props.weights.length; i ++){
+				if (this.props.weights[i].date_added === dateString){
+					let conf = window.confirm("You've already added a weight for " + dateString + ". Update this weight?");
+					if (conf){
+						this.props.updateWeight(this.convertWeight(), this.props.weights[i].id);
+					}
+					this.setState({weightDate: null, newWeightPrimary: null, newWeightSeconday: null});
+					return;
+				}
+			}
+			this.props.addWeight(this.convertWeight(), dateString);
+			this.setState({weightDate: null, newWeightPrimary: null, newWeightSeconday: null});
+		} else {
+			alert("You have to choose the date you weighed this much!");
+		}
 	}
 	handleWeightChange(e, unit){
 		if (unit === "PRIMARY"){
@@ -115,20 +137,29 @@ class UserDashboard extends Component {
 			</div>
 		);
 	}
+	chooseWeightDate = (date) => {
+		this.setState({weightDate: date});
+	}
 	render(){
 		let numLevels = 8;
 		let numSections = numLevels + 1; 
 		let levelMap = Array( numLevels ).fill().map((x,i) => i);
 
 		let user = this.props.auth.user;
-		let weights = this.props.weights;
+		let weights = []
+		let dates = [];
+		let ids = [];
 
-		weights = Object.keys(weights).map(key => {
-			return this.props.weights[key]['weight_kg'];
+		Object.keys(this.props.weights).map(key => {
+			dates.push(this.props.weights[key]['date_added']);
+			weights.push(this.props.weights[key]['weight_kg']);
+			ids.push(this.props.weights[key]['id']);
+			
 		});
-
 		if (!this.state.wholeGraph){
 			weights.splice(0, user.starting_weight);
+			dates.splice(0, user.starting_weight);
+			ids.splice(0, user.starting_weight);
 		}
 
 		let weightLen = weights.length - 1;
@@ -159,7 +190,7 @@ class UserDashboard extends Component {
 		*	In terms of percentage of graph height, each section is (initial - min) / (numSections * range)
 		*/
 		let sectionHeight = (initialWeight - minWeight)/(numSections * weightRange);
-
+	
 		//	Divide by numLevels here since there are numSections - 1 = numLevels increments between the sections
 		let kgPerSection = (initialWeight - user.ideal_weight_kg)/numLevels;
 
@@ -225,21 +256,40 @@ class UserDashboard extends Component {
 							<form id='submit-weight' onSubmit={(e) => this.addWeight(e)}>
 								<div id='submit-weight-title'>Enter A Weight:</div>
 								<div id='submit-weight-input-area'>
-									{user.weight_units === "Stones" ?
-										<span id='weight-buttons'>
-											<input type='number' onChange={(e) => this.handleWeightChange(e, "PRIMARY")} placeholder='Stones'/>
-											<input type='number' onChange={(e) => this.handleWeightChange(e, "SECONDARY")} placeholder='Pounds'/>
-										</span> : <input step="0.01" onChange={(e) => this.handleWeightChange(e, "PRIMARY")} type='number' />
+									<div className='weight-input-title'>Select Date</div>
+									<DatePicker
+										selected={this.state.weightDate}
+										onChange={this.chooseWeightDate}
+									/>
+									{this.state.weightDate ? 
+									<div id='submit-weight-second'>
+										{user.weight_units === "Stones" ?
+											<span id='weight-buttons'>
+												<input type='number' onChange={(e) => this.handleWeightChange(e, "PRIMARY")} placeholder='Stones'/>
+												<input type='number' onChange={(e) => this.handleWeightChange(e, "SECONDARY")} placeholder='Pounds'/>
+											</span> : <input step="0.01" placeholder='Your Weight' onChange={(e) => this.handleWeightChange(e, "PRIMARY")} type='number' />
+										}
+										<button id='weight-change-submit' type='submit'>Submit</button>
+									</div>
+									: null
 									}
-									<button id='weight-change-submit' type='submit'>Submit</button>
 								</div>
 							</form>
 							{	this.props.weights.length < 1 ? <div id='incentives-loading-indicator'>Loading Incentives...</div>
 								:
-								<IncentiveLayer level={level} initialWeightKg={initialWeight} idealWeightKg={user.ideal_weight_kg} carbRanks={user.carb_ranks} alcohol={user.alcohol} weightUnits={user.weight_units} currentWeightKg={currentWeight} />
+								<IncentiveLayer 
+									level={level} 
+									initialWeightKg={initialWeight} 
+									idealWeightKg={user.ideal_weight_kg} 
+									carbRanks={user.carb_ranks} 
+									alcohol={user.alcohol} 
+									weightUnits={user.weight_units} 
+									currentWeightKg={currentWeight} 
+								/>
 							}
 						</div>
 						<div id='dashboard-fourth'>
+							{ weights.length > 0 ? 
 							<div id='graph-area' style={{background:levelBg}}>
 								<div id='graph-top'>
 									<div id='axis-labels'>
@@ -254,7 +304,7 @@ class UserDashboard extends Component {
 											<div className='toggle-section'>
 												<div className='toggle-section-header'>Graph View:</div>
 												<div className={this.state.wholeGraph ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(true)}>History</div>
-													<div className={this.state.wholeGraph ? 'toggle-option' : 'toggle-option active'} onClick={() => this.changeDisplay	(false)}>Current</div>
+												<div className={this.state.wholeGraph ? 'toggle-option' : 'toggle-option active'} onClick={() => this.changeDisplay	(false)}>Current</div>
 											</div>
 
 											: null
@@ -269,7 +319,7 @@ class UserDashboard extends Component {
 									<div id='graph-middle'>
 									<div id='y-labels'>
 
-									{this.state.wholeGraph ? 
+									{this.state.wholeGraph && user.starting_weight !== 0 ? 
 										<div className='y-label graph-section graph-section-0' style={{...styles.firstSection, background: levelBg}}><div className='y-label-weight'>{weightStringFromKg(maxWeight, user['weight_units'])}</div></div>
 										: null
 									}
@@ -286,9 +336,9 @@ class UserDashboard extends Component {
 											if (y <= level){
 												currStyle = {...currStyle, background: levelBg};
 											} else {
-												let currRed = 57 - 5 * (numLevels - y + 1);
-												let currGreen = 192 - 20 * (numLevels - y + 1);
-												let currBlue = 228 - 15 * (numLevels - y + 1);
+												let currRed = 57 - 5 * (numLevels - y - 1);
+												let currGreen = 192 - 20 * (numLevels - y - 1);
+												let currBlue = 228 - 15 * (numLevels - y - 1);
 												let currBackground = "rgb(" + currRed + ", " + currGreen + ", " + currBlue + ")";
 												currStyle = {...currStyle, background: currBackground, borderTop: "1px dashed rgba(0,0,0,0.2)"};
 											}
@@ -322,9 +372,9 @@ class UserDashboard extends Component {
 													if (y <= level){
 														currStyle = {...currStyle, background: levelBg}
 													} else {
-														let currRed = 57 - 5 * (numLevels - y + 1);
-														let currGreen = 192 - 20 * (numLevels - y + 1);
-														let currBlue = 228 - 15 * (numLevels - y + 1);
+														let currRed = 57 - 5 * (numLevels - y - 1);
+														let currGreen = 192 - 20 * (numLevels - y - 1);
+														let currBlue = 228 - 15 * (numLevels - y -1);
 														let currBackground = "rgb(" + currRed + ", " + currGreen + ", " + currBlue + ")";
 														currStyle = {...currStyle, background: currBackground, borderTop: "1px dashed rgba(0,0,0,0.2)"};
 													}
@@ -337,7 +387,16 @@ class UserDashboard extends Component {
 												return (
 													<div className='data-point' key={i} style={{ width: 100/(weightLen + 1) + "%" }}>
 														<div className='weight-point' style={{top: (1+ 99 * ( maxWeight - weight )/weightRange) + "%" }}>
-															<div className='point-hover'>{weightStringFromKg(weight, user.weight_units)}</div>
+															<div className='point-hover'>
+																<div className='point-hover-section'>{weightStringFromKg(weight, user.weight_units)}</div>
+																<div className='point-hover-section'>{dates[i]}</div>
+																<div className='point-hover-section' 
+																	id='point-delete' 
+																	onClick={() => this.props.deleteWeight(ids[i])}
+																>
+																	Delete
+																</div>
+															</div>
 														</div>
 													</div>
 												)
@@ -356,6 +415,8 @@ class UserDashboard extends Component {
 									}
 								</div>
 							</div>
+							: <div id='zero-weights'>You haven't entered any weights yet!</div>
+							}
 						</div>
 					</div>
 				}
@@ -376,8 +437,14 @@ const mapDispatchToProps = dispatch => {
 		fetchWeights: () => {
 			return dispatch(weights.fetchWeights())
 		},
-		addWeight: (weightKg) => {
-			return dispatch(weights.addWeight(weightKg))
+		addWeight: (weightKg, date) => {
+			return dispatch(weights.addWeight(weightKg, date))
+		},
+		updateWeight: (weightKg, id) => {
+			return dispatch(weights.updateWeight(weightKg, id));
+		},
+		deleteWeight: (id) => {
+			return dispatch(weights.deleteWeight(id));
 		}
 	}
 }

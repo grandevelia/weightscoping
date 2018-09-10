@@ -15,4 +15,5 @@ urlpatterns = [
 	url(r'^auth/reset_password/$', ResetPasswordAPI.as_view()),
 	url(r'^auth/confirm_reset/$', ConfirmResetAPI.as_view()),
 	url(r'^auth/update_password/$', UpdatePasswordAPI.as_view()),
+	#url(r'^weights/$', WeightViewSet.as_view({'put': 'update', 'get': 'retrieve', 'patch': 'partial_update', 'delete': 'destroy'})),
 ]

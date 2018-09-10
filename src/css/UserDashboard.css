@@ -54,8 +54,28 @@ body {
 }
 #submit-weight-input-area{
 	display: flex;
+	flex-direction: column;
+}
+#submit-weight-input-area > *{
+	height: 2rem;
+}
+#submit-weight-input-area > div:first-of-type{
+	width: 100%;
+	position: relative;
+}
+.react-datepicker-wrapper, .react-datepicker-wrapper *{
+	height: 2rem;
+	width: 100%;
+}
+.weight-input-title{
+	font-size: 0.8em;
+	height: 1em !important;
+	margin-bottom: 2.5%;
+}
+#submit-weight-second{
+	margin-top: 2.5%;
+	display: flex;
 	flex-direction: row;
-	height: 2.5rem;
 }
 #submit-weight input{
 	display: inline-block;
@@ -205,9 +225,9 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	right: 1rem;
+	padding: 2.5%;
+	right: 50%;
 	width: 5rem;
-	height: 1rem;
 	font-size: 0.65em;
 	visibility: hidden;
 	background-color: black;
@@ -215,6 +235,15 @@ body {
 	color: rgb(77, 248, 212);
 	opacity: 0;
 	transition: ease-in-out 0.125s;
+}
+.point-hover-section{
+	padding: 2.5% 0;
+}
+#point-delete{
+	color: red;
+}
+#point-delete:hover{
+	color: white;
 }
 #y-labels{
 	flex-basis: 30%;
