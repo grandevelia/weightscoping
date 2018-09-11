@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import authenticate
-from .models import Profile, WeightInput
+from .models import Profile, WeightInput, Notification
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -230,3 +230,19 @@ class WeightSerializer(serializers.ModelSerializer):
 		return input_day
 
 
+class NotificationSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Notification
+		fields = (
+			'user',
+			'date',
+			'message',
+			'read',
+			'id',
+		)
+
+	def validate_date(self, input_day):
+		today = date.today()
+		if input_day > today:
+			raise serializers.ValidationError("Date can't be in the future")
+		return input_day
