@@ -2,19 +2,38 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { auth, notifications } from "../actions";
 import { Link } from 'react-router-dom';
+import NotificationLightbox from './NotificationLightbox';
 import '../css/DashboardHeader.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 class DashboardHeader extends Component {
 	constructor(props){
 		super(props);
-		props.fetchNotifications();
+        props.fetchNotifications();
+        this.state = {
+            notificationLightbox : null
+        }
 	}
 	handleLogout(){
 		this.props.logout();
-	}
+    }
+    closeNotification(){
+        this.setState({notificationLightbox:null});
+    }
+    showNotification(target){
+        this.props.updateNotification(target.id);
+        this.setState({notificationLightbox : target});
+    }
     render(){
-		let user = this.props.auth.user;
+        let notifications = this.props.notifications;
+        let user = this.props.auth.user;
+        let unreadCount = 0;
+        notifications.map(i => {
+            if (!i.read){
+                unreadCount ++;
+            }
+            return null;
+        });
         return (
             <div id='dashboard-nav-links'>
                 <div className='nav-wrapper'>
@@ -39,9 +58,39 @@ class DashboardHeader extends Component {
                         <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
                     </div>
                     <div id='navbar-notification-notice'>
-                        {this.props.notifications.length > 0 ? <div className='notification-num'>{this.props.notifications.length}</div> : null}
+                        {unreadCount > 0 ? <div className='notification-num'>{unreadCount}</div> : null}
+                        <div id='notification-detail-area'>
+                        {
+                            notifications.map((i, index) => {
+                                return (
+                                    <div key={index} className='notification-detail' onClick={() => this.showNotification(i)}>
+                                        <div className='notification-title-area'>
+                                            {!i.read ? 
+                                            <div className='notification-title'>
+                                                <div className='notification-circle'></div>
+                                                New Notification
+                                            </div>
+                                            : null }
+                                            <div className='notification-date'>{i.date}</div>
+                                        </div>
+                                        <div className='notification-body'>
+                                            {i.message.length > 40 ? i.message.substring(0, 40) + "..." : i.message}
+                                        </div>
+                                        <div className='notification-see-more'>
+                                            View
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                        </div>
                     </div>
                 </div>
+                {
+                    this.state.notificationLightbox !== null ?
+                        <NotificationLightbox closeNotification={() => this.closeNotification()} content={this.state.notificationLightbox} />
+                    : null
+                }
             </div>
         )
     }
@@ -63,7 +112,7 @@ const mapDispatchToProps = dispatch => {
 			return dispatch(notifications.fetchNotifications());
 		},
 		updateNotification: id => {
-			return dispatch(notifications.updateNotification(id));
+			return dispatch(notifications.updateNotificationStatus(id));
 		}
 	}
 }

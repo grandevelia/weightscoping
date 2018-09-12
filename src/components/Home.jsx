@@ -12,7 +12,6 @@ import Plans from './Plans';
 import Contact from './Contact';
 import TermsOfUse from './TermsOfUse';
 import Privacy from './Privacy';
-import { notifications } from "../actions";
 
 class Home extends Component {
 	updateIntroState(update){

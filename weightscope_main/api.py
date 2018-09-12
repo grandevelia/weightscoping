@@ -185,6 +185,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 	def partial_update(self, request, pk):
 		notification = Notification.objects.get(id=pk)
-		notification.read = False
+		notification.read = True
 		notification.save()
 		return Response(request.data, status=status.HTTP_200_OK)

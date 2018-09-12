@@ -1,0 +1,33 @@
+.lightbox-background{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.lightbox-main{
+    width: 75%;
+    position: relative;
+    background: white;
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5%;
+    margin-top: 5%;
+}
+.lightbox-body{
+    margin: 0 !important;
+    line-height: 1.5em;
+}
+#close-lightbox{
+    margin-top: 2.5%;
+    font-weight: 500;
+    align-self: flex-end;
+}
+#close-lightbox:hover{
+    font-weight: bold;
+    cursor: pointer
+}

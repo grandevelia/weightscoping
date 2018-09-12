@@ -57,7 +57,7 @@ export const addWeight = (weight_kg, date_added) => {
 				let weights = getState().weights;
 				if (moment(date_added).isAfter(moment(weights[weights.length-1].date_added))){
 					if (weight_kg <= user.ideal_weight_kg && weights.length && weights[weights.length - 1].weight_kg > user.ideal_weight_kg){
-						dispatch(addNotification("Congratulations! You've reached your ideal weight. Once you maintain a weight of " + weightStringFromKg(1.02 * user.ideal_weight_kg) + " (within 2% of your ideal weight) for 7 days, you will enter Maintenance Mode. Our focus will switch from helping you lose weight to helping you stay where you're at: the perfect weight for you."));
+						dispatch(addNotification("Congratulations! You've reached your ideal weight. Once you maintain a weight of " + weightStringFromKg(1.02 * user.ideal_weight_kg, user.weight_units) + " (within 2% of your ideal weight) for 7 days, you will enter Maintenance Mode. Our focus will switch from helping you lose weight to helping you stay where you're at: the perfect weight for you."));
 					}
 				}
 				return dispatch({type: 'ADD_WEIGHT', weight: res.data});
