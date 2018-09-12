@@ -20,7 +20,7 @@ export default function weights(state=initialState, action){
 					break;
 				}
 			}
-			weightList.splice(index, 1, action.weight);
+			weightList.splice(index, 0, action.weight);
 			return weightList;
 		}
 

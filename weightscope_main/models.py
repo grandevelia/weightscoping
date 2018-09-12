@@ -79,3 +79,9 @@ class WeightInput(models.Model):
 	weight_kg = models.FloatField()
 	date_added = models.DateField(validators=[ensure_past])
 	user = models.ForeignKey(Profile, related_name='weights', on_delete=models.CASCADE)
+
+class Notification(models.Model):
+	user = models.ForeignKey(Profile, related_name='notifications', on_delete=models.CASCADE)
+	message = models.CharField(max_length=10000)
+	date = models.DateField(validators=[ensure_past])
+	read = models.BooleanField(default=False)

@@ -19,8 +19,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-src/components/PaypalButton.jsx
-weightscope/settings.py
-weightscope/settings.pyc
-weightscope/production_settings.py
-weightscope/production_settings.pyc

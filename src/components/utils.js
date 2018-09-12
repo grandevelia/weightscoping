@@ -113,10 +113,10 @@ export function	calcHeightInches(units, primary, secondary){
 }
 export const disallowedCarbs = (start, carbRanks) => {
 	let disallowed = "";
-	for (let i = start; i < carbRanks.length; i ++){
-		if (i !== carbRanks.length - 1){
+	for (let i = start; i < carbRanks.length-1; i ++){
+		if (i !== carbRanks.length - 2){
 			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
-		} else if (start !== carbRanks.length - 1) {
+		} else if (start !== carbRanks.length - 2) {
 			disallowed += " or " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
 		} else {
 			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ];

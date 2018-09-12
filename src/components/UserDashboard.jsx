@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { weights } from "../actions";
+import { weights, notifications } from "../actions";
 import { weightStringFromKg, poundsToKg, iconIndex, carbOrder, carbOptions } from './utils';
 import IncentiveLayer from './IncentiveLayer';
 import PaypalButton from './PaypalButton';
@@ -19,6 +19,7 @@ class UserDashboard extends Component {
 	constructor(props){
 		super(props);
 		props.fetchWeights();
+
 		this.state = {
 			weightDate: null,
 			newWeightPrimary: null,
@@ -428,7 +429,8 @@ class UserDashboard extends Component {
 const mapStateToProps = state => {
 	return {
 		auth: state.auth,
-		weights: state.weights
+		weights: state.weights,
+		notifications: state.notifications
 	}
 }
 
@@ -445,6 +447,9 @@ const mapDispatchToProps = dispatch => {
 		},
 		deleteWeight: (id) => {
 			return dispatch(weights.deleteWeight(id));
+		},
+		addNotification: message => {
+			return dispatch(notifications.addNotification(message));
 		}
 	}
 }

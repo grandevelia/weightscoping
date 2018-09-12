@@ -1,9 +1,10 @@
 from django.conf.urls import include, url
 from rest_framework import routers
-from .api import RegistrationAPI, ConfirmationAPI, LoginAPI, UserAPI, WeightViewSet, UpdateUserAPI, ResetPasswordAPI, ConfirmResetAPI, UpdatePasswordAPI
+from .api import NotificationViewSet, RegistrationAPI, ConfirmationAPI, LoginAPI, UserAPI, WeightViewSet, UpdateUserAPI, ResetPasswordAPI, ConfirmResetAPI, UpdatePasswordAPI
 
 router = routers.DefaultRouter()
 router.register('weights', WeightViewSet, 'weights')
+router.register('notifications', NotificationViewSet, 'notifications')
 
 urlpatterns = [
 	url(r'^', include(router.urls)),

@@ -8,9 +8,9 @@ from django.contrib.auth import login
 from django.db import models
 from django.conf import settings
 
-from .serializers import UpdatePasswordSerializer, ConfirmResetSerializer, UpdateUserSerializer, WeightSerializer, CreateUserSerializer, ConfirmUserSerializer, UserSerializer, LoginUserSerializer, ResetPasswordSerializer
+from .serializers import NotificationSerializer, UpdatePasswordSerializer, ConfirmResetSerializer, UpdateUserSerializer, WeightSerializer, CreateUserSerializer, ConfirmUserSerializer, UserSerializer, LoginUserSerializer, ResetPasswordSerializer
 from .notification_utils import send_email
-from .models import Profile, WeightInput
+from .models import Profile, WeightInput, Notification
 
 import hashlib, random, datetime, unicodedata
 
@@ -140,7 +140,7 @@ class WeightViewSet(viewsets.ModelViewSet):
 	def create(self, request):
 		data = request.data
 		date = unicodedata.normalize('NFKD', data['date_added']).encode('ascii','ignore')
-
+		
 		data['date_added'] = date
 		data['user'] = request.user.id
 		serializer = self.get_serializer(data=data)
@@ -162,3 +162,29 @@ class WeightViewSet(viewsets.ModelViewSet):
 		weight.save()
 		return Response(request.data, status=status.HTTP_200_OK)
 	
+class NotificationViewSet(viewsets.ModelViewSet):
+	permission_classes = [permissions.IsAuthenticated, ]
+	serializer_class = NotificationSerializer
+
+	def get_queryset(self):
+		return self.request.user.notifications.all().order_by('date')
+
+	def create(self,request):
+		data = request.data
+		date = datetime.date.today()
+		data['user'] = request.user.id
+		data['date'] = date
+		serializer = self.get_serializer(data=data)
+		serializer.is_valid(raise_exception=True)
+		self.perform_create(serializer)
+		headers = self.get_success_headers(serializer.data)
+		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+	def perform_create(self, serializer):
+		serializer.save()
+
+	def partial_update(self, request, pk):
+		notification = Notification.objects.get(id=pk)
+		notification.read = False
+		notification.save()
+		return Response(request.data, status=status.HTTP_200_OK)

@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { auth } from "../actions";
+import { auth, notifications } from "../actions";
 import { Link } from 'react-router-dom';
 import '../css/DashboardHeader.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 class DashboardHeader extends Component {
+	constructor(props){
+		super(props);
+		props.fetchNotifications();
+	}
 	handleLogout(){
 		this.props.logout();
 	}
@@ -34,6 +38,9 @@ class DashboardHeader extends Component {
                         <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
                         <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
                     </div>
+                    <div id='navbar-notification-notice'>
+                        {this.props.notifications.length > 0 ? <div className='notification-num'>{this.props.notifications.length}</div> : null}
+                    </div>
                 </div>
             </div>
         )
@@ -42,7 +49,8 @@ class DashboardHeader extends Component {
 
 const mapStateToProps = state => {
 	return {
-		auth: state.auth
+		auth: state.auth,
+		notifications: state.notifications,
 	}
 }
 
@@ -50,6 +58,12 @@ const mapDispatchToProps = dispatch => {
 	return {
 		logout: () => {
 			return dispatch(auth.logout())
+        },
+		fetchNotifications: () => {
+			return dispatch(notifications.fetchNotifications());
+		},
+		updateNotification: id => {
+			return dispatch(notifications.updateNotification(id));
 		}
 	}
 }

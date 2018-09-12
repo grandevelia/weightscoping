@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { weightStringFromKg } from './utils';
 import { connect } from 'react-redux';
 import { weights } from "../actions";
+import moment from 'moment';
 
 class ProgressSummary extends Component {
     constructor(props){
@@ -14,12 +15,32 @@ class ProgressSummary extends Component {
     }
     render(){
         let user = this.props.auth.user;
-		let weights = Object.keys(this.props.weights).map(key => {
-			return this.props.weights[key]['weight_kg'];
-		});
-		let weightLen = weights.length - 1;
-		let initialWeight  = weights[user.starting_weight];
-        let currentWeight = weights[weightLen];
+        let weights = this.props.weights;
+        let weightLen = weights.length - 1;
+        if (weightLen < 1){
+            return <div>Loading Weight History...</div>
+        }
+		let initialWeight  = weights[user.starting_weight].weight_kg;
+        let currentWeight = weights[weightLen].weight_kg;
+        let closestIdealBreakthrough = -1;
+        if (currentWeight <= 1.02 * user.ideal_weight_kg){
+            //Starting from most recent weight, find the most recent time they attained their ideal weight
+            //For the first time without having been in maintenance mode first
+            
+            for (let i = weightLen; i >= 0; i --){
+                if (weights[i].weight_kg <= 1.02 * user.ideal_weight_kg){
+                    if (weights[i].weight_kg <= user.ideal_weight_kg){
+                        closestIdealBreakthrough = i;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        let daysAtIdeal = 0;
+        if (closestIdealBreakthrough >= 0){
+            daysAtIdeal = moment().diff(moment(weights[closestIdealBreakthrough].date_added), 'days');
+        }
         
         return (
             <div id='top-area'>
@@ -28,7 +49,10 @@ class ProgressSummary extends Component {
                         <div className='top-label'>Mode:</div>
                         <div className='top-entry'>
                         {
-                            currentWeight < user['ideal_weight_kg'] + initialWeight/7 ?
+                            currentWeight < user['ideal_weight_kg'] + (initialWeight-user['ideal_weight_kg'])/7 ?
+                                daysAtIdeal < 7 ?
+                                "Days to Maintenance Mode: " + (7-daysAtIdeal)
+                                : 
                                 "Maintenance"
                             :
                                 "Weight Loss"

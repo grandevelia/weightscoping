@@ -12,6 +12,7 @@ import Plans from './Plans';
 import Contact from './Contact';
 import TermsOfUse from './TermsOfUse';
 import Privacy from './Privacy';
+import { notifications } from "../actions";
 
 class Home extends Component {
 	updateIntroState(update){
@@ -40,13 +41,13 @@ class Home extends Component {
 }
 const mapStateToProps = state => {
 	return {
-		auth: state.auth
+		auth: state.auth,
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-
+		
 	}
 }
 

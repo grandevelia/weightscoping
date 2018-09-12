@@ -28,13 +28,17 @@ export default class IncentiveLayer extends Component {
 					</div>
 					<div className='level-area-header'>Next target weight: </div>
 					<div className='level-area-content'>
-						{weightStringFromKg(this.props.initialWeightKg-(level+2)*(this.props.initialWeightKg - this.props.idealWeightKg)/8, this.props.weightUnits)}
+						{level < 7 ? 
+						weightStringFromKg(this.props.initialWeightKg-(level+2)*(this.props.initialWeightKg - this.props.idealWeightKg)/8, this.props.weightUnits)
+						: "Maintain weight under " + weightStringFromKg(this.props.idealWeightKg, this.props.weightUnits)}
 					</div>
 				</div>
 				<div className='level-area-section'>
 					<div className='level-area-header'>You may have</div>
 					<div className='level-area-content'>
-						{ allowedCarbs(level, carbRanks) }
+						{ level < 7 ? allowedCarbs(level, carbRanks) :
+						"Whatever you want"	
+						}
 					</div>
 				</div>
 				<div className='level-area-section'>
