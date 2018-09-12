@@ -16,18 +16,17 @@ class ProgressSummary extends Component {
     render(){
         let user = this.props.auth.user;
         let weights = this.props.weights;
-        let weightLen = weights.length - 1;
-        if (weightLen < 1){
+        if (weights.length < 1){
             return <div>Loading Weight History...</div>
         }
 		let initialWeight  = weights[user.starting_weight].weight_kg;
-        let currentWeight = weights[weightLen].weight_kg;
+        let currentWeight = weights[weights.length - 1 ].weight_kg;
         let closestIdealBreakthrough = -1;
         if (currentWeight <= 1.02 * user.ideal_weight_kg){
             //Starting from most recent weight, find the most recent time they attained their ideal weight
             //For the first time without having been in maintenance mode first
             
-            for (let i = weightLen; i >= 0; i --){
+            for (let i = weights.length -1 ; i >= 0; i --){
                 if (weights[i].weight_kg <= 1.02 * user.ideal_weight_kg){
                     if (weights[i].weight_kg <= user.ideal_weight_kg){
                         closestIdealBreakthrough = i;
