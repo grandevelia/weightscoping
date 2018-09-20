@@ -133,7 +133,6 @@ body {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	color: white;
 	height: 85vh;
 }
 #graph-top{
@@ -161,7 +160,7 @@ body {
 	font-size: 1.1em;
 }
 #graph-top-right{
-	flex-basis: 25%;
+	flex-basis: 35%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
@@ -176,7 +175,6 @@ body {
 .toggle-option{
 	padding: 0.25em;
 	font-size: 0.6rem;
-	border-radius: 5px;
 	flex: 1;
 	text-align: center;
 	margin: 0 2.5%;
@@ -185,12 +183,31 @@ body {
 	cursor: pointer;
 }
 .toggle-option.active{
-	background: rgb(57, 192, 228);
+	border-bottom: 2px solid white;
+}
+#project-button{
+	background: rgb(0, 70, 92);
+	font-size: 1em;
+	padding: 1.25% 5%;
+	border-radius: 5px;
+}
+#project-button:hover{
+	cursor: pointer;
+	background: rgba(0,0,0,0.3);
+}
+#project-button.active{
+	border-radius: 5px 5px 0px 0px;
 }
 #graph-middle{
-	flex-basis: 85%;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+#graph-middle-top{
 	display: flex;
 	flex-direction: row;
+	flex-basis: 95%;
+	padding-left: 1.25%;
 }
 .data-point{
 	display: inline-block;
@@ -199,12 +216,22 @@ body {
 }
 .weight-point{
 	position: absolute;
-	transform: translateY(-50%);
+	transform: translateY(-50%) translateX(-50%);
+	left: 50%;
 	height: 0.25rem;
 	width: 0.25rem;
 	border-radius: 50%;
 	transition: ease-in-out 0.125s;
 	background: white;
+}
+.interpolated{
+	background: rgb(57, 228, 192);
+	height: 0.5rem;
+	width: 0.5rem;
+}
+.interpolated-text{
+	color: white;
+	margin-bottom: 5%;
 }
 .data-point:hover .weight-point{
 	cursor: pointer;
@@ -212,6 +239,11 @@ body {
 	width: 0.5rem;
 	background-color: rgb(57, 228, 192);
 	transition: ease-in-out 0.125s;
+}
+.data-point:hover .interpolated{
+	background: white;
+	width: 0.25rem;
+	height: 0.25rem;
 }
 .data-point:hover .point-hover{
 	visibility: visible;
@@ -252,7 +284,6 @@ body {
 	display: flex;
 	flex-direction: column;
 	text-align: center;
-	color: white
 }
 .y-label{
 	font-size: 0.6em;
@@ -272,7 +303,6 @@ body {
 	border-radius: 50%;
 	height: 1.5rem;
 	width: 1.5rem;
-	color: white;
 	position: relative;
 	background: rgba(195,195,195,0.5);
 }
@@ -306,6 +336,9 @@ body {
 	align-items: center;
 	justify-content: flex-end;
 }
+.maintenance-icons{
+	transform: translateY(0%) !important;
+}
 .disallowed-icons .icon{
 	border: 1px solid rgb(211, 24, 43);
 }
@@ -327,6 +360,7 @@ body {
 #graph-display{
 	flex: 1;
 	position: relative;
+	flex-direction: row;
 }
 #graph-display-backgrounds{
 	position: absolute;
@@ -431,7 +465,26 @@ body {
 }
 .top-entry{
     color: black;
-    font-size: 0.95em;
+	font-size: 0.95em;
+	position: relative;
+}
+#current-mode:hover #maintenance-mouseover{
+	display: flex;
+	cursor: pointer;
+}
+#maintenance-mouseover{
+	display: none;
+	position: absolute;
+	background-color: rgb(134, 247, 255);
+	box-shadow: 0px 0px 2px rgba(0,0,0,0.4);
+	padding: 5%;
+	border-radius: 8px;
+	font-size: 0.8em;
+	text-align: left;
+	left: 55%;
+	top: 65%;
+	z-index: 99;
+	width: 15rem;
 }
 .center-label{
 	font-size: 0.9em;
@@ -461,7 +514,7 @@ body {
 }
 #notification-detail-area{
 	display: none;
-	width: 33vw;
+	width: 15rem;
 	z-index: 999;
 	right: 0;
 	top: 2.5rem;
@@ -521,4 +574,93 @@ body {
 .notification-detail:hover .notification-see-more{
 	font-weight: bold;
 	transition: 0s;
+}
+.m-date{
+	display: inline-flex;
+	flex-direction: column;
+	flex: 1;
+	height: 100%;
+	position: relative;
+}
+.m-date:last-child{
+	border-right: 1px solid rgba(0,0,0,0.2);
+}
+.avg-section{
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.5em;
+	border-left: 1px solid rgba(0,0,0,0.2);
+	border-top: 1px solid rgba(0,0,0,0.2);
+}
+.avg-section:last-child{
+	border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+.no-data{
+	background: grey;
+}
+.weight-ok{
+	background: rgb(55, 119, 236);
+}
+.weight-not-ok{
+	background: rgb(213, 25, 50);
+}
+.m-date-hover{
+	bottom: 97.5%;
+	position: absolute;
+	font-size: 0.6em;
+	width: 5rem;
+	border-radius: 5px;
+	text-align: center;
+	padding: 1em;
+	right: 80%;
+	background-color: black;
+	display: none;
+}
+.m-date:hover .m-date-hover{
+	display: inline;
+}
+#m-graph-display{
+	flex-basis: 80%;
+	flex: 1;
+}
+#m-y-labels{
+	flex-basis: 20%;
+	flex-shrink: 1;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	padding-right: 2.5%;
+}
+#m-axis-labels{
+	flex-basis: 20%;
+	flex-shrink: 1;
+	position: relative;
+	display: flex;
+}
+.m-axis-label{
+	padding: 1.25%;
+	flex: 1;
+	font-size: 0.65em;
+}
+#history-axis-labels{
+	flex-basis: 10%;
+}
+.history-axis-label{
+	font-size: 0.6em;
+}
+#history-y-labels{
+	flex-basis: 10%;
+	flex-shrink: 1;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	padding-right: 2.5%;
+}
+#reversion-warning{
+	color: rgb(213, 25, 50);
+	font-size: 0.9em;
 }

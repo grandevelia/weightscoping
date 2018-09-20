@@ -1,60 +1,74 @@
 import React, { Component } from 'react';
-import { weightStringFromKg } from './utils';
+import { weightStringFromKg, breakthroughIndex, mStatusCheck } from './utils';
 import { connect } from 'react-redux';
-import { weights } from "../actions";
+import { weights, auth } from "../actions";
 import moment from 'moment';
 
 class ProgressSummary extends Component {
-    constructor(props){
-        super(props);
-        props.fetchWeights();
-        this.state = {
-            newWeightPrimary: null,
-            newWeightSecondary: null
-        }
+    state = {
+        newWeightPrimary: null,
+        newWeightSecondary: null
+    }
+    componentDidMount(){
+        this.props.fetchWeights();
     }
     render(){
         let user = this.props.auth.user;
         let weights = this.props.weights;
+        let warningDays, weightsArr, dates;
+
         if (weights.length < 1){
             return <div>Loading Weight History...</div>
         }
 		let initialWeight  = weights[user.starting_weight].weight_kg;
         let currentWeight = weights[weights.length - 1 ].weight_kg;
-        let closestIdealBreakthrough = -1;
-        if (currentWeight <= 1.02 * user.ideal_weight_kg){
-            //Starting from most recent weight, find the most recent time they attained their ideal weight
-            //For the first time without having been in maintenance mode first
-            
-            for (let i = weights.length -1 ; i >= 0; i --){
-                if (weights[i].weight_kg <= 1.02 * user.ideal_weight_kg){
-                    if (weights[i].weight_kg <= user.ideal_weight_kg){
-                        closestIdealBreakthrough = i;
-                    }
-                } else {
-                    break;
-                }
-            }
-        }
-        let daysAtIdeal = 0;
-        if (closestIdealBreakthrough >= 0){
-            daysAtIdeal = moment().diff(moment(weights[closestIdealBreakthrough].date_added), 'days');
-        }
         
+        let daysAtIdeal = 0;
+        if (user.mode === "0"){
+            let closestIdealBreakthrough = breakthroughIndex( Object.keys(this.props.weights).map(key => weights[key]['weight_kg']), user.ideal_weight_kg );
+
+            if (closestIdealBreakthrough >= 0){
+                daysAtIdeal = 1 + moment().diff(moment(weights[closestIdealBreakthrough].date_added), 'days');
+            }
+        } else {
+            weightsArr = []
+            dates = [];
+    
+            //Split user weight data into arrays for easier manipulation
+            Object.keys(weights).map(key => {
+                dates.push(weights[key]['date_added']);
+                weightsArr.push(weights[key]['weight_kg']);
+            });
+
+            warningDays = mStatusCheck(weightsArr, dates, user.starting_weight, user.ideal_weight_kg);
+        }
         return (
             <div id='top-area'>
                 <div id='top-content'>
                     <div className='top-section'>
                         <div className='top-label'>Mode:</div>
-                        <div className='top-entry'>
+                        <div className='top-entry' id='current-mode'>
                         {
-                            currentWeight < user['ideal_weight_kg'] + (initialWeight-user['ideal_weight_kg'])/7 ?
-                                daysAtIdeal < 7 ?
-                                "Days to Maintenance Mode: " + (7-daysAtIdeal)
-                                : 
-                                "Maintenance"
+                            user.mode === "0" ?
+
+                                currentWeight < user['ideal_weight_kg'] * 1.02 ?
+                                    <div>
+                                        <div id='maintenance-mouseover'>
+                                            Once you reach your ideal weight, you must maintain within 2% of it in order to enter the next phase
+                                        </div>
+                                        Days to Maintenance Mode: {(7-daysAtIdeal)}
+                                    </div>
+                                :
+                                    "Weight Loss"
+                            : warningDays < 10 ?
+                                <div>
+                                    Maintentance
+                                    <div id='reversion-warning'>
+                                        Exceeding all allowed Averages. Days to reversion to Weight Loss Mode: {warningDays}
+                                    </div>
+                                </div>
                             :
-                                "Weight Loss"
+                            "Maintentance"
                         }
                         </div>
                     </div>
@@ -106,7 +120,10 @@ const mapDispatchToProps = dispatch => {
 	return {
 		fetchWeights: () => {
 			return dispatch(weights.fetchWeights())
-		}
+        },
+        updateUserSettings: (key, value) => {
+            return dispatch(auth.updateUserSettings(key, value))
+        },
 	}
 }
 

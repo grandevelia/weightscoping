@@ -1,5 +1,5 @@
 export const confirmRegistration = (email, activation_key) => {
-	return (dispatch, getState) => {
+	return dispatch => {
 		let headers = {
 			"Content-Type": "application/json"
     	};
@@ -62,7 +62,7 @@ export const loadUser = () => {
 }
 
 export const login = (email, password) => {
-	return (dispatch, getState) => {
+	return dispatch => {
 		let headers = {
 			"Content-Type": "application/json"
 		};
@@ -93,13 +93,12 @@ export const login = (email, password) => {
 }
 
 export const register = (email, password, alcohol, carb_ranks, weight_units, height_units, height_inches, weight_kg, ideal_weight_kg, monetary_value, sex) => {
-	return (dispatch, getState) => {
+	return dispatch => {
 		let headers = {
 			"Content-Type": "application/json"
 		};
 		monetary_value = Math.round(parseInt(monetary_value*100,10));
 		let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
-		//let body = JSON.stringify({"email":"test20@test.com","password":"test","alcohol":false,"carb_ranks":[2,0,3,5,1,4,6],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":"200","weight_kg":100,"sex":"male"});
 		return fetch("/api/auth/register/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
@@ -192,7 +191,6 @@ export const updateUserSettings = (key, value) => {
 		.then(res => {
 			if (res.status === 200){
 				dispatch({type: 'SETTING_CHANGE', user:res.data});
-				alert("Your settings have been updated.");
 				return res.data;
 			} else if (res.status >= 400 && res.status < 500){
 				dispatch({type:'AUTHENTICATION_ERROR', data:res.data});

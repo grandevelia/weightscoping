@@ -57,7 +57,7 @@ class Profile(AbstractUser):
 	PAYMENT_CHOICES = (
 		('1', 'Classic'),
 		('2', 'Slow Burn'),
-		('3', 'I Don\'t Believe You'),
+		('3', 'I Need More Evidence'),
 	)
 	payment_option = models.CharField(
 		max_length = 1,
@@ -65,6 +65,15 @@ class Profile(AbstractUser):
 		default='3'
 	)
 	starting_weight = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+	MODE_CHOICES = (
+		('0', 'Weight Loss'),
+		('1', 'Maintenance'),
+	)
+	mode = models.CharField(
+		max_length=20,
+		choices=MODE_CHOICES,
+		default='Weight Loss'
+	)
 	REQUIRED_FIELDS=[]
 
 	def get_username(self):

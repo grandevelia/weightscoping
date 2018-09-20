@@ -9,6 +9,9 @@ export default function weights(state=initialState, action){
 	switch (action.type) {
 
 		case 'FETCH_WEIGHTS':
+			if (action.weights.length === 0){
+				return [null]
+			}
 			return [...action.weights];
 
 		case 'ADD_WEIGHT': {

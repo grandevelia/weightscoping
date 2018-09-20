@@ -132,6 +132,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'sex',
 			'payment_option',
 			'starting_weight',
+			'mode',
 		)
 class ResetPasswordSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -170,6 +171,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 			'sex',
 			'payment_option',
 			'starting_weight',
+			'mode',
 		)
 
 	def validate(self, request):

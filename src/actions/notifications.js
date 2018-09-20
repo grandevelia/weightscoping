@@ -79,7 +79,6 @@ export const addNotification = (message) => {
 			}
 		})
 		.then(res => {
-            console.log(res.data)
 			if (res.status === 201) {
 				return dispatch({type: 'ADD_NOTIFICATION', notification: res.data});
 			} else if (res.status === 401 || res.status === 403) {

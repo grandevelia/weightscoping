@@ -11,7 +11,7 @@
     display: flex;
     padding: 0 2.5%;
     position: relative;
-    text-align: left;
+    text-align: center;
 }
 .nav-wrapper:hover{
     background-color: black;

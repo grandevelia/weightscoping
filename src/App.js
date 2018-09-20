@@ -5,7 +5,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
-import {auth} from "./actions";
+import {auth, weights} from "./actions";
 import weightScoping from './reducers';
 
 import Intro from './components/Intro';
@@ -17,8 +17,12 @@ let store = createStore(weightScoping, applyMiddleware(thunk))
 class RootContainerComponent extends Component {
   componentDidMount(){
     this.props.loadUser();
+    this.props.fetchWeights();
   }
   render(){
+    if (this.props.auth.user !== null && this.props.weights.length === 0){
+      return <div>Loading...</div>
+    }
     return (
         <BrowserRouter>
             <Switch>
@@ -36,12 +40,16 @@ class RootContainerComponent extends Component {
 const mapStateToProps = state => {
   return {
     auth: state.auth,
+    weights: state.weights
   }
 }
 const mapDispatchToProps = dispatch => {
   return {
     loadUser: () => {
       return dispatch(auth.loadUser());
+    },
+    fetchWeights: () =>{
+      return dispatch(weights.fetchWeights());
     }
   }
 }

@@ -22,13 +22,22 @@ class UserSettings extends Component {
 		this.setState({email: val})
 	}
 	updateSettings(key, value){
-		this.props.updateUserSettings(key, value);
+        this.props.updateUserSettings(key, value);
+        alert("Your settings have been updated.");
     }
     resetLevels(e){
         e.preventDefault();
         let conf = window.confirm("If you press OK, your levels will be reset from your current weight, and you will be set to level 0. Your weight history will be saved.");
         if (conf){
-            this.props.updateUserSettings("starting_weight", this.props.weights.length-1);
+            if (this.props.weights[this.props.length-1] > this.props.auth.user.ideal_weight_kg){
+                this.props.updateUserSettings("starting_weight", this.props.weights.length-1);
+                this.props.updateUserSettings("mode", 0);
+                let currUrl = window.location.href;
+                let nextUrl = currUrl.substring(0, currUrl.length - 12) + "UserDashboard";
+                window.location = nextUrl;
+            } else {
+                alert("You must be above your ideal weight in order to reset your levels.");
+            }
         }
     }
     render(){
