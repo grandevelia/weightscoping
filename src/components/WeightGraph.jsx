@@ -3,7 +3,6 @@ import { iconIndex, carbOrder, carbOptions } from './utils';
 import WeightHistoryGraph from './WeightHistoryGraph';
 import WeightLossGraph from './WeightLossGraph';
 import MModeGraph from './MModeGraph';
-import Projection from './Projection';
 
 export default class WeightGraph extends Component {
     state = {
@@ -132,7 +131,6 @@ export default class WeightGraph extends Component {
                             <div className={this.state.wholeGraph === 0 ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(0)}>History</div>
                             <div className={this.state.wholeGraph === 1 ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(1)}>Current</div>
                             {user.mode === "1" ? <div className={this.state.wholeGraph === 2 ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(2)}>Maintenance</div>: null}
-                            <div className={this.state.wholeGraph === 3 ? 'toggle-option active' : 'toggle-option'} onClick={() => this.changeDisplay(3)} id='project-button'>Project</div>
                         </div>
                         { user.mode === "0" ? 
                             <div className='toggle-section'>
@@ -147,7 +145,6 @@ export default class WeightGraph extends Component {
                 {this.state.wholeGraph === 0 ? <WeightHistoryGraph calcStyles={this.calcStyles} level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight} allowedIcons={this.allowedIcons} disallowedIcons={this.disallowedIcons}/>
                 : this.state.wholeGraph === 1 ? <WeightLossGraph calcStyles={this.calcStyles} level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight} allowedIcons={this.allowedIcons} disallowedIcons={this.disallowedIcons}/>
                 : this.state.wholeGraph === 2 ? <MModeGraph level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight}/>
-                : this.state.wholeGraph === 3 ? <Projection user={user} weights={this.props.weights} />
                 : <div>Invalid State</div>
                 }
             </div>

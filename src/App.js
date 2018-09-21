@@ -20,9 +20,6 @@ class RootContainerComponent extends Component {
     this.props.fetchWeights();
   }
   render(){
-    if (this.props.auth.user !== null && this.props.weights.length === 0){
-      return <div>Loading...</div>
-    }
     return (
         <BrowserRouter>
             <Switch>

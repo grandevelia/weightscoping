@@ -329,3 +329,16 @@ export const mStatusCheck = (weights, dates, startingWeight, idealWeight) => {
 
 	return modeReversionDays(weightAvgs, idealWeight);
 }
+export const guessWeightsToNow = (weights, dates) => {
+	let lastDay = dates[dates.length-1];
+	let lastWeight = weights[dates.length-1];
+	let dayDiff = moment().diff(moment(lastDay), "days");
+	for (let i = 1; i <= dayDiff; i ++){
+		dates.push(moment(lastDay).add(1*i, "day").format("YYYY-MM-DD"));
+		weights.push(lastWeight);
+	}
+	return {
+		weights: weights,
+		dates: dates
+	}
+}

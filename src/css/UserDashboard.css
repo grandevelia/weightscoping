@@ -134,6 +134,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	height: 85vh;
+	width: 100%;
 }
 #graph-top{
 	padding: 1.25%;
@@ -186,17 +187,23 @@ body {
 	border-bottom: 2px solid white;
 }
 #project-button{
-	background: rgb(0, 70, 92);
-	font-size: 1em;
+	background-color: rgb(8, 40, 109);
+	background: linear-gradient(bottom left, rgba(89, 0, 255, 0.7), rgb(13, 74, 208) 10%, rgba(89, 0, 255, 0.7) 90%);
+	border-left: 1px solid black;
+	font-size: 0.8em;
 	padding: 1.25% 5%;
-	border-radius: 5px;
+	border-radius: 0 8px 8px 0;
+	width: 2rem;
+	height: 100%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 2px 0px 1px rgba(0,0,0,0.4);
+	transition: ease-in-out 0.25s;
 }
 #project-button:hover{
 	cursor: pointer;
-	background: rgba(0,0,0,0.3);
-}
-#project-button.active{
-	border-radius: 5px 5px 0px 0px;
+	background-color: rgb(8, 40, 109);
 }
 #graph-middle{
 	display: flex;
@@ -207,7 +214,13 @@ body {
 	display: flex;
 	flex-direction: row;
 	flex-basis: 95%;
-	padding-left: 1.25%;
+	padding: 0 1.25%;
+}
+#graph-middle-m{
+	display: flex;
+	flex-direction: row;
+	flex-basis: 92.5%;
+	padding: 0 1.25%;
 }
 .data-point{
 	display: inline-block;
@@ -223,15 +236,6 @@ body {
 	border-radius: 50%;
 	transition: ease-in-out 0.125s;
 	background: white;
-}
-.interpolated{
-	background: rgb(57, 228, 192);
-	height: 0.5rem;
-	width: 0.5rem;
-}
-.interpolated-text{
-	color: white;
-	margin-bottom: 5%;
 }
 .data-point:hover .weight-point{
 	cursor: pointer;
@@ -372,6 +376,12 @@ body {
 .graph-section-8{
 	border-top: 1px solid white !important;
 	border-bottom: 1px dashed rgba(0,0,0,0.4);
+}
+.m-graph-section{
+	flex: 1;
+}
+#m-date-label, #m-weight-label{
+	flex: 0.25;
 }
 #x-labels{
 	padding: 1.25%;
@@ -575,15 +585,12 @@ body {
 	font-weight: bold;
 	transition: 0s;
 }
-.m-date{
-	display: inline-flex;
-	flex-direction: column;
-	flex: 1;
-	height: 100%;
-	position: relative;
-}
 .m-date:last-child{
 	border-right: 1px solid rgba(0,0,0,0.2);
+}
+.projected:first-of-type *{
+	border-left: 2px outset rgba(89, 0, 255, 0.7);
+	margin-left: 2px;
 }
 .avg-section{
 	display: flex;
@@ -606,24 +613,37 @@ body {
 .weight-not-ok{
 	background: rgb(213, 25, 50);
 }
-.m-date-hover{
-	bottom: 97.5%;
-	position: absolute;
-	font-size: 0.6em;
-	width: 5rem;
-	border-radius: 5px;
-	text-align: center;
-	padding: 1em;
-	right: 80%;
-	background-color: black;
-	display: none;
-}
-.m-date:hover .m-date-hover{
-	display: inline;
-}
 #m-graph-display{
+	background-color: rgb(230,230,230);
+	border-radius: 2px;
+	align-items: stretch;
+	padding: 1%;
+	white-space: nowrap;
 	flex-basis: 80%;
 	flex: 1;
+	overflow-x: scroll;
+	padding-left: 0.5%;
+	box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
+}
+.m-date{
+	display: inline-flex;
+	vertical-align: top;
+	flex-direction: column;
+	flex: 1;
+	height: 100%;
+	min-width: 4rem;
+}
+.graph-date{
+	font-size: 0.6em;
+	flex: 0.5;
+	white-space: normal;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgb(250,250,250);
+	color: black;
+	border-left: 1px solid rgba(0,0,0,0.2);
+	border-top: 1px solid rgba(0,0,0,0.2);
 }
 #m-y-labels{
 	flex-basis: 20%;
@@ -632,7 +652,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	text-align: center;
-	padding-right: 2.5%;
+	padding: 2.5% 2.5% 2.5% 0;
 }
 #m-axis-labels{
 	flex-basis: 20%;
@@ -663,4 +683,60 @@ body {
 #reversion-warning{
 	color: rgb(213, 25, 50);
 	font-size: 0.9em;
+}
+.graph-weight{
+	flex: 0.5;
+	position: relative;
+	font-size: 0.6em;
+}
+.graph-weight-number{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border: none;
+	margin: 0 !important;
+	border-left: 1px solid rgba(0,0,0,0.2);
+	border-bottom: 1px solid rgba(0,0,0,0.2);
+	transition: ease-in-out 0.25s;
+}
+.weight-submit{
+	position: absolute;
+	min-width: 50%;
+	top: 2%;
+	height: 98%;
+	padding: 2.5% 5%;
+	color: white;
+	font-size: 0.4em;
+	right: 0;
+	height: 100%;
+	background-color: rgb(8, 40, 109);
+	background: linear-gradient(bottom left, rgba(89, 0, 255, 0.7), rgb(13, 74, 208) 10%, rgba(89, 0, 255, 0.7) 90%);
+	visibility: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 0 5px 5px 0;
+	border: none;
+	margin: none;
+	outline: none;
+	z-index: 10;
+}
+.weight-submit:hover{
+	cursor: pointer;
+	background-color: rgb(8, 40, 109);
+}
+.graph-weight-number:focus{
+	width: 180%;
+	left: -50%;
+	outline: 2px solid rgb(0, 132, 255);
+	z-index: 9;
+	transition: ease-in-out 0.25s;
+}
+.graph-weight-number:focus ~ .weight-submit {
+	right: -90% !important;
+	border-right: 2px solid rgb(0, 132, 255);
+	visibility: visible;
+	transition: right ease-in 0.25s;
 }

@@ -1,8 +1,23 @@
 import React, { Component } from 'react';
-import { interpolateDates, maintenanceAvgs, weightStringFromKg, iconIndex, maintenanceCarbOrder, carbOptions, calcAverages } from './utils';
+import { interpolateDates, maintenanceAvgs, weightStringFromKg, iconIndex, maintenanceCarbOrder, carbOptions, calcAverages, guessWeightsToNow } from './utils';
 import moment from 'moment';
 
 export default class WeightHistoryGraph extends Component {
+    constructor(props){
+        super(props);
+        let numInputs = moment().diff(moment(props.weights[0].date_added), 'days');
+        let inputState = {};
+        for (let i = 0; i < numInputs; i ++){
+            inputState[i] = "";
+        }
+        this.state = {
+            projecting: 0,
+            inputs: inputState
+        }
+    }
+    componentDidMount(){
+        this.refs.scroll.scrollLeft = 1000000000000000;
+    }
     allowedIcons(index, carbRanks){
 
 		if (isNaN(index)){
@@ -34,7 +49,37 @@ export default class WeightHistoryGraph extends Component {
                     }
 			</div>
 		);
-	}
+    }
+    changeWeight(e, i){
+        let newInputs = this.state.inputs;
+        newInputs[i] = e.target.value;
+        this.setState({inputs: newInputs});
+    }
+    submitWeight(e, i, date, interpolated){
+        e.preventDefault();
+        if (this.state.inputs[i] === ""){
+            return
+        }
+        let newWeight = parseInt(this.state.input[i], 10);
+    }
+    project(){
+        let daysToProject = parseInt(prompt("How many days would you like to project? (1-30)"), 10);
+        if (isNaN(daysToProject)){
+            return;
+        }
+        if (daysToProject > 30){
+            daysToProject = 30;
+        }
+        if (daysToProject < 1){
+            return;
+        }
+        this.setState({projecting : daysToProject}, () => {
+            this.refs.scroll.scrollLeft = 1000000000000000;
+        });
+    }
+    hideProjection(){
+        this.setState({projecting: 0});
+    }
     render(){
         let user = this.props.user;
         let numLevels = maintenanceAvgs.length;
@@ -75,14 +120,14 @@ export default class WeightHistoryGraph extends Component {
         weights = preStartWeights.concat(interpData.weights.slice(1,interpData.weights.length));
         dates = preStartDates.concat(interpData.dates.slice(1,interpData.dates.length));
 
-        interpIndexes = interpData.indexes; 
+        interpIndexes = interpData.indexes;
+        //Ensure weights are present up to current day
+        interpData = guessWeightsToNow(weights, dates);
+        weights = interpData.weights;
+        dates = interpData.dates;
+
 
         let weightAvgs = calcAverages(modStart, weights);
-
-        //Remove weights before ideal weight breakthrough
-        ids = interpIndexes.slice(modStart, interpIndexes.length);
-        weights = weights.slice(modStart, weights.length);
-        dates = dates.slice(modStart, dates.length);
 
         //Find x label widths
         let dateRange = moment(dates[dates.length-1]).diff(moment(dates[0]), "days");
@@ -91,15 +136,41 @@ export default class WeightHistoryGraph extends Component {
         for (let i = 0; i < 5; i ++){
             xLabels.push(moment(dates[0]).add(dateInc * i, "days").format("YYYY-MM-DD"));
         }
+
+
+        let projectedAverages, projectedWeights, projectedDates;
+        if (this.state.projecting > 0){
+            //Get last day, add the same weight state.projecting days later, interpolate between, get averages
+            projectedDates = [];
+            projectedDates.push(dates[dates.length-1]);
+            projectedDates.push(moment(projectedDates[0]).add(this.state.projecting, "days").format("YYYY-MM-DD"));
+            projectedWeights = [];
+            projectedWeights.push(weights[weights.length-1]);
+            projectedWeights.push(weights[weights.length-1]);
+            let tempData = interpolateDates(projectedWeights, projectedDates);
+
+            projectedWeights = weights.concat(tempData.weights.slice(1,tempData.weights.length));
+            projectedDates = dates.concat(tempData.dates.slice(1,tempData.dates.length));
+
+            projectedAverages = calcAverages(weights.length, projectedWeights);
+
+            projectedWeights = projectedWeights.slice(weights.length);
+            projectedDates = projectedDates.slice(dates.length);
+        }
+        //Remove weights before ideal weight breakthrough
+        ids = interpIndexes.slice(modStart, interpIndexes.length);
+        weights = weights.slice(modStart, weights.length);
+        dates = dates.slice(modStart, dates.length);
         return (
             <div id='graph-middle'>
-                <div id='graph-middle-top'>
+                <div id='graph-middle-m'>
                     <div id='m-y-labels'>
+                        <div className='y-label m-graph-section' id='m-date-label'>Date</div>
                         {
                             levelMap.map(y => {
                                 y = (maintenanceAvgs.length - 1) - y;
                                 return (
-                                    <div key={y} className={'y-label graph-section'} style={{flexBasis: 100/numLevels + "%"}}>
+                                    <div key={y} className='y-label m-graph-section'>
                                         <div className='icons-wrap'>
                                             {this.allowedIcons(y, user.carb_ranks)}
                                         </div>
@@ -108,8 +179,9 @@ export default class WeightHistoryGraph extends Component {
                                 )
                             })
                         }
+                        <div className='y-label m-graph-section' id='m-weight-label'>Weight</div>
                     </div>
-                    <div id='m-graph-display'>
+                    <div id='m-graph-display' ref='scroll'>
                         {
                             weightAvgs.map((weight, i) => {
                                 let currInterpolated = false;
@@ -118,7 +190,7 @@ export default class WeightHistoryGraph extends Component {
                                 }
                                 return (
                                     <div className={currInterpolated ? 'm-date interpolated' : 'm-date'} key={i} style={{ width: 100/weights.length + "%" }}>
-                                        <div className='m-date-hover'>{dates[i]}</div>
+                                        <div className='graph-date'>{moment(dates[i]).format("MM-DD-YYYY")}</div>
                                         {
                                             levelMap.map(i => {
                                                 let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
@@ -148,18 +220,79 @@ export default class WeightHistoryGraph extends Component {
                                                 )
                                             })
                                         }
+
+                                        <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, i, dates[i], currInterpolated)}>
+                                            <input id={'input-number-' + i} onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' defaultValue=
+                                            {
+                                                user.weight_units === "Pounds" ? 
+                                                    weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 7)
+                                                : user.weight_units === "Kilograms" ?
+                                                    weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 10)
+                                                : null
+                                            } />
+                                            <input type='submit' className='weight-submit'/>
+                                        </form>
                                     </div>
                                 )
                             })
                         }
+                        {
+                            Array(this.state.projecting).fill().map((x, i) => i).map((x,i) => {
+                                let weight = projectedAverages[i];
+                                return (
+                                    <span className='m-date projected' key={i} style={{ width: 100/weights.length + "%" }}>
+                                        <div className='graph-date'>{moment(projectedDates[i]).format("MM-DD-YYYY")}</div>
+                                        {
+                                            levelMap.map(i => {
+                                                let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
+                                                let weightOk = null;
+                                                if (currAvg in weight){
+                                                    if (weight[currAvg] < user.ideal_weight_kg){
+                                                        weightOk = true;
+                                                    } else {
+                                                        weightOk = false;
+                                                    }
+                                                }
+                                                let weightString;
+                                                if (!isNaN(weight[currAvg])){
+                                                    weightString = weightStringFromKg(weight[currAvg], user.weight_units);
+                                                    if (user.weight_units === "Pounds"){
+                                                        weightString = weightString.substring(0, weightString.length - 7);
+                                                    } else if (user.weight_units === "Kilograms"){
+                                                        weightString = weightString.substring(0, weightString.length - 10);
+                                                    }
+                                                } else {
+                                                    weightString = "n/a";
+                                                }
+                                                return (
+                                                    <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data' : weightOk === true ? 'avg-section weight-ok' : 'avg-section weight-not-ok'}> 
+                                                            {weightString}
+                                                    </div>
+                                                )
+                                            })
+                                        }
+
+                                        <div className='graph-weight'>
+                                            <input type='number' defaultValue=
+                                            {
+                                                user.weight_units === "Pounds" ? 
+                                                    weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 7)
+                                                : user.weight_units === "Kilograms" ?
+                                                    weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 10)
+                                                : null
+                                            } />
+                                        </div>
+                                    </span>
+                                )
+                            })
+                        }
+                        {
+                            this.state.projecting === 0 ?
+                                <div id='project-button' onClick={() => this.project()}>Project</div>
+                            :
+                                <div id='project-button' onClick={() => this.hideProjection()}>Hide</div>
+                        }
                     </div>
-                </div>
-                <div id='x-labels'>
-                    {
-                        xLabels.map((x, k ) => {
-                            return <div key={"xlabel"+k} className='x-label'>{ x.substring(5,10)}</div>
-                        })
-                    }
                 </div>
             </div>
         )
