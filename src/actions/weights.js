@@ -23,6 +23,9 @@ export const fetchWeights = () => {
 		})
 		.then(res => {
 			if (res.status === 200) {
+				if (res.data.length === 0){
+					addWeight(100, moment().format("YYYY-MM-DD"));
+				}
 				return dispatch({type: 'FETCH_WEIGHTS', weights: res.data});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
