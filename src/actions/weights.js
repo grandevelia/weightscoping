@@ -23,6 +23,7 @@ export const fetchWeights = () => {
 		})
 		.then(res => {
 			if (res.status === 200) {
+				console.log(res.data.length)
 				if (res.data.length === 0){
 					addWeight(100, moment().format("YYYY-MM-DD"));
 				}
