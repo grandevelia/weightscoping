@@ -1,6 +1,6 @@
 import moment from 'moment';
 const initialState = [
-
+	null
 ];
 
 export default function weights(state=initialState, action){
@@ -9,9 +9,7 @@ export default function weights(state=initialState, action){
 	switch (action.type) {
 
 		case 'FETCH_WEIGHTS':
-			if (action.weights.length === 0){
-				return [null]
-			}
+			weightList.splice(0,1);
 			return [...action.weights];
 
 		case 'ADD_WEIGHT': {

@@ -34,6 +34,7 @@ export const fetchWeights = () => {
 
 export const addWeight = (weight_kg, date_added) => {
 	return (dispatch, getState) => {
+		console.log("got to add")
 		let headers = {"Content-Type": "application/json"};
 		let {token} = getState().auth;
 		

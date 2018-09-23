@@ -20,18 +20,15 @@ class UserDashboard extends Component {
 		newWeightPrimary: null,
 		newWeightSecondary: null
 	}
-	componentDidMount(){
-		this.props.fetchWeights();
-	}
 	addWeight(e){
 		e.preventDefault();
 		if (this.state.weightDate){
 			let dateString = moment(this.state.weightDate.utc()._d).format("YYYY-MM-DD");
-			for (let i = 0; i < this.props.weights.length; i ++){
-				if (this.props.weights[i].date_added === dateString){
+			for (let i = 0; i < weights.length; i ++){
+				if (weights[i].date_added === dateString){
 					let conf = window.confirm("You've already added a weight for " + dateString + ". Update this weight?");
 					if (conf){
-						this.props.updateWeight(this.convertWeight(), this.props.weights[i].id);
+						this.props.updateWeight(this.convertWeight(), weights[i].id);
 					}
 					this.setState({weightDate: null, newWeightPrimary: null, newWeightSeconday: null});
 					return;
@@ -73,12 +70,19 @@ class UserDashboard extends Component {
 		this.props.deleteWeight(id);
 	}
 	render(){
+		if (this.props.weights.length > 0 && this.props.weights[0] === null){
+			return (
+				<div>Loading Weights...</div>
+			)
+		}
 		let user = this.props.auth.user;
 		let weights = this.props.weights;
+		console.log(user, weights)
+
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
 		if (user.mode === "0"){
-			level = lossmodeLevel(this.props.weights[user.starting_weight].weight_kg, user.ideal_weight_kg, this.props.weights[this.props.weights.length-1].weight_kg);
+			level = lossmodeLevel(weights[user.starting_weight].weight_kg, user.ideal_weight_kg, weights[weights.length-1].weight_kg);
 			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
 			remainingOwed = totalOwed-user.amount_paid/100;
 		} else {
@@ -89,9 +93,9 @@ class UserDashboard extends Component {
 			let dateArr = [];
 
 			//Split user weight data into arrays for easier manipulation
-			Object.keys(this.props.weights).map(key => {
-				dateArr.push(this.props.weights[key]['date_added']);
-				weightArr.push(this.props.weights[key]['weight_kg']);
+			Object.keys(weights).map(key => {
+				dateArr.push(weights[key]['date_added']);
+				weightArr.push(weights[key]['weight_kg']);
 			});
 			let mData = setupAverages(weightArr, dateArr, user.starting_weight);
 			mWeights = mData.weights;
@@ -99,6 +103,7 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
+		console.log(level)
 		return (
 			<div id='dashboard-wrap'>
 				<ProgressSummary />
@@ -142,8 +147,6 @@ class UserDashboard extends Component {
 									}
 								</div>
 							</form>
-							{	this.props.weights.length < 1 ? <div id='incentives-loading-indicator'>Loading Incentives...</div>
-								:
 								<div id='level-area'>
 									<div className='level-area-section'>
 										<div className='level-area-header'>You are at level</div>
@@ -155,7 +158,7 @@ class UserDashboard extends Component {
 										<div className='level-area-content'>
 											{
 												level < 7 ? 
-													weightStringFromKg(this.props.weights[user.starting_weight].weight_kg-(level+2)*(this.props.weights[user.starting_weight].weight_kg - user.ideal_weight_kg)/8, user.weight_units)
+													weightStringFromKg(weights[user.starting_weight].weight_kg-(level+2)*(weights[user.starting_weight].weight_kg - user.ideal_weight_kg)/8, user.weight_units)
 												: 
 													"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
 											}
@@ -202,14 +205,9 @@ class UserDashboard extends Component {
 										</div>
 									</div>
 								</div>
-							}
 						</div>
 						<div id='dashboard-fourth'>
-							{ weights.length > 0 ? 
-								<WeightGraph user={user} level={level} weights={weights} deleteWeight={this.deleteWeight}/>
-							: 
-								<div id='zero-weights'>You haven't entered any weights yet!</div>
-							}
+							<WeightGraph user={user} level={level} weights={weights} addWeight={this.props.addWeight} updateWeight={this.props.updateWeight} deleteWeight={this.deleteWeight}/>
 						</div>
 					</div>
 				}
@@ -228,9 +226,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		fetchWeights: () => {
-			return dispatch(weights.fetchWeights())
-		},
 		addWeight: (weightKg, date) => {
 			return dispatch(weights.addWeight(weightKg, date))
 		},

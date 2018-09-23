@@ -143,8 +143,11 @@ export const allowedCarbs = (end, carbRanks) => {
 	}
 	return allowed;
 }
-export const interpolateDates = (weightArr, dateArr) => {
-	let indexes = [];
+export const interpolateDates = (weightArr, dateArr, interpolatedIndexes=false) => {
+	let indexes;
+	if (interpolatedIndexes === false){
+		indexes = [];
+	}
 	for (let i = 0; i < dateArr.length - 1; i ++){
 		let currDate = moment(dateArr[i]);
 		let dateDiff = moment(dateArr[i+1]).diff(currDate, "days")
@@ -156,15 +159,27 @@ export const interpolateDates = (weightArr, dateArr) => {
 			for (let j = 1; j < dateDiff; j ++){
 				dateArr.splice(i+j, 0, currDate.add(1, "days").format("YYYY-MM-DD"));
 				weightArr.splice(i+j, 0, currWeight + (weightPerDay * j));
-				indexes.push(i + j);
+				if (interpolatedIndexes === false){
+					indexes.push(i + j);	
+				} else {
+					interpolatedIndexes.splice(i + j, 0, null);
+				}
 			}
-			i += dateDiff - 1; //Minus one because i increments after the loop
+			i += dateDiff - 1; //Minus one because i increments after this loop
 		}
 	}
-	return {
-		weights: weightArr,
-		dates: dateArr,
-		indexes: indexes
+	if (interpolatedIndexes === false){
+		return {
+			weights: weightArr,
+			dates: dateArr,
+			indexes: indexes
+		}
+	} else {
+		return {
+			weights: weightArr,
+			dates: dateArr,
+			indexes: interpolatedIndexes
+		}
 	}
 }
 
@@ -329,16 +344,18 @@ export const mStatusCheck = (weights, dates, startingWeight, idealWeight) => {
 
 	return modeReversionDays(weightAvgs, idealWeight);
 }
-export const guessWeightsToNow = (weights, dates) => {
+export const guessWeightsToNow = (weights, dates, ids) => {
 	let lastDay = dates[dates.length-1];
 	let lastWeight = weights[dates.length-1];
 	let dayDiff = moment().diff(moment(lastDay), "days");
 	for (let i = 1; i <= dayDiff; i ++){
 		dates.push(moment(lastDay).add(1*i, "day").format("YYYY-MM-DD"));
 		weights.push(lastWeight);
+		ids.push(null);
 	}
 	return {
 		weights: weights,
-		dates: dates
+		dates: dates,
+		indexes: ids
 	}
 }

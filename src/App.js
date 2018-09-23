@@ -23,7 +23,9 @@ class RootContainerComponent extends Component {
     return (
         <BrowserRouter>
             <Switch>
-                <Route path="/Home" component={ Home } />
+                <Route path="/Home" render={() => 
+                  <Home weights={this.props.weights} />
+                } />
                 <Route path="/" render={ () => 
                   <Intro auth={ this.props.auth } />} 
                 />

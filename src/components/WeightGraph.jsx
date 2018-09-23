@@ -144,7 +144,7 @@ export default class WeightGraph extends Component {
                 </div>
                 {this.state.wholeGraph === 0 ? <WeightHistoryGraph calcStyles={this.calcStyles} level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight} allowedIcons={this.allowedIcons} disallowedIcons={this.disallowedIcons}/>
                 : this.state.wholeGraph === 1 ? <WeightLossGraph calcStyles={this.calcStyles} level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight} allowedIcons={this.allowedIcons} disallowedIcons={this.disallowedIcons}/>
-                : this.state.wholeGraph === 2 ? <MModeGraph level={this.props.level} user={user} weights={this.props.weights} deleteWeight={this.props.deleteWeight}/>
+                : this.state.wholeGraph === 2 ? <MModeGraph level={this.props.level} user={user} weights={this.props.weights} updateWeight={this.props.updateWeight} addWeight={this.props.addWeight}/>
                 : <div>Invalid State</div>
                 }
             </div>

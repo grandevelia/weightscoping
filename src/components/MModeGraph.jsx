@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { interpolateDates, maintenanceAvgs, weightStringFromKg, iconIndex, maintenanceCarbOrder, carbOptions, calcAverages, guessWeightsToNow } from './utils';
+import { poundsToKg, interpolateDates, maintenanceAvgs, weightStringFromKg, iconIndex, maintenanceCarbOrder, carbOptions, calcAverages, guessWeightsToNow } from './utils';
 import moment from 'moment';
 
 export default class WeightHistoryGraph extends Component {
@@ -55,13 +55,25 @@ export default class WeightHistoryGraph extends Component {
         newInputs[i] = e.target.value;
         this.setState({inputs: newInputs});
     }
-    submitWeight(e, i, date, interpolated){
+    submitWeight(e, i, date, interpolated, id=null){
         e.preventDefault();
         if (this.state.inputs[i] === ""){
             return
         }
         let newWeight = parseInt(this.state.input[i], 10);
+        if (interpolated){
+			this.props.addWeight(this.convertWeight(newWeight), date);
+        } else {
+            this.props.updateWeight(this.convertWeight(newWeight), id);
+        }
     }
+	convertWeight(weight){
+		let weightUnits = this.props.auth.user.weight_units;
+		if (weightUnits === "Pounds"){
+			return poundsToKg(weight);
+		}
+		return weight;
+	}
     project(){
         let daysToProject = parseInt(prompt("How many days would you like to project? (1-30)"), 10);
         if (isNaN(daysToProject)){
@@ -105,26 +117,29 @@ export default class WeightHistoryGraph extends Component {
         let preStartDates = dates.slice(0, user.starting_weight + 1);
         let untouchedWeightLen = preStartWeights.length;
 
-        let interpData = interpolateDates(preStartWeights, preStartDates);
+        let interpData = interpolateDates(preStartWeights, preStartDates, ids);
         preStartWeights = interpData.weights;
         preStartDates = interpData.dates;
+        ids = interpData.indexes;
 
         //Find how many points were interpolated from 0 through starting weight
         let preStartAddedCount = interpData.weights.length - untouchedWeightLen;
         let modStart = user.starting_weight + preStartAddedCount; //Adjust starting index to account for new data
         
         //interpolate points from user.starting_weight through end, and join previous result for averaging
-        interpData = interpolateDates(weights.slice(user.starting_weight, weights.length), dates.slice(user.starting_weight, dates.length));
+        interpData = interpolateDates(weights.slice(user.starting_weight, weights.length), dates.slice(user.starting_weight, dates.length), ids);
 
         //Don't use first element of second array to avoid duplicate join point
         weights = preStartWeights.concat(interpData.weights.slice(1,interpData.weights.length));
         dates = preStartDates.concat(interpData.dates.slice(1,interpData.dates.length));
 
         interpIndexes = interpData.indexes;
+
         //Ensure weights are present up to current day
-        interpData = guessWeightsToNow(weights, dates);
+        interpData = guessWeightsToNow(weights, dates, ids);
         weights = interpData.weights;
         dates = interpData.dates;
+        ids = interpData.indexes;
 
 
         let weightAvgs = calcAverages(modStart, weights);
@@ -157,6 +172,7 @@ export default class WeightHistoryGraph extends Component {
             projectedWeights = projectedWeights.slice(weights.length);
             projectedDates = projectedDates.slice(dates.length);
         }
+
         //Remove weights before ideal weight breakthrough
         ids = interpIndexes.slice(modStart, interpIndexes.length);
         weights = weights.slice(modStart, weights.length);
@@ -221,7 +237,12 @@ export default class WeightHistoryGraph extends Component {
                                             })
                                         }
 
-                                        <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, i, dates[i], currInterpolated)}>
+                                        <form className='graph-weight' onSubmit={
+                                            currInterpolated ? 
+                                                (e) => this.submitWeight(e, i, dates[i], currInterpolated) 
+                                            :
+                                                (e) => this.submitWeight(e, i, dates[i], currInterpolated, ids[i])
+                                        }>
                                             <input id={'input-number-' + i} onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' defaultValue=
                                             {
                                                 user.weight_units === "Pounds" ? 
