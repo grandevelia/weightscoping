@@ -23,9 +23,8 @@ export const fetchWeights = () => {
 		})
 		.then(res => {
 			if (res.status === 200) {
-				console.log(res.data.length)
 				if (res.data.length === 0){
-					addWeight(100, moment().format("YYYY-MM-DD"));
+					return dispatch(addWeight(100, moment().format("YYYY-MM-DD")));
 				}
 				return dispatch({type: 'FETCH_WEIGHTS', weights: res.data});
 			} else if (res.status === 401 || res.status === 403) {
@@ -38,7 +37,7 @@ export const fetchWeights = () => {
 
 export const addWeight = (weight_kg, date_added) => {
 	return (dispatch, getState) => {
-		console.log("got to add")
+		console.log("got into add")
 		let headers = {"Content-Type": "application/json"};
 		let {token} = getState().auth;
 		
