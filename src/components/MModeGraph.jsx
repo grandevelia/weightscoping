@@ -97,8 +97,6 @@ export default class WeightHistoryGraph extends Component {
         let numLevels = maintenanceAvgs.length;
         let levelMap = Array( numLevels ).fill().map((x,i) => i);
 
-		let interpIndexes = [];
-
 		let weights = []
 		let dates = [];
 		let ids = [];
@@ -133,8 +131,6 @@ export default class WeightHistoryGraph extends Component {
         weights = preStartWeights.concat(interpData.weights.slice(1,interpData.weights.length));
         dates = preStartDates.concat(interpData.dates.slice(1,interpData.dates.length));
 
-        interpIndexes = interpData.indexes;
-
         //Ensure weights are present up to current day
         interpData = guessWeightsToNow(weights, dates, ids);
         weights = interpData.weights;
@@ -144,21 +140,12 @@ export default class WeightHistoryGraph extends Component {
 
         let weightAvgs = calcAverages(modStart, weights);
 
-        //Find x label widths
-        let dateRange = moment(dates[dates.length-1]).diff(moment(dates[0]), "days");
-        let dateInc = (Math.floor(dateRange/5) + Math.ceil(dateRange/5))/2;
-        let xLabels = [];
-        for (let i = 0; i < 5; i ++){
-            xLabels.push(moment(dates[0]).add(dateInc * i, "days").format("YYYY-MM-DD"));
-        }
-
-
         let projectedAverages, projectedWeights, projectedDates;
         if (this.state.projecting > 0){
             //Get last day, add the same weight state.projecting days later, interpolate between, get averages
             projectedDates = [];
             projectedDates.push(dates[dates.length-1]);
-            projectedDates.push(moment(projectedDates[0]).add(this.state.projecting, "days").format("YYYY-MM-DD"));
+            projectedDates.push(moment(projectedDates[0]).add(this.state.projecting, "days").format("YYYY-MMMM-DD"));
             projectedWeights = [];
             projectedWeights.push(weights[weights.length-1]);
             projectedWeights.push(weights[weights.length-1]);
@@ -174,146 +161,142 @@ export default class WeightHistoryGraph extends Component {
         }
 
         //Remove weights before ideal weight breakthrough
-        ids = interpIndexes.slice(modStart, interpIndexes.length);
+        ids = ids.slice(modStart, ids.length);
         weights = weights.slice(modStart, weights.length);
         dates = dates.slice(modStart, dates.length);
         return (
-            <div id='graph-middle'>
-                <div id='graph-middle-m'>
-                    <div id='m-y-labels'>
-                        <div className='y-label m-graph-section' id='m-date-label'>Date</div>
-                        {
-                            levelMap.map(y => {
-                                y = (maintenanceAvgs.length - 1) - y;
-                                return (
-                                    <div key={y} className='y-label m-graph-section'>
-                                        <div className='icons-wrap'>
-                                            {this.allowedIcons(y, user.carb_ranks)}
-                                        </div>
-                                        <div className='y-label-weight'>{maintenanceAvgs[y] + " Days"}</div>
+            <div className='graph-middle'>
+                <div id='tab-y-labels'>
+                    <div className='y-label tab-graph-section' id='tab-date-label'>Date</div>
+                    {
+                        levelMap.map(y => {
+                            y = (maintenanceAvgs.length - 1) - y;
+                            return (
+                                <div key={y} className='y-label tab-graph-section'>
+                                    <div className='icons-wrap'>
+                                        {this.allowedIcons(y, user.carb_ranks)}
                                     </div>
-                                )
-                            })
-                        }
-                        <div className='y-label m-graph-section' id='m-weight-label'>Weight</div>
-                    </div>
-                    <div id='m-graph-display' ref='scroll'>
-                        {
-                            weightAvgs.map((weight, i) => {
-                                let currInterpolated = false;
-                                if (interpIndexes.includes(i)){
-                                    currInterpolated = true;
-                                }
-                                return (
-                                    <div className={currInterpolated ? 'm-date interpolated' : 'm-date'} key={i} style={{ width: 100/weights.length + "%" }}>
-                                        <div className='graph-date'>{moment(dates[i]).format("MM-DD-YYYY")}</div>
-                                        {
-                                            levelMap.map(i => {
-                                                let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
-                                                let weightOk = null;
-                                                if (currAvg in weight){
-                                                    if (weight[currAvg] < user.ideal_weight_kg){
-                                                        weightOk = true;
-                                                    } else {
-                                                        weightOk = false;
-                                                    }
-                                                }
-                                                let weightString;
-                                                if (!isNaN(weight[currAvg])){
-                                                    weightString = weightStringFromKg(weight[currAvg], user.weight_units);
-                                                    if (user.weight_units === "Pounds"){
-                                                        weightString = weightString.substring(0, weightString.length - 7);
-                                                    } else if (user.weight_units === "Kilograms"){
-                                                        weightString = weightString.substring(0, weightString.length - 10);
-                                                    }
+                                    <div className='y-label-weight'>{maintenanceAvgs[y] + " Days"}</div>
+                                </div>
+                            )
+                        })
+                    }
+                    <div className='y-label tab-graph-section' id='tab-weight-label'>Weight</div>
+                </div>
+                <div id='tab-graph-display' ref='scroll'>
+                    {
+                        weightAvgs.map((weight, i) => {
+                            let currInterpolated = false;
+                            if (ids[i] === null){
+                                currInterpolated = true;
+                            }
+                            return (
+                                <div className={currInterpolated ? 'tab-date interpolated' : 'tab-date'} key={i} style={{ width: 100/weights.length + "%" }}>
+                                    <div className='graph-date'>{moment(dates[i]).format("YYYY-MM-DD")}</div>
+                                    {
+                                        levelMap.map(i => {
+                                            let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
+                                            let weightOk = null;
+                                            if (currAvg in weight){
+                                                if (weight[currAvg] < user.ideal_weight_kg){
+                                                    weightOk = true;
                                                 } else {
-                                                    weightString = "n/a";
+                                                    weightOk = false;
                                                 }
-                                                return (
-                                                    <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data' : weightOk === true ? 'avg-section weight-ok' : 'avg-section weight-not-ok'}> 
-                                                            {weightString}
-                                                    </div>
-                                                )
-                                            })
-                                        }
+                                            }
+                                            let weightString;
+                                            if (!isNaN(weight[currAvg])){
+                                                weightString = weightStringFromKg(weight[currAvg], user.weight_units);
+                                                if (user.weight_units === "Pounds"){
+                                                    weightString = weightString.substring(0, weightString.length - 7);
+                                                } else if (user.weight_units === "Kilograms"){
+                                                    weightString = weightString.substring(0, weightString.length - 10);
+                                                }
+                                            } else {
+                                                weightString = "n/a";
+                                            }
+                                            return (
+                                                <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data' : weightOk === true ? 'avg-section weight-ok' : 'avg-section weight-not-ok'}> 
+                                                        {weightString}
+                                                </div>
+                                            )
+                                        })
+                                    }
 
-                                        <form className='graph-weight' onSubmit={
-                                            currInterpolated ? 
-                                                (e) => this.submitWeight(e, i, dates[i], currInterpolated) 
+                                    <form className='graph-weight' onSubmit={
+                                        currInterpolated ? 
+                                            (e) => this.submitWeight(e, i, dates[i], currInterpolated) 
+                                        :
+                                            (e) => this.submitWeight(e, i, dates[i], currInterpolated, ids[i])
+                                    }>
+                                        <input id={'input-number-' + i} onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' defaultValue=
+                                        {
+                                            user.weight_units !== "Kilograms" ? 
+                                                weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 7)
                                             :
-                                                (e) => this.submitWeight(e, i, dates[i], currInterpolated, ids[i])
-                                        }>
-                                            <input id={'input-number-' + i} onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' defaultValue=
-                                            {
-                                                user.weight_units === "Pounds" ? 
-                                                    weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 7)
-                                                : user.weight_units === "Kilograms" ?
-                                                    weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 10)
-                                                : null
-                                            } />
-                                            <input type='submit' className='weight-submit'/>
-                                        </form>
-                                    </div>
-                                )
-                            })
-                        }
-                        {
-                            Array(this.state.projecting).fill().map((x, i) => i).map((x,i) => {
-                                let weight = projectedAverages[i];
-                                return (
-                                    <span className='m-date projected' key={i} style={{ width: 100/weights.length + "%" }}>
-                                        <div className='graph-date'>{moment(projectedDates[i]).format("MM-DD-YYYY")}</div>
-                                        {
-                                            levelMap.map(i => {
-                                                let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
-                                                let weightOk = null;
-                                                if (currAvg in weight){
-                                                    if (weight[currAvg] < user.ideal_weight_kg){
-                                                        weightOk = true;
-                                                    } else {
-                                                        weightOk = false;
-                                                    }
-                                                }
-                                                let weightString;
-                                                if (!isNaN(weight[currAvg])){
-                                                    weightString = weightStringFromKg(weight[currAvg], user.weight_units);
-                                                    if (user.weight_units === "Pounds"){
-                                                        weightString = weightString.substring(0, weightString.length - 7);
-                                                    } else if (user.weight_units === "Kilograms"){
-                                                        weightString = weightString.substring(0, weightString.length - 10);
-                                                    }
+                                                weightStringFromKg(weights[i], user.weight_units).substring(0, weightStringFromKg(weights[i], user.weight_units).length - 10)
+                                        } />
+                                        <input type='submit' className='weight-submit'/>
+                                    </form>
+                                </div>
+                            )
+                        })
+                    }
+                    {
+                        Array(this.state.projecting).fill().map((x, i) => i).map((x,i) => {
+                            let weight = projectedAverages[i];
+                            return (
+                                <span className='tab-date projected' key={i} style={{ width: 100/weights.length + "%" }}>
+                                    <div className='graph-date'>{moment(projectedDates[i]).format("YYYY-MM-DD")}</div>
+                                    {
+                                        levelMap.map(i => {
+                                            let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
+                                            let weightOk = null;
+                                            if (currAvg in weight){
+                                                if (weight[currAvg] < user.ideal_weight_kg){
+                                                    weightOk = true;
                                                 } else {
-                                                    weightString = "n/a";
+                                                    weightOk = false;
                                                 }
-                                                return (
-                                                    <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data' : weightOk === true ? 'avg-section weight-ok' : 'avg-section weight-not-ok'}> 
-                                                            {weightString}
-                                                    </div>
-                                                )
-                                            })
-                                        }
+                                            }
+                                            let weightString;
+                                            if (!isNaN(weight[currAvg])){
+                                                weightString = weightStringFromKg(weight[currAvg], user.weight_units);
+                                                if (user.weight_units === "Pounds"){
+                                                    weightString = weightString.substring(0, weightString.length - 7);
+                                                } else if (user.weight_units === "Kilograms"){
+                                                    weightString = weightString.substring(0, weightString.length - 10);
+                                                }
+                                            } else {
+                                                weightString = "n/a";
+                                            }
+                                            return (
+                                                <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data' : weightOk === true ? 'avg-section weight-ok' : 'avg-section weight-not-ok'}> 
+                                                        {weightString}
+                                                </div>
+                                            )
+                                        })
+                                    }
 
-                                        <div className='graph-weight'>
-                                            <input type='number' defaultValue=
-                                            {
-                                                user.weight_units === "Pounds" ? 
-                                                    weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 7)
-                                                : user.weight_units === "Kilograms" ?
-                                                    weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 10)
-                                                : null
-                                            } />
-                                        </div>
-                                    </span>
-                                )
-                            })
-                        }
-                        {
-                            this.state.projecting === 0 ?
-                                <div id='project-button' onClick={() => this.project()}>Project</div>
-                            :
-                                <div id='project-button' onClick={() => this.hideProjection()}>Hide</div>
-                        }
-                    </div>
+                                    <div className='graph-weight'>
+                                        <input type='number' defaultValue=
+                                        {
+                                            user.weight_units !== "Kilograms" ? 
+                                                weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 7)
+                                            :
+                                                weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 10)
+                                        } />
+                                    </div>
+                                </span>
+                            )
+                        })
+                    }
+                    {
+                        this.state.projecting === 0 ?
+                            <div id='project-button' onClick={() => this.project()}>Project</div>
+                        :
+                            <div id='project-button' onClick={() => this.hideProjection()}>Hide</div>
+                    }
                 </div>
             </div>
         )

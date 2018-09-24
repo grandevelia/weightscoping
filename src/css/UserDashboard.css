@@ -145,14 +145,11 @@ body {
 #axis-labels{
 	display: flex;
 	flex-basis: 30%;
-	align-content: end;
+	justify-content: space-between;
 }
 .axis-label{
 	flex-basis: 33%;
 	font-size: 0.7em;
-}
-.axis-label:last-of-type{
-	text-align: right;
 }
 #graph-title{
 	flex: 1;
@@ -184,7 +181,7 @@ body {
 	cursor: pointer;
 }
 .toggle-option.active{
-	border-bottom: 2px solid white;
+	border-bottom: 2px solid black;
 }
 #project-button{
 	background-color: rgb(8, 40, 109);
@@ -200,26 +197,22 @@ body {
 	justify-content: center;
 	box-shadow: 2px 0px 1px rgba(0,0,0,0.4);
 	transition: ease-in-out 0.25s;
+	color: white;
 }
 #project-button:hover{
 	cursor: pointer;
 	background-color: rgb(8, 40, 109);
 }
-#graph-middle{
+.graph-middle{
 	display: flex;
 	flex: 1;
-	flex-direction: column;
+	flex-direction: row;
+	padding: 0 1.25%;
 }
 #graph-middle-top{
 	display: flex;
 	flex-direction: row;
 	flex-basis: 95%;
-	padding: 0 1.25%;
-}
-#graph-middle-m{
-	display: flex;
-	flex-direction: row;
-	flex-basis: 92.5%;
 	padding: 0 1.25%;
 }
 .data-point{
@@ -235,7 +228,7 @@ body {
 	width: 0.25rem;
 	border-radius: 50%;
 	transition: ease-in-out 0.125s;
-	background: white;
+	background: black;
 }
 .data-point:hover .weight-point{
 	cursor: pointer;
@@ -303,7 +296,7 @@ body {
 	justify-content: space-between;
 }
 .icon{
-	border: 1px solid white;
+	border: 1px solid rgba(0,0,0,0.1);
 	border-radius: 50%;
 	height: 1.5rem;
 	width: 1.5rem;
@@ -329,13 +322,11 @@ body {
 }
 .allowed-icons{
 	position: relative;
-	transform: translateY(-50%);
 	display: flex;
 	align-items: center;
 }
 .disallowed-icons{
 	position: relative;
-	transform: translateY(-50%);
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -373,14 +364,10 @@ body {
 	display: flex;
 	flex-direction: column;
 }
-.graph-section-8{
-	border-top: 1px solid white !important;
-	border-bottom: 1px dashed rgba(0,0,0,0.4);
-}
-.m-graph-section{
+.tab-graph-section{
 	flex: 1;
 }
-#m-date-label, #m-weight-label{
+#tab-date-label, #tab-weight-label{
 	flex: 0.25;
 }
 #x-labels{
@@ -585,7 +572,7 @@ body {
 	font-weight: bold;
 	transition: 0s;
 }
-.m-date:last-child{
+.tab-date:last-child{
 	border-right: 1px solid rgba(0,0,0,0.2);
 }
 .projected:first-of-type *{
@@ -600,6 +587,7 @@ body {
 	font-size: 0.5em;
 	border-left: 1px solid rgba(0,0,0,0.2);
 	border-top: 1px solid rgba(0,0,0,0.2);
+	color: white;
 }
 .avg-section:last-child{
 	border-bottom: 1px solid rgba(0,0,0,0.2);
@@ -613,7 +601,7 @@ body {
 .weight-not-ok{
 	background: rgb(213, 25, 50);
 }
-#m-graph-display{
+#tab-graph-display{
 	background-color: rgb(230,230,230);
 	border-radius: 2px;
 	align-items: stretch;
@@ -625,7 +613,10 @@ body {
 	padding-left: 0.5%;
 	box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
 }
-.m-date{
+#weight-loss-graph #tab-graph-display{
+	flex-basis: 70%;
+}
+.tab-date{
 	display: inline-flex;
 	vertical-align: top;
 	flex-direction: column;
@@ -645,7 +636,7 @@ body {
 	border-left: 1px solid rgba(0,0,0,0.2);
 	border-top: 1px solid rgba(0,0,0,0.2);
 }
-#m-y-labels{
+#tab-y-labels, #weightloss-tab-y-labels{
 	flex-basis: 20%;
 	flex-shrink: 1;
 	position: relative;
@@ -654,13 +645,16 @@ body {
 	text-align: center;
 	padding: 2.5% 2.5% 2.5% 0;
 }
-#m-axis-labels{
+#weightloss-tab-y-labels{
+	flex-basis: 30%;
+}
+#tab-axis-labels{
 	flex-basis: 20%;
 	flex-shrink: 1;
 	position: relative;
 	display: flex;
 }
-.m-axis-label{
+.tab-axis-label{
 	padding: 1.25%;
 	flex: 1;
 	font-size: 0.65em;

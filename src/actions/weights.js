@@ -2,6 +2,7 @@ import { addNotification } from './notifications';
 import { updateUserSettings } from './auth';
 import { weightStringFromKg, breakthroughIndex, mStatusCheck } from '../components/utils';
 import moment from 'moment';
+
 export const fetchWeights = () => {
 	return (dispatch, getState) => {
 		let headers = {"Content-Type": "application/json"};
@@ -26,6 +27,7 @@ export const fetchWeights = () => {
 				if (res.data.length === 0){
 					return dispatch(addWeight(75, moment().subtract(1, "days").format("YYYY-MM-DD")));
 				}
+				checkModeUpdate(res.data, getState().auth.user, dispatch);
 				return dispatch({type: 'FETCH_WEIGHTS', weights: res.data});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
@@ -37,7 +39,6 @@ export const fetchWeights = () => {
 
 export const addWeight = (weight_kg, date_added) => {
 	return (dispatch, getState) => {
-		console.log(weight_kg, date_added)
 		let headers = {"Content-Type": "application/json"};
 		let {token} = getState().auth;
 		
@@ -57,7 +58,6 @@ export const addWeight = (weight_kg, date_added) => {
 			}
 		})
 		.then(res => {
-			console.log(res)
 			if (res.status === 201) {
 				let user = getState().auth.user;
 				let weights = getState().weights;
@@ -80,7 +80,7 @@ export const addWeight = (weight_kg, date_added) => {
 						}
 					}
 
-					checkModeUpdate(weights, user);
+					checkModeUpdate(weights, user, dispatch);
 					return dispatch({type: 'ADD_WEIGHT', weight: res.data});
 				} else {
 					return dispatch(fetchWeights());
@@ -122,7 +122,7 @@ export const updateWeight = (weight_kg, id) => {
 		.then(res => {
 			if (res.status === 200) {
 				let state = getState();
-				checkModeUpdate(state.weights, state.auth.user.mode, state.auth.user.ideal_weight_kg);
+				checkModeUpdate(state.weights, state.auth.user, dispatch);
 				return dispatch({type: 'UPDATE_WEIGHT', weight_kg: weight_kg, id: id});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
@@ -175,7 +175,7 @@ export const deleteWeight = id => {
 		})
 		.then(res => {
 			if (res.status === 204) {
-				checkModeUpdate(state.weights, state.auth.user.mode, state.auth.user.ideal_weight_kg);
+				checkModeUpdate(state.weights, state.auth.user, dispatch);
 				return dispatch({type: 'DELETE_WEIGHT', id:id});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
@@ -185,7 +185,10 @@ export const deleteWeight = id => {
 	}
 }
 
-const checkModeUpdate = (weights, user) => {
+const checkModeUpdate = (weights, user, dispatch) => {
+	if (!user){
+		return
+	}
 	let mode = user.mode;
 	let idealWeight = user.ideal_weight_kg;
 
@@ -195,8 +198,8 @@ const checkModeUpdate = (weights, user) => {
 		if (closestIdealBreakthrough >= 0){
 			let daysAtIdeal = 1 + moment().diff(moment(weights[closestIdealBreakthrough].date_added), 'days');
 			if (daysAtIdeal > 6){
-				updateUserSettings("mode", "1");
-				updateUserSettings("starting_weight", weights.length-1)
+				dispatch(updateUserSettings("mode", "1"));
+				dispatch(updateUserSettings("starting_weight", weights.length-1));
 			}
 		}
 	} else if (mode === "1"){
@@ -209,11 +212,10 @@ const checkModeUpdate = (weights, user) => {
 			dates.push(weights[key]['date_added']);
 			weightsArr.push(weights[key]['weight_kg']);
 		});
-
-		let warningDays = mStatusCheck(weights, dates, user.starting_weight, user.ideal_weight_kg);
+		let warningDays = mStatusCheck(weightsArr, dates, user.starting_weight, user.ideal_weight_kg);
 		if (warningDays <= 0){
-			updateUserSettings("mode", "0");
-			updateUserSettings("starting_weight", weights.length-1)
+			dispatch(updateUserSettings("mode", "0"));
+			dispatch(updateUserSettings("starting_weight", weights.length-1));
 		}
 	}
 }

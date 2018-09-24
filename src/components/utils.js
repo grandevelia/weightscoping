@@ -283,7 +283,7 @@ export const modeReversionDays = (weightAvgs, idealWeight) => {
 	//Calculate warning content
 	if (averagesAboveIdealToday === maintenanceAvgs.length){
 		let gracePeriod = 10;
-		for (let i = 1; i < gracePeriod; i ++){
+		for (let i = 1; i <= gracePeriod; i ++){
 			let averagesAboveIdealCurr = 0;
 			Object.keys(weightAvgs[weightAvgs.length-(1+i)]).map(k => {
 				let v = weightAvgs[weightAvgs.length-i][k];
@@ -301,7 +301,23 @@ export const modeReversionDays = (weightAvgs, idealWeight) => {
 	}
 	return warningDays;
 }
-
+export const guessWeightsToNow = (weights, dates, ids=false) => {
+	let lastDay = dates[dates.length-1];
+	let lastWeight = weights[dates.length-1];
+	let dayDiff = moment().diff(moment(lastDay), "days");
+	for (let i = 1; i <= dayDiff; i ++){
+		dates.push(moment(lastDay).add(1*i, "day").format("YYYY-MM-DD"));
+		weights.push(lastWeight);
+		if (ids !== false){
+			ids.push(null);
+		}
+	}
+	return {
+		weights: weights,
+		dates: dates,
+		indexes: ids
+	}
+}
 export const setupAverages = (weights, dates, startingWeight) => {
 	/*
 	* Returns object containing a users weights with weights for all missing dates interpolated,
@@ -311,11 +327,15 @@ export const setupAverages = (weights, dates, startingWeight) => {
 	* param startingWeight original index of mode switch
 	*/
 
+	/*let currentData = guessWeightsToNow(weights, dates)
+	weights = currentData.weights;
+	dates = currentData.dates;*/
 	//interpolate missing data
 	let preStartWeights = weights.slice(0, startingWeight + 1);
 	let preStartDates = dates.slice(0, startingWeight + 1);
 	let untouchedWeightLen = preStartWeights.length;
 
+	//Interpolate weights before starting weight so the starting weight index is known
 	let interpData = interpolateDates(preStartWeights, preStartDates);
 	preStartWeights = interpData.weights;
 	preStartDates = interpData.dates;
@@ -341,21 +361,5 @@ export const mStatusCheck = (weights, dates, startingWeight, idealWeight) => {
 
 	let setupData = setupAverages(weights, dates, startingWeight);
 	let weightAvgs = calcAverages(setupData.startIndex, setupData.weights);
-
 	return modeReversionDays(weightAvgs, idealWeight);
-}
-export const guessWeightsToNow = (weights, dates, ids) => {
-	let lastDay = dates[dates.length-1];
-	let lastWeight = weights[dates.length-1];
-	let dayDiff = moment().diff(moment(lastDay), "days");
-	for (let i = 1; i <= dayDiff; i ++){
-		dates.push(moment(lastDay).add(1*i, "day").format("YYYY-MM-DD"));
-		weights.push(lastWeight);
-		ids.push(null);
-	}
-	return {
-		weights: weights,
-		dates: dates,
-		indexes: ids
-	}
 }

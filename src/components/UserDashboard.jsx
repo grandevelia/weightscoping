@@ -6,10 +6,7 @@ import PaypalButton from './PaypalButton';
 import ProgressSummary from './ProgressSummary';
 import WeightGraph from './WeightGraph';
 
-import DatePicker from 'react-datepicker';
 import moment from 'moment';
- 
-import 'react-datepicker/dist/react-datepicker.css';
 import '../css/UserDashboard.css';
 
 let paymentFracs = [0.25,0.1,0.0];
@@ -102,6 +99,8 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
+		console.log("Auth: " + user, "Weights: " + weights);
+
 		return (
 			<div id='dashboard-wrap'>
 				<ProgressSummary />
@@ -123,86 +122,65 @@ class UserDashboard extends Component {
 					:
 					<div id='lower-area'>
 						<div id='dashboard-third'>
-							<form id='submit-weight' onSubmit={(e) => this.addWeight(e)}>
-								<div id='submit-weight-title'>Enter A Weight:</div>
-								<div id='submit-weight-input-area'>
-									<div className='weight-input-title'>Select Date (MM-DD-YYYY)</div>
-									<DatePicker
-										selected={this.state.weightDate}
-										onChange={this.chooseWeightDate}
-									/>
-									{this.state.weightDate ? 
-									<div id='submit-weight-second'>
-										{user.weight_units === "Stones" ?
-											<span id='weight-buttons'>
-												<input type='number' onChange={(e) => this.handleWeightChange(e, "PRIMARY")} placeholder='Stones'/>
-												<input type='number' onChange={(e) => this.handleWeightChange(e, "SECONDARY")} placeholder='Pounds'/>
-											</span> : <input step="0.01" placeholder='Your Weight' onChange={(e) => this.handleWeightChange(e, "PRIMARY")} type='number' />
-										}
-										<button id='weight-change-submit' type='submit'>Submit</button>
-									</div>
-									: null
-									}
-								</div>
-							</form>
-								<div id='level-area'>
-									<div className='level-area-section'>
-										<div className='level-area-header'>You are at level</div>
+							
+							<div id='level-area'>
+								<div className='level-area-section'>
+									<div className='level-area-header'>You are at level</div>
 
-										<div className='level-area-content'>
-											{user.mode === "0" ? {level} : "Maintenance: " + level }
-										</div>
-										<div className='level-area-header'>Next target weight: </div>
-										<div className='level-area-content'>
-											{
-												level < 7 ? 
-													weightStringFromKg(weights[user.starting_weight].weight_kg-(level+2)*(weights[user.starting_weight].weight_kg - user.ideal_weight_kg)/8, user.weight_units)
-												: 
-													"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
-											}
-										</div>
+									<div className='level-area-content'>
+										{user.mode === "0" ? level : "Maintenance: " + level }
 									</div>
-									<div className='level-area-section'>
-										<div className='level-area-header'>You may have</div>
-										<div className='level-area-content'>
-											{ 
-												level < 7 ? 
-													allowedCarbs(level, user.carb_ranks) 
-												:
-													['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
-														let curr = weightAvgs[k];
-														if (curr <= user.ideal_weight_kg){
-															return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
-														}
-													}).filter(e => e)).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
-														if (weightAvgs[19] <= user.ideal_weight_kg){
-															return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
-														}
-													})).join(', ')
-											}
-										</div>
-									</div>
-									<div className='level-area-section'>
-										<div className='level-area-header'>You may not have</div>
-										<div className='level-area-content'>
-											{ 
-												level < 7 ? 
-													disallowedCarbs(level, user.carb_ranks) 
-												:
-													Object.keys(weightAvgs).map((k, i) => {
-														let curr = weightAvgs[k];
-														if (curr > user.ideal_weight_kg){
-															return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
-														}
-													}).filter(e => e).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
-														if (weightAvgs[19] > user.ideal_weight_kg){
-															return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
-														}
-													})).join(', ')
-											 }
-										</div>
+									<div className='level-area-header'>Next target weight: </div>
+									<div className='level-area-content'>
+										{
+											level < 7 ? 
+												weightStringFromKg(weights[user.starting_weight].weight_kg-(level+2)*(weights[user.starting_weight].weight_kg - user.ideal_weight_kg)/8, user.weight_units)
+											: 
+												"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
+										}
 									</div>
 								</div>
+								<div className='level-area-section'>
+									<div className='level-area-header'>You may have</div>
+									<div className='level-area-content'>
+										{ 
+											level < 7 ? 
+												allowedCarbs(level, user.carb_ranks) 
+											:
+												['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
+													let curr = weightAvgs[k];
+													if (curr <= user.ideal_weight_kg){
+														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+													}
+												}).filter(e => e)).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+													if (weightAvgs[19] <= user.ideal_weight_kg){
+														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+													}
+												})).join(', ')
+										}
+									</div>
+								</div>
+								<div className='level-area-section'>
+									<div className='level-area-header'>You may not have</div>
+									<div className='level-area-content'>
+										{ 
+											level < 7 ? 
+												disallowedCarbs(level, user.carb_ranks) 
+											:
+												Object.keys(weightAvgs).map((k, i) => {
+													let curr = weightAvgs[k];
+													if (curr > user.ideal_weight_kg){
+														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+													}
+												}).filter(e => e).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+													if (weightAvgs[19] > user.ideal_weight_kg){
+														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+													}
+												})).join(', ')
+											}
+									</div>
+								</div>
+							</div>
 						</div>
 						<div id='dashboard-fourth'>
 							<WeightGraph user={user} level={level} weights={weights} addWeight={this.props.addWeight} updateWeight={this.props.updateWeight} deleteWeight={this.deleteWeight}/>

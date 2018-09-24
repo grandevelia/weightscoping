@@ -7,7 +7,7 @@ export default class WeightHistoryGraph extends Component {
         let user = this.props.user;
         let level = this.props.level;
 
-		let sectionHeight, kgPerSection, levelBg, numLevels, numSections, levelMap;
+		let sectionHeight, kgPerSection, numLevels, numSections, levelMap;
 
 		let weights = []
 		let dates = [];
@@ -66,12 +66,12 @@ export default class WeightHistoryGraph extends Component {
         }
         let styles = this.props.calcStyles(maxWeight, minWeight, initialWeight, sectionHeight);
         return (
-            <div id='graph-middle'>
+            <div className='graph-middle'>
                 <div id='graph-middle-top'>
                     <div id={user.mode == "0" ? 'y-labels' : "history-y-labels"}> 
                         {   
                             maxWeight > initialWeight && user.mode === "0" ?
-                                <div className='y-label graph-section graph-section-0' style={{...styles.firstSection, background: levelBg}}>
+                                <div className='y-label graph-section graph-section-0' style={{...styles.firstSection}}>
                                     <div className='y-label-weight'>
                                         {weightStringFromKg(maxWeight, user['weight_units'])}
                                     </div>
@@ -90,15 +90,6 @@ export default class WeightHistoryGraph extends Component {
                                     } else {
                                         currStyle = styles.singleSection;
                                     }
-                                    if (y <= level){
-                                        currStyle = {...currStyle, background: levelBg};
-                                    } else {
-                                        let currRed = 57 - 5 * (numLevels - y - 1);
-                                        let currGreen = 192 - 20 * (numLevels - y - 1);
-                                        let currBlue = 228 - 15 * (numLevels - y - 1);
-                                        let currBackground = "rgb(" + currRed + ", " + currGreen + ", " + currBlue + ")";
-                                        currStyle = {...currStyle, background: currBackground, borderTop: "1px dashed rgba(0,0,0,0.2)"};
-                                    }
                                     return (
                                         <div key={y} className={'y-label graph-section graph-section-' + (y+1)} style={currStyle}>
                                             <div className='icons-wrap'>
@@ -112,7 +103,7 @@ export default class WeightHistoryGraph extends Component {
                             :
                                 levelMap.map(y => {
                                     let yWeight = maxWeight - y * (maxWeight - minWeight)/numLevels;
-                                    let currStyle = {flexBasis: 100/numLevels + "%", background: levelBg};
+                                    let currStyle = {flexBasis: 100/numLevels + "%"};
                                 
                                     return (
                                         <div key={y} className={'y-label graph-section graph-section-' + (y+1)} style={currStyle}>
@@ -125,7 +116,7 @@ export default class WeightHistoryGraph extends Component {
 
                     <div id='graph-display'>
                         <div id='graph-display-backgrounds'>
-                            <div className='graph-section graph-section-0' style={{...styles.firstSection, background: levelBg}}></div>
+                            <div className='graph-section graph-section-0' style={{...styles.firstSection}}></div>
                             {
                                 user.mode === "0" && initialWeight > user.ideal_weight_kg ?
                                     levelMap.map(y => {
@@ -134,15 +125,6 @@ export default class WeightHistoryGraph extends Component {
                                             currStyle = styles.doubleSection;
                                         } else {
                                             currStyle = styles.singleSection;
-                                        }
-                                        if (y <= level){
-                                            currStyle = {...currStyle, background: levelBg}
-                                        } else {
-                                            let currRed = 57 - 5 * (numLevels - y - 1);
-                                            let currGreen = 192 - 20 * (numLevels - y - 1);
-                                            let currBlue = 228 - 15 * (numLevels - y -1);
-                                            let currBackground = "rgb(" + currRed + ", " + currGreen + ", " + currBlue + ")";
-                                            currStyle = {...currStyle, background: currBackground, borderTop: "1px dashed rgba(0,0,0,0.2)"};
                                         }
                                         return <div key={y} className={'graph-section graph-section-' + (y+1)} style={currStyle}></div>;
                                     })
