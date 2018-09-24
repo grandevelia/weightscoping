@@ -78,12 +78,8 @@ class UserDashboard extends Component {
 		let user = this.props.auth.user;
 		let weights = this.props.weights;
 
-		console.log(user, weights);
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
-		if (user.email === "theseus35@gmail.com"){
-			this.updateSettings("starting_weight", 0);
-		}
 		if (user.mode === "0"){
 			level = lossmodeLevel(weights[user.starting_weight].weight_kg, user.ideal_weight_kg, weights[weights.length-1].weight_kg);
 			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
