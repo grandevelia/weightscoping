@@ -66,8 +66,8 @@ class Profile(AbstractUser):
 	)
 	starting_weight = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 	MODE_CHOICES = (
-		('0', 'Weight Loss'),
-		('1', 'Maintenance'),
+		('0', '0'),
+		('1', '1'),
 	)
 	mode = models.CharField(
 		max_length=20,
