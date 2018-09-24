@@ -99,7 +99,7 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-		console.log("Auth: " + user, "Weights: " + weights);
+		console.log(user, weights);
 
 		return (
 			<div id='dashboard-wrap'>
