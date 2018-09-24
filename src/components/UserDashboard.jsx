@@ -81,8 +81,8 @@ class UserDashboard extends Component {
 		console.log(user, weights);
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
-		if (user.mode !== "0" && user.mode !== "1"){
-			this.updateSettings("mode", "0");
+		if (user.email === "theseus35@gmail.com"){
+			this.updateSettings("starting_weight", 0);
 		}
 		if (user.mode === "0"){
 			level = lossmodeLevel(weights[user.starting_weight].weight_kg, user.ideal_weight_kg, weights[weights.length-1].weight_kg);
