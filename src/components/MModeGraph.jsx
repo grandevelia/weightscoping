@@ -60,7 +60,7 @@ export default class WeightHistoryGraph extends Component {
         if (this.state.inputs[i] === ""){
             return
         }
-        let newWeight = parseInt(this.state.input[i], 10);
+        let newWeight = parseInt(this.state.inputs[i], 10);
         if (interpolated){
 			this.props.addWeight(this.convertWeight(newWeight), date);
         } else {
@@ -68,7 +68,7 @@ export default class WeightHistoryGraph extends Component {
         }
     }
 	convertWeight(weight){
-		let weightUnits = this.props.auth.user.weight_units;
+		let weightUnits = this.props.user.weight_units;
 		if (weightUnits === "Pounds"){
 			return poundsToKg(weight);
 		}

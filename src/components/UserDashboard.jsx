@@ -66,7 +66,7 @@ class UserDashboard extends Component {
 	chooseWeightDate = (date) => {
 		this.setState({weightDate: date});
 	}
-	deleteWeight(id){
+	deleteWeight = id => {
 		this.props.deleteWeight(id);
 	}
 	render(){
@@ -77,7 +77,6 @@ class UserDashboard extends Component {
 		}
 		let user = this.props.auth.user;
 		let weights = this.props.weights;
-		console.log(user, weights)
 
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
@@ -103,7 +102,6 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-		console.log(level)
 		return (
 			<div id='dashboard-wrap'>
 				<ProgressSummary />

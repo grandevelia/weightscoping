@@ -23,8 +23,9 @@ export const fetchWeights = () => {
 		})
 		.then(res => {
 			if (res.status === 200) {
+				console.log(res.data.length);
 				if (res.data.length === 0){
-					return dispatch(addWeight(100, moment().format("YYYY-MM-DD")));
+					return dispatch(addWeight(75, moment().subtract(1, "days").format("YYYY-MM-DD")));
 				}
 				return dispatch({type: 'FETCH_WEIGHTS', weights: res.data});
 			} else if (res.status === 401 || res.status === 403) {
@@ -38,6 +39,7 @@ export const fetchWeights = () => {
 export const addWeight = (weight_kg, date_added) => {
 	return (dispatch, getState) => {
 		console.log("got into add")
+		console.log(weight_kg, date_added)
 		let headers = {"Content-Type": "application/json"};
 		let {token} = getState().auth;
 		
@@ -61,26 +63,29 @@ export const addWeight = (weight_kg, date_added) => {
 				let user = getState().auth.user;
 				let weights = getState().weights;
 
-				//If the user is in weight loss mode, check for ideal weight breakthrough when new weight is added
-				if (user.mode === "0"){
+				if (weights.length && weights[0] !== null){
+					//If the user is in weight loss mode, check for ideal weight breakthrough when new weight is added
+					if (user.mode === "0"){
 
-					//If this is the most recent weight (not filling in a gap)
-					if (moment(date_added).isAfter(moment(weights[weights.length-1].date_added))){
+						//If this is the most recent weight (not filling in a gap)
+						if (moment(date_added).isAfter(moment(weights[weights.length-1].date_added))){
 
-						//Ensure weights is at least 1 item long
-						if (weights.length ){
+							//Ensure weights is at least 1 item long
+							if (weights.length ){
 
-							//Breakthrough only if the next most recent weight was above ideal weight
-							if (weight_kg <= user.ideal_weight_kg && weights[weights.length - 1].weight_kg > user.ideal_weight_kg){
-								dispatch(addNotification("Congratulations! You've reached your ideal weight. Once you maintain a weight of " + weightStringFromKg(1.02 * user.ideal_weight_kg, user.weight_units) + " (within 2% of your ideal weight) for 7 days, you will enter Maintenance Mode. Our focus will switch from helping you lose weight to helping you stay where you're at: the perfect weight for you."));
+								//Breakthrough only if the next most recent weight was above ideal weight
+								if (weight_kg <= user.ideal_weight_kg && weights[weights.length - 1].weight_kg > user.ideal_weight_kg){
+									dispatch(addNotification("Congratulations! You've reached your ideal weight. Once you maintain a weight of " + weightStringFromKg(1.02 * user.ideal_weight_kg, user.weight_units) + " (within 2% of your ideal weight) for 7 days, you will enter Maintenance Mode. Our focus will switch from helping you lose weight to helping you stay where you're at: the perfect weight for you."));
+								}
 							}
 						}
 					}
+
+					checkModeUpdate(weights, user);
+					return dispatch({type: 'ADD_WEIGHT', weight: res.data});
+				} else {
+					return dispatch(fetchWeights());
 				}
-
-				checkModeUpdate(weights, user);
-
-				return dispatch({type: 'ADD_WEIGHT', weight: res.data});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
 				throw res.data;

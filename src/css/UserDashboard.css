@@ -704,8 +704,7 @@ body {
 .weight-submit{
 	position: absolute;
 	min-width: 50%;
-	top: 2%;
-	height: 98%;
+	top: 0%;
 	padding: 2.5% 5%;
 	color: white;
 	font-size: 0.4em;
