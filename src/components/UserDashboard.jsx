@@ -78,6 +78,7 @@ class UserDashboard extends Component {
 		let user = this.props.auth.user;
 		let weights = this.props.weights;
 
+		console.log(user, weights);
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
 		if (user.mode !== "0" && user.mode !== "1"){
@@ -105,7 +106,6 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-		console.log(user, weights);
 
 		return (
 			<div id='dashboard-wrap'>
