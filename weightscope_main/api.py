@@ -139,9 +139,9 @@ class WeightViewSet(viewsets.ModelViewSet):
 
 	def create(self, request):
 		data = request.data
-		date = unicodedata.normalize('NFKD', data['date_added']).encode('ascii','ignore')
+		#date = unicodedata.normalize('NFKD', data['date_added']).encode('ascii','ignore')
 		
-		data['date_added'] = date
+		#data['date_added'] = date
 		data['user'] = request.user.id
 		serializer = self.get_serializer(data=data)
 		serializer.is_valid()

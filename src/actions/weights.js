@@ -186,7 +186,6 @@ export const deleteWeight = id => {
 }
 
 const checkModeUpdate = (weights, user) => {
-	console.log("checking mode update", weights, user)
 	let mode = user.mode;
 	let idealWeight = user.ideal_weight_kg;
 
