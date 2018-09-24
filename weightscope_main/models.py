@@ -72,7 +72,7 @@ class Profile(AbstractUser):
 	mode = models.CharField(
 		max_length=20,
 		choices=MODE_CHOICES,
-		default='Weight Loss'
+		default='0'
 	)
 	REQUIRED_FIELDS=[]
 

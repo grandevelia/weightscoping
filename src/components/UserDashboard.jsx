@@ -66,6 +66,9 @@ class UserDashboard extends Component {
 	deleteWeight = id => {
 		this.props.deleteWeight(id);
 	}
+	updateSettings(key, value){
+		this.props.updateUserSettings(key,value);
+	}
 	render(){
 		if (this.props.weights.length > 0 && this.props.weights[0] === null){
 			return (
@@ -77,6 +80,9 @@ class UserDashboard extends Component {
 
 		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
+		if (user.mode !== "0" && user.mode !== "1"){
+			this.updateSettings("mode", "0");
+		}
 		if (user.mode === "0"){
 			level = lossmodeLevel(weights[user.starting_weight].weight_kg, user.ideal_weight_kg, weights[weights.length-1].weight_kg);
 			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
