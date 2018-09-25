@@ -51,7 +51,7 @@ class ProgressSummary extends Component {
                         {
                             user.mode === "0" ?
 
-                                currentWeight < user['ideal_weight_kg'] * 1.02 ?
+                                daysAtIdeal > 0 ?
                                     <div>
                                         <div id='maintenance-mouseover'>
                                             Once you reach your ideal weight, you must maintain within 2% of it in order to enter the next phase
