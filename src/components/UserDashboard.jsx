@@ -17,6 +17,9 @@ class UserDashboard extends Component {
 		newWeightPrimary: null,
 		newWeightSecondary: null
 	}
+	componentDidMount(){
+		this.props.fetchWeights();
+	}
 	addWeight(e){
 		e.preventDefault();
 		if (this.state.weightDate){
@@ -204,6 +207,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
+		fetchWeights: () => {
+			return dispatch(weights.fetchWeights());
+		},
 		addWeight: (weightKg, date) => {
 			return dispatch(weights.addWeight(weightKg, date))
 		},
