@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { poundsToKg, interpolateDates, maintenanceAvgs, weightStringFromKg, iconIndex, maintenanceCarbOrder, carbOptions, calcAverages, guessWeightsToNow } from './utils';
+import { iconIndex, carbOrder, carbOptions, poundsToKg, interpolateDates, maintenanceAvgs, weightStringFromKg, maintenanceCarbOrder, calcAverages, guessWeightsToNow } from './utils';
 import moment from 'moment';
 
 export default class WeightHistoryGraph extends Component {
@@ -12,6 +12,8 @@ export default class WeightHistoryGraph extends Component {
         }
         this.state = {
             projecting: 0,
+            projectedWeights: null,
+            projectedDates: null,
             inputs: inputState
         }
     }
@@ -74,7 +76,7 @@ export default class WeightHistoryGraph extends Component {
 		}
 		return weight;
 	}
-    project(){
+    project(weights, dates){
         let daysToProject = parseInt(prompt("How many days would you like to project? (1-30)"), 10);
         if (isNaN(daysToProject)){
             return;
@@ -85,7 +87,28 @@ export default class WeightHistoryGraph extends Component {
         if (daysToProject < 1){
             return;
         }
-        this.setState({projecting : daysToProject}, () => {
+        let projectedWeights, projectedDates;
+        //Get last day, add the same weight state.projecting days later, interpolate between
+        projectedDates = [];
+        projectedDates.push(dates[dates.length-1]);
+        projectedDates.push(moment(projectedDates[0]).add(daysToProject, "days").format("YYYY-MM-DD"));
+
+        projectedWeights = [];
+        projectedWeights.push(weights[weights.length-1]);
+        projectedWeights.push(weights[weights.length-1]);
+        let tempData = interpolateDates(projectedWeights, projectedDates);
+
+        projectedWeights = weights.concat(tempData.weights.slice(1,tempData.weights.length));
+        projectedDates = dates.concat(tempData.dates.slice(1,tempData.dates.length));
+
+        projectedWeights = projectedWeights.slice(weights.length);
+        projectedDates = projectedDates.slice(dates.length);
+        
+        this.setState({
+            projecting : daysToProject,
+            projectedWeights: projectedWeights,
+            projectedDates: projectedDates
+        }, () => {
             this.refs.scroll.scrollLeft = 1000000000000000;
         });
     }
@@ -96,74 +119,24 @@ export default class WeightHistoryGraph extends Component {
         let user = this.props.user;
         let numLevels = maintenanceAvgs.length;
         let levelMap = Array( numLevels ).fill().map((x,i) => i);
+        let weights = this.props.weights;
+        let dates = this.props.dates;
+        let ids = this.props.ids;
+        let startingIndex = this.props.startingIndex;
 
-		let weights = []
-		let dates = [];
-		let ids = [];
+        let weightAvgs = calcAverages(startingIndex, weights);
 
-		//Split user weight data into arrays for easier manipulation
-		Object.keys(this.props.weights).map(key => {
-			dates.push(this.props.weights[key]['date_added']);
-			weights.push(this.props.weights[key]['weight_kg']);
-			ids.push(this.props.weights[key]['id']);
-        });
-        
-        //Find averages of recent weights
-
-        //interpolate missing data
-        let preStartWeights = weights.slice(0, user.starting_weight + 1);
-        let preStartDates = dates.slice(0, user.starting_weight + 1);
-        let untouchedWeightLen = preStartWeights.length;
-
-        let interpData = interpolateDates(preStartWeights, preStartDates, ids);
-        preStartWeights = interpData.weights;
-        preStartDates = interpData.dates;
-        ids = interpData.indexes;
-
-        //Find how many points were interpolated from 0 through starting weight
-        let preStartAddedCount = interpData.weights.length - untouchedWeightLen;
-        let modStart = user.starting_weight + preStartAddedCount; //Adjust starting index to account for new data
-        
-        //interpolate points from user.starting_weight through end, and join previous result for averaging
-        interpData = interpolateDates(weights.slice(user.starting_weight, weights.length), dates.slice(user.starting_weight, dates.length), ids);
-
-        //Don't use first element of second array to avoid duplicate join point
-        weights = preStartWeights.concat(interpData.weights.slice(1,interpData.weights.length));
-        dates = preStartDates.concat(interpData.dates.slice(1,interpData.dates.length));
-
-        //Ensure weights are present up to current day
-        interpData = guessWeightsToNow(weights, dates, ids);
-        weights = interpData.weights;
-        dates = interpData.dates;
-        ids = interpData.indexes;
-
-
-        let weightAvgs = calcAverages(modStart, weights);
-
-        let projectedAverages, projectedWeights, projectedDates;
+        let projectedAverages, projectedWeights;
         if (this.state.projecting > 0){
-            //Get last day, add the same weight state.projecting days later, interpolate between, get averages
-            projectedDates = [];
-            projectedDates.push(dates[dates.length-1]);
-            projectedDates.push(moment(projectedDates[0]).add(this.state.projecting, "days").format("YYYY-MMMM-DD"));
-            projectedWeights = [];
-            projectedWeights.push(weights[weights.length-1]);
-            projectedWeights.push(weights[weights.length-1]);
-            let tempData = interpolateDates(projectedWeights, projectedDates);
-
-            projectedWeights = weights.concat(tempData.weights.slice(1,tempData.weights.length));
-            projectedDates = dates.concat(tempData.dates.slice(1,tempData.dates.length));
-
-            projectedAverages = calcAverages(weights.length, projectedWeights);
-
-            projectedWeights = projectedWeights.slice(weights.length);
-            projectedDates = projectedDates.slice(dates.length);
+            projectedWeights = this.state.projectedWeights;
+            projectedAverages = calcAverages(weights.length, weights.concat(projectedWeights));
         }
 
         //Remove weights before ideal weight breakthrough
-        ids = ids.slice(modStart, ids.length);
-        weights = weights.slice(modStart, weights.length);
-        dates = dates.slice(modStart, dates.length);
+        ids = ids.slice(startingIndex, ids.length);
+        weights = weights.slice(startingIndex, weights.length);
+        dates = dates.slice(startingIndex, dates.length);
+
         return (
             <div className='graph-middle'>
                 <div id='tab-y-labels'>
@@ -247,7 +220,7 @@ export default class WeightHistoryGraph extends Component {
                             let weight = projectedAverages[i];
                             return (
                                 <span className='tab-date projected' key={i} style={{ width: 100/weights.length + "%" }}>
-                                    <div className='graph-date'>{moment(projectedDates[i]).format("YYYY-MM-DD")}</div>
+                                    <div className='graph-date'>{this.state.projectedDates[i]}</div>
                                     {
                                         levelMap.map(i => {
                                             let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
@@ -279,13 +252,13 @@ export default class WeightHistoryGraph extends Component {
                                     }
 
                                     <div className='graph-weight'>
-                                        <input type='number' defaultValue=
+                                        <input onChange={(e) => this.changeWeight(e, i, true)} className='graph-weight-number' type='number' value=
                                         {
                                             user.weight_units !== "Kilograms" ? 
                                                 weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 7)
                                             :
                                                 weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 10)
-                                        } />
+                                        }/>
                                     </div>
                                 </span>
                             )
@@ -293,7 +266,7 @@ export default class WeightHistoryGraph extends Component {
                     }
                     {
                         this.state.projecting === 0 ?
-                            <div id='project-button' onClick={() => this.project()}>Project</div>
+                            <div id='project-button' onClick={() => this.project(weights, dates)}>Project</div>
                         :
                             <div id='project-button' onClick={() => this.hideProjection()}>Hide</div>
                     }

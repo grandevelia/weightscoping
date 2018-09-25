@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { weights, notifications, auth } from "../actions";
-import { planTitles, weightStringFromKg, poundsToKg, allowedCarbs, disallowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions } from './utils';
+import { planTitles, weightStringFromKg, allowedCarbs, disallowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions, interpolateDates, guessWeightsToNow } from './utils';
 import PaypalButton from './PaypalButton';
 import ProgressSummary from './ProgressSummary';
 import WeightGraph from './WeightGraph';
@@ -13,99 +13,116 @@ let paymentFracs = [0.25,0.1,0.0];
 
 class UserDashboard extends Component {
 	state = {
-		weightDate: null,
-		newWeightPrimary: null,
-		newWeightSecondary: null
+		weights: null,
+		dates: null,
+		ids: null,
+		startingIndex: null
+	}
+	setupWeight(){
+
+		let user = this.props.auth.user;
+		let weights = []
+		let dates = [];
+		let ids = [];
+		//Split user weight data into arrays for easier manipulation
+		Object.keys(this.props.weights).map(key => {
+			dates.push(this.props.weights[key]['date_added']);
+			weights.push(this.props.weights[key]['weight_kg']);
+			ids.push(this.props.weights[key]['id']);
+        });
+		//Adjust starting index to account for points  interpolated from 0 through starting weight
+        let newStartingIndex = moment(dates[user.starting_weight]).diff(moment(dates[0]), "days");
+        
+        //interpolate missing data
+        let interpData = interpolateDates(weights, dates, ids);
+
+        //Don't use first element of second array to avoid duplicate join point
+        weights = interpData.weights;
+		dates = interpData.dates;
+		ids = interpData.ids;
+
+        //Ensure weights are present up to current day
+        interpData = guessWeightsToNow(weights, dates, ids);
+        weights = interpData.weights;
+        dates = interpData.dates;
+		ids = interpData.indexes;
+
+		this.setState({
+			weights: weights,
+			dates: dates,
+			ids: ids,
+			startingIndex: newStartingIndex
+		})
 	}
 	componentDidMount(){
-		this.props.fetchWeights();
-	}
-	addWeight(e){
-		e.preventDefault();
-		if (this.state.weightDate){
-			let dateString = moment(this.state.weightDate.utc()._d).format("YYYY-MM-DD");
-			for (let i = 0; i < weights.length; i ++){
-				if (weights[i].date_added === dateString){
-					let conf = window.confirm("You've already added a weight for " + dateString + ". Update this weight?");
-					if (conf){
-						this.props.updateWeight(this.convertWeight(), weights[i].id);
-					}
-					this.setState({weightDate: null, newWeightPrimary: null, newWeightSeconday: null});
-					return;
-				}
-			}
-			this.props.addWeight(this.convertWeight(), dateString);
-			this.setState({weightDate: null, newWeightPrimary: null, newWeightSeconday: null});
+		if (this.props.weights.length && this.props.weights[0] === null){
+			this.props.fetchWeights().then(() => {
+				this.setupWeight();
+			});
 		} else {
-			alert("You have to choose the date you weighed this much!");
+			this.setupWeight();
 		}
 	}
-	handleWeightChange(e, unit){
-		if (unit === "PRIMARY"){
-			this.setState({
-				newWeightPrimary: e.target.value
-			});
-		} else if (unit === "SECONDARY"){
-			this.setState({
-				newWeightSecondary: e.target.value
-			});
+	updateWeight(weight, id){
+		let index = 0;
+		for (let i = 0; i < this.state.ids.length; i ++){
+			if (this.state.ids[i] === id){
+				index = i;
+				break;
+			}
 		}
+		this.props.updateWeight(weight, id);
+		let newWeights = this.state.weights;
+		newWeights[index] = weight;
+		this.setState({weights: newWeights});
 	}
-	convertWeight(){
-		let weightUnits = this.props.auth.user.weight_units;
-		if (weightUnits === "Stones"){
-			return poundsToKg(parseInt(this.state.newWeightPrimary,10) * 14 + parseInt(this.state.newWeightSecondary,10));
-		} else if (weightUnits === "Pounds"){
-			return poundsToKg(parseInt(this.state.newWeightPrimary,10));
+	addWeight(weight, date){
+		let index = 0;
+		for (let i = 0; i < this.state.dates.length; i ++){
+			if (this.state.dates[i] === date){
+				index = i;
+				break;
+			}
 		}
-		return this.state.newWeightPrimary;
+		this.props.addWeight(weight, date);
+		let newWeights = this.state.weights;
+		newWeights[index] = weight;
+		this.setState({weights: newWeights});
 	}
 	updateValue(e){
 		this.setState({monetary_value:e.target.value});
-	}
-	chooseWeightDate = (date) => {
-		this.setState({weightDate: date});
-	}
-	deleteWeight = id => {
-		this.props.deleteWeight(id);
 	}
 	updateSettings(key, value){
 		this.props.updateUserSettings(key,value);
 	}
 	render(){
-		if (this.props.weights.length > 0 && this.props.weights[0] === null){
+		if ((this.props.weights.length && this.props.weights[0] === null) || this.state.weights === null){
 			return (
 				<div>Loading Weights...</div>
 			)
 		}
 		let user = this.props.auth.user;
-		let weights = this.props.weights;
+		let weights = this.state.weights;
+		
+		let totalOwed = 0;
+		let remainingOwed = 0;
 
-		let totalOwed, remainingOwed;
 		let level, mWeights, modStart, weightAvgs;
 		if (user.mode === "0"){
-			level = lossmodeLevel(weights[user.starting_weight].weight_kg, user.ideal_weight_kg, weights[weights.length-1].weight_kg);
+
+			level = lossmodeLevel(weights[this.state.startingIndex], user.ideal_weight_kg, weights[weights.length-1]);
 			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
 			remainingOwed = totalOwed-user.amount_paid/100;
+
 		} else {
 			level = 7;
-			totalOwed = 0;
-			remainingOwed = 0;
-			let weightArr = []
-			let dateArr = [];
-
-			//Split user weight data into arrays for easier manipulation
-			Object.keys(weights).map(key => {
-				dateArr.push(weights[key]['date_added']);
-				weightArr.push(weights[key]['weight_kg']);
-			});
-			let mData = setupAverages(weightArr, dateArr, user.starting_weight);
+			
+			let mData = setupAverages(this.state.weights, this.state.dates, this.state.startingIndex);
 			mWeights = mData.weights;
 			modStart = mData.startIndex;
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-
 		return (
 			<div id='dashboard-wrap'>
 				<ProgressSummary />
@@ -127,29 +144,27 @@ class UserDashboard extends Component {
 					:
 					<div id='lower-area'>
 						<div id='dashboard-third'>
-							
+
 							<div id='level-area'>
 								<div className='level-area-section'>
 									<div className='level-area-header'>You are at level</div>
-
-									<div className='level-area-content'>
-										{user.mode === "0" ? level : "Maintenance: " + level }
-									</div>
+									<div className='level-area-content'>{level}</div>
 									<div className='level-area-header'>Next target weight: </div>
 									<div className='level-area-content'>
 										{
 											level < 7 ? 
-												weightStringFromKg(weights[user.starting_weight].weight_kg-(level+2)*(weights[user.starting_weight].weight_kg - user.ideal_weight_kg)/8, user.weight_units)
+												weightStringFromKg(weights[this.state.startingIndex]-(level+2)*(weights[this.state.startingIndex] - user.ideal_weight_kg)/8, user.weight_units)
 											: 
 												"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
 										}
 									</div>
 								</div>
+
 								<div className='level-area-section'>
 									<div className='level-area-header'>You may have</div>
 									<div className='level-area-content'>
 										{ 
-											level < 7 ? 
+											level < 7 || user.mode === "0" ? 
 												allowedCarbs(level, user.carb_ranks) 
 											:
 												['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
@@ -169,7 +184,7 @@ class UserDashboard extends Component {
 									<div className='level-area-header'>You may not have</div>
 									<div className='level-area-content'>
 										{ 
-											level < 7 ? 
+											level < 7 || user.mode === "0" ? 
 												disallowedCarbs(level, user.carb_ranks) 
 											:
 												Object.keys(weightAvgs).map((k, i) => {
@@ -188,7 +203,7 @@ class UserDashboard extends Component {
 							</div>
 						</div>
 						<div id='dashboard-fourth'>
-							<WeightGraph user={user} level={level} weights={weights} addWeight={this.props.addWeight} updateWeight={this.props.updateWeight} deleteWeight={this.deleteWeight}/>
+							<WeightGraph user={user} level={level} weights={this.state.weights} dates={this.state.dates} ids={this.state.ids} startingIndex={this.state.startingIndex} updateWeight={(weight_kg, id) => this.updateWeight(weight_kg, id)} addWeight={(weight_kg, date) => this.addWeight(weight_kg, date)}/>
 						</div>
 					</div>
 				}

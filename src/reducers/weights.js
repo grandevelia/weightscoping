@@ -37,7 +37,7 @@ export default function weights(state=initialState, action){
 				alert("Undefined Weight");
 				return;
 			}
-		    weightList[index].weight_kg = action.weight_kg;
+			weightList[index].weight_kg = action.weight_kg;
 			return weightList;
 		}
 

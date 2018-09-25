@@ -101,8 +101,24 @@ export const addWeight = (weight_kg, date_added) => {
 
 export const updateWeight = (weight_kg, id) => {
 	return (dispatch, getState) => {
+		let state = getState();
+		let user = state.auth.user;
+		if (user.mode === "0"){
+			let weights = state.weights;
+			let updatingStartingWeight = false;
+			for (let i = 0; i < weights.length; i ++){
+				if (weights[i].id === id && i === user.starting_weight){
+					updatingStartingWeight = true;
+					break;	
+				}
+			}
+			if (updatingStartingWeight && user.ideal_weight_kg <= weight_kg){
+				alert("The weight that is used to determine your levels must be above your ideal weight. Please reset your starting weight before updating this weight.");
+				throw new Error("Key Weight Misconfigured");
+			}
+		}
 		let headers = {"Content-Type": "application/json"};
-		let {token} = getState().auth;
+		let {token} = state.auth;
 
 		if (token) {
 			headers["Authorization"] = "Token " + token;

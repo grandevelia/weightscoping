@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { weightStringFromKg, interpolateDates, guessWeightsToNow, calcAverages, poundsToKg} from './utils';
+import { iconIndex, carbOrder, carbOptions, weightStringFromKg, interpolateDates, poundsToKg } from './utils';
 import moment from 'moment';
 
 export default class WeightHistoryGraph extends Component{
@@ -12,6 +12,8 @@ export default class WeightHistoryGraph extends Component{
         }
         this.state = {
             projecting: 0,
+            projectedWeights: null,
+            projectedDates: null,
             inputs: inputState
         }
     }
@@ -28,7 +30,7 @@ export default class WeightHistoryGraph extends Component{
             let targetWeight = this.convertWeight(parseInt(e.target.value,10));
             if (i > 0){
                 //When a user changes a projected weights, all weights before that day are filled
-                let anchorWeight = this.props.weights[this.props.weights.length-1].weight_kg;
+                let anchorWeight = this.props.weights[this.props.weights.length-1];
                 let interpWeights = [];
                 interpWeights.push(anchorWeight);
                 interpWeights.push(targetWeight);
@@ -108,46 +110,70 @@ export default class WeightHistoryGraph extends Component{
             projectedDates: null
         });
     }
+	allowedIcons(index, carbRanks){
+		if (isNaN(index)){
+			return <div className='loading-icons'>Loading...</div>
+		}
+		if (index === 0){
+			return (
+				<div className='allowed-icons'>
+					<div className='icon icon-allowed' id='non-incentive-icon'>
+						<div className='icon-description'>Non Incentive Food</div>
+					</div>
+				</div>
+			)
+		}
+		let indexArr = Array( index ).fill().map((x,i) => i);
+		return (
+			<div className='allowed-icons'>
+				<div className='icon icon-allowed' id='non-incentive-icon'>
+					<div className='icon-description'>Non Incentive Food</div>
+				</div>
+				{indexArr.map((x, i) => {
+					let index = carbRanks[ carbOrder[ i ] ];
+					return (
+						<div key={i} className='icon icon-allowed' id={iconIndex[index] + "-icon"}>
+							<div className='icon-description'>{carbOptions[ index ]}</div>
+						</div>
+					)
+				})}
+			</div>
+		);
+	}
+	disallowedIcons(index, carbRanks) {
+		if (isNaN(index)){
+			return <div className='loading-icons'>Loading...</div>
+		}
+		let arr = Array( carbOptions.length - index - 1 ).fill().map((x,i) => index + i);
+		return (
+			<div className='disallowed-icons'>
+				{arr.map(i => {
+                    //For non-alcohol drinkers, carbRanks.length < than available indices
+                    //With alcoholic options as the last two entries in the carbOptions array,
+                    //using index only if it is < carbRanks.length avoids out of bounds errors
+					if (i < carbRanks.length){
+						let index = carbRanks[ carbOrder[ i ] ];
+						return (
+							<div key={i} className='icon icon-diallowed' id={iconIndex[index] + "-icon"}>
+								<div className='icon-cross'></div>
+								<div className='icon-description'>{carbOptions[ index ]}</div>
+							</div>
+						)
+					}
+					return "";
+				})}
+			</div>
+		);
+    }
     render(){
         let user = this.props.user;
         let kgPerSection, numLevels, levelMap;
 
-		let weights = []
-		let dates = [];
-		let ids = [];
-
-		//Split user weight data into arrays for easier manipulation
-		Object.keys(this.props.weights).map(key => {
-			dates.push(this.props.weights[key]['date_added']);
-			weights.push(this.props.weights[key]['weight_kg']);
-			ids.push(this.props.weights[key]['id']);
-		});
-        
-        //interpolate missing data
-        let preStartWeights = weights.slice(0, user.starting_weight + 1);
-        let preStartDates = dates.slice(0, user.starting_weight + 1);
-
-        let interpData = interpolateDates(preStartWeights, preStartDates, ids);
-        preStartWeights = interpData.weights;
-        preStartDates = interpData.dates;
-        ids = interpData.indexes;
-        
-        //interpolate points from user.starting_weight through end, and join previous result for averaging
-        interpData = interpolateDates(weights.slice(user.starting_weight, weights.length), dates.slice(user.starting_weight, dates.length), ids);
-
-        //Don't use first element of second array to avoid duplicate join point
-        weights = preStartWeights.concat(interpData.weights.slice(1,interpData.weights.length));
-        dates = preStartDates.concat(interpData.dates.slice(1,interpData.dates.length));
-
-        //Ensure weights are present up to current day
-        interpData = guessWeightsToNow(weights, dates, ids);
-        weights = interpData.weights;
-        dates = interpData.dates;
-        ids = interpData.indexes;
-		let initialWeight = weights[user.starting_weight];
-
-		let maxWeight = Math.max(...weights);
-		let minWeight = Math.min(...weights);
+        let weights = this.props.weights;
+        let dates = this.props.dates;
+        let ids = this.props.ids;
+		
+        let initialWeight = weights[this.props.startingIndex];
 
         /*
         *	Percentage height of graph for each level
@@ -163,35 +189,23 @@ export default class WeightHistoryGraph extends Component{
     
         //Divide by numLevels here since there are numSections - 1 = numLevels increments between the sections
         kgPerSection = (initialWeight - user.ideal_weight_kg)/numLevels;
-        let test = this.state.projectedWeights;
+        let projectedWeights = this.state.projectedWeights;
         return (
             <div className='graph-middle' id='weight-loss-graph'>
                 <div id='weightloss-tab-y-labels'>
                     {
-                        initialWeight > user.ideal_weight_kg ?
-                            levelMap.map(y => {
-                                let yWeight = initialWeight - (y + 1) * kgPerSection;
-                                if (y === 0){
-                                    yWeight += kgPerSection;
-                                }
-                                return (
-                                    <div key={y} className={'y-label graph-section graph-section-' + (y+1)}>
-                                        <div className='icons-wrap'>
-                                            {this.props.allowedIcons(y, user.carb_ranks)}
-                                            {this.props.disallowedIcons(y, user.carb_ranks)}
-                                        </div>
-                                        <div className='y-label-weight'>{ weightStringFromKg( yWeight , user['weight_units'] )}</div>
-                                    </div>
-                                )
-                            })
-                        :
                         levelMap.map(y => {
-                            let yWeight = maxWeight - y * (maxWeight - minWeight)/numLevels;
-                            let currStyle = {flexBasis: 100/numLevels + "%"};
-                            
+                            let yWeight = initialWeight - (y + 1) * kgPerSection;
+                            if (y === 0){
+                                yWeight += kgPerSection;
+                            }
                             return (
-                                <div key={y} className={'y-label graph-section graph-section-' + (y+1)} style={currStyle}>
-                                    <div className='y-label-weight' style={{alignItems: "flex-start"}}>{ weightStringFromKg( yWeight , user['weight_units'] )}</div>
+                                <div key={y} className={'y-label graph-section graph-section-' + (y+1)}>
+                                    <div className='icons-wrap'>
+                                        {this.allowedIcons(y, user.carb_ranks)}
+                                        {this.disallowedIcons(y, user.carb_ranks)}
+                                    </div>
+                                    <div className='y-label-weight'>{ weightStringFromKg( yWeight , user['weight_units'] )}</div>
                                 </div>
                             )
                         })
@@ -273,9 +287,9 @@ export default class WeightHistoryGraph extends Component{
                                         <input onChange={(e) => this.changeWeight(e, i, true)} className='graph-weight-number' type='number' value=
                                         {
                                             user.weight_units !== "Kilograms" ? 
-                                                weightStringFromKg(test[i], user.weight_units).substring(0, weightStringFromKg(test[i], user.weight_units).length - 7)
+                                                weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 7)
                                             :
-                                                weightStringFromKg(test[i], user.weight_units).substring(0, weightStringFromKg(test[i], user.weight_units).length - 10)
+                                                weightStringFromKg(projectedWeights[i], user.weight_units).substring(0, weightStringFromKg(projectedWeights[i], user.weight_units).length - 10)
                                         }/>
                                     </div>
                                 </span>

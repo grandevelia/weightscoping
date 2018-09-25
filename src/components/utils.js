@@ -117,35 +117,27 @@ export function	calcHeightInches(units, primary, secondary){
 	}
 }
 export const disallowedCarbs = (start, carbRanks) => {
-	let disallowed = "";
-	for (let i = start; i < carbRanks.length-1; i ++){
-		if (i !== carbRanks.length - 2){
-			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
-		} else if (start !== carbRanks.length - 2) {
-			disallowed += " or " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
-		} else {
-			disallowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ];
-		}
+	let disallowed = [];
+	for (let i = start; i < carbRanks.length; i ++){
+			disallowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
 	}
-	return disallowed;
+	return disallowed.join(', ');
 }
 export const allowedCarbs = (end, carbRanks) => {
-	let allowed = "All non-incentive food";
-	if (end !== 0){
-		allowed += ", ";
-	}
+	let allowed = ["All non-incentive food"];
 	for (let i = end-1; i >= 0; i --){
-		if (i !== 0){
-			allowed += carbOptions[ carbRanks[ carbOrder[ i ] ] ] + ", ";
-		} else {
-			allowed += " and " + carbOptions[ carbRanks[ carbOrder[ i ] ] ];
-		}
+		allowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
 	}
-	return allowed;
+	return allowed.join(", ");
 }
-export const interpolateDates = (weightArr, dateArr, interpolatedIndexes=false) => {
+export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
+	/*
+	* If originalIds is false, the indexes of interpolated dates will be returned
+	* if it is passed an array of ids, null will be interpolated in between the original ids
+	*/
+
 	let indexes;
-	if (interpolatedIndexes === false){
+	if (originalIds === false){
 		indexes = [];
 	}
 	for (let i = 0; i < dateArr.length - 1; i ++){
@@ -159,26 +151,26 @@ export const interpolateDates = (weightArr, dateArr, interpolatedIndexes=false) 
 			for (let j = 1; j < dateDiff; j ++){
 				dateArr.splice(i+j, 0, currDate.add(1, "days").format("YYYY-MM-DD"));
 				weightArr.splice(i+j, 0, currWeight + (weightPerDay * j));
-				if (interpolatedIndexes === false){
+				if (originalIds === false){
 					indexes.push(i + j);	
 				} else {
-					interpolatedIndexes.splice(i + j, 0, null);
+					originalIds.splice(i + j, 0, null);
 				}
 			}
 			i += dateDiff - 1; //Minus one because i increments after this loop
 		}
 	}
-	if (interpolatedIndexes === false){
+	if (originalIds === false){
 		return {
 			weights: weightArr,
 			dates: dateArr,
-			indexes: indexes
+			ids: indexes
 		}
 	} else {
 		return {
 			weights: weightArr,
 			dates: dateArr,
-			indexes: interpolatedIndexes
+			ids: originalIds
 		}
 	}
 }
@@ -212,7 +204,6 @@ export const lossmodeLevel = (initialWeight, idealWeight, currentWeight) => {
 	let numLevels = 8;
 	//	Divide by numLevels here since there are numSections - 1 = numLevels increments between the sections
 	let kgPerSection = (initialWeight - idealWeight)/numLevels;
-
 	let level = Math.floor((initialWeight - currentWeight)/kgPerSection);
 	if (level >= 1){
 		//First level is two increments from initial weight
