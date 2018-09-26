@@ -111,15 +111,15 @@ export function weightStringFromKg(weightKg, targetUnit){
 }
 export function	calcHeightInches(units, primary, secondary){
 	if (units === "Feet / Inches"){
-		return 12 * parseInt(primary,10) + parseInt(secondary,10);
+		return 12 * parseInt(primary, 10) + parseInt(secondary, 10);
 	} else{
-		return  parseInt(primary,10)/2.54;
+		return  parseInt(primary, 10)/2.54;
 	}
 }
 export const disallowedCarbs = (start, carbRanks) => {
 	let disallowed = [];
 	for (let i = start; i < carbRanks.length; i ++){
-			disallowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
+		disallowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
 	}
 	return disallowed.join(', ');
 }
@@ -174,32 +174,6 @@ export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
 		}
 	}
 }
-
-export const breakthroughIndex = (weights, idealWeight) => {
-	/*
-	* Returns the index in a weight array that corresponds to a user's most recent
-	* breakthrough to entering maintenance mode
-	*/
-	let currentWeight = weights[weights.length-1];
-	let closestIdealBreakthrough = -1;
-	if (currentWeight <= 1.02 * idealWeight){
-		//Starting from most recent weight, find the most recent time they attained their ideal weight
-		//For the first time without having been in maintenance mode first
-		
-		for (let i = weights.length -1 ; i >= 0; i --){
-			if (weights[i] <= 1.02 * idealWeight){
-				if (weights[i] <= idealWeight){
-					closestIdealBreakthrough = i;
-				}
-			} else {
-				//Went over 1.02 * ideal weight -> days to maintenance reset
-				break;
-			}
-		}
-	}
-	return closestIdealBreakthrough
-}
-
 export const lossmodeLevel = (initialWeight, idealWeight, currentWeight) => {
 	let numLevels = 8;
 	//	Divide by numLevels here since there are numSections - 1 = numLevels increments between the sections

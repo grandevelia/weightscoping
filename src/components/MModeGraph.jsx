@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { iconIndex, carbOrder, carbOptions, poundsToKg, interpolateDates, maintenanceAvgs, weightStringFromKg, maintenanceCarbOrder, calcAverages, guessWeightsToNow } from './utils';
+import { iconIndex, carbOptions, poundsToKg, interpolateDates, maintenanceAvgs, weightStringFromKg, maintenanceCarbOrder, calcAverages } from './utils';
 import moment from 'moment';
 
 export default class WeightHistoryGraph extends Component {

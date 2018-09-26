@@ -29,6 +29,7 @@ class UserDashboard extends Component {
 			dates.push(this.props.weights[key]['date_added']);
 			weights.push(this.props.weights[key]['weight_kg']);
 			ids.push(this.props.weights[key]['id']);
+			return "";
         });
 		//Adjust starting index to account for points  interpolated from 0 through starting weight
         let newStartingIndex = moment(dates[user.starting_weight]).diff(moment(dates[0]), "days");
@@ -103,7 +104,6 @@ class UserDashboard extends Component {
 		}
 		let user = this.props.auth.user;
 		let weights = this.state.weights;
-		
 		let totalOwed = 0;
 		let remainingOwed = 0;
 
@@ -111,8 +111,8 @@ class UserDashboard extends Component {
 		if (user.mode === "0"){
 
 			level = lossmodeLevel(weights[this.state.startingIndex], user.ideal_weight_kg, weights[weights.length-1]);
-			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value/100;
-			remainingOwed = totalOwed-user.amount_paid/100;
+			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value;
+			remainingOwed = totalOwed-user.amount_paid;
 
 		} else {
 			level = 7;
@@ -125,8 +125,8 @@ class UserDashboard extends Component {
 		}
 		return (
 			<div id='dashboard-wrap'>
-				<ProgressSummary />
-				{user.amount_paid/100 < totalOwed ? 
+				<ProgressSummary weights={this.state.weights} user={user}/>
+				{user.amount_paid < totalOwed ? 
 					<div id='payment-info-area'>
 						<div className='payment-option'>
 							<div className='option-header'>{planTitles[user.payment_option-1]}</div>
@@ -144,7 +144,21 @@ class UserDashboard extends Component {
 					:
 					<div id='lower-area'>
 						<div id='dashboard-third'>
-
+							{
+								user.mode === "1" ?
+									<div className='mode-switch'>
+										<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
+											Switch to Weight Loss Mode
+										</div>
+									</div>
+								: this.state.weights[this.state.weights.length - 1] <= user.ideal_weight_kg ?
+									<div className='mode-switch'>
+										<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
+											Switch to Maintenance Mode
+										</div>
+									</div>
+								: null
+							}
 							<div id='level-area'>
 								<div className='level-area-section'>
 									<div className='level-area-header'>You are at level</div>
