@@ -7,7 +7,7 @@ export default class NotificationLightbox extends Component {
         return (
             <div className='lightbox-background'>
                 <div className='lightbox-main'>
-                    <div className='notification-title-area'>
+                    <div className='lightbox-notification-title-area'>
                         <div className='notification-title'>New Notification</div>
                         <div className='notification-date'>{content.date}</div>
                     </div>

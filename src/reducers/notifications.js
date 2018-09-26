@@ -11,7 +11,7 @@ export default function notifications(state=initialState, action){
 			return [...action.notifications];
 
 		case 'ADD_NOTIFICATION': {
-			notificationList.push(action.notification);
+			notificationList.unshift(action.notification);
 			return notificationList;
 		}
 

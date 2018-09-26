@@ -245,9 +245,6 @@ const mapDispatchToProps = dispatch => {
 		updateWeight: (weightKg, id) => {
 			return dispatch(weights.updateWeight(weightKg, id));
 		},
-		deleteWeight: (id) => {
-			return dispatch(weights.deleteWeight(id));
-		},
 		addNotification: message => {
 			return dispatch(notifications.addNotification(message));
 		},

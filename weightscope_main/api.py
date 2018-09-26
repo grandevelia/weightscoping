@@ -167,7 +167,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 	serializer_class = NotificationSerializer
 
 	def get_queryset(self):
-		return self.request.user.notifications.all().order_by('date')
+		return self.request.user.notifications.all().order_by('-date')
 
 	def create(self,request):
 		data = request.data

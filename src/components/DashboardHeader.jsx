@@ -48,15 +48,10 @@ class DashboardHeader extends Component {
                 <div className='nav-wrapper'>
                     <Link to="/Home/About" className="navbar-link" id='about-link'>About</Link>
                 </div>
-                <div className='nav-wrapper'></div><div className='nav-wrapper'></div>
-                <div className='nav-wrapper'>
-                    <Link to="/Home/UserSettings" className="navbar-link dropdown" id='settings-link'>{user.email.substring(0, user.email.indexOf('@'))}			
-                        <i className='fa fa-angle-down fa-lg'></i>
-                    </Link>
-                    <div className='dropdown-content'>
-                        <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
-                        <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
-                    </div>
+                <div className='nav-wrapper'></div>
+                <div className='nav-wrapper'></div>
+                <div className='nav-wrapper' id='notification-header-section'>
+                    <i className="fa fa-bell" aria-hidden="true"></i>
                     <div id='navbar-notification-notice'>
                         {unreadCount > 0 ? <div className='notification-num'>{unreadCount}</div> : null}
                         <div id='notification-detail-area'>
@@ -84,6 +79,15 @@ class DashboardHeader extends Component {
                             })
                         }
                         </div>
+                    </div>
+                </div>
+                <div className='nav-wrapper'>
+                    <Link to="/Home/UserSettings" className="navbar-link dropdown" id='settings-link'>{user.email.substring(0, user.email.indexOf('@'))}			
+                        <i className='fa fa-angle-down fa-lg'></i>
+                    </Link>
+                    <div className='dropdown-content'>
+                        <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
+                        <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
                     </div>
                 </div>
                 {
