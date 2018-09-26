@@ -35,7 +35,7 @@ export default class FourthPage extends Component {
 		
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
-		} else if (this.props.carbRanks.indexOf(null) >= 0){
+		} else if (this.props.carbRanks.includes(null)){
 			return <Redirect to="/SecondPage" />
 		} else if (this.props.heightInches === null){
 			return <Redirect to="/ThirdPage" />

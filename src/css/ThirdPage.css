@@ -1,14 +1,19 @@
 #third-wrap{
 	text-align: center;
+	position: relative;
+	padding: 2.5%;
+	width: calc(100% - 4rem);
+	display: flex;
+	align-items: center;
+	flex-direction: column;
 }
-#third-wrap form{
+#third-page-form{
 	width: 60%;
-	margin: auto;
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
 }
-#third-wrap form p{
+#third-page-form p{
 	display: flex;
 	justify-content: space-between;
 	margin: 1.25% 0;

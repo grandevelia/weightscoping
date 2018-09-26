@@ -80,7 +80,7 @@ body {
 }
 #graph-top{
 	padding: 1.25%;
-	flex-basis: 15%;
+	flex-basis: 10%;
 	display: flex;
 	flex-direction: row;
 }
@@ -147,7 +147,8 @@ body {
 	align-items: stretch;
 }
 .icons-wrap{
-	width: 66%;
+	flex-basis: 66%;
+	flex: 1;
 	position: relative;
 	display: flex;
 	justify-content: space-between;
@@ -203,8 +204,8 @@ body {
 	border-bottom: 1px solid rgb(211, 24, 43);
 }
 .y-label-weight{
-	width: 33%;
-	flex-grow: 1;
+	flex-basis: 33%;
+	flex-shrink: 1;
 	justify-content: flex-end;
 	display: flex;
 	align-items: center;
@@ -386,12 +387,11 @@ body {
 }
 #tab-y-labels, #weightloss-tab-y-labels{
 	flex-basis: 20%;
-	flex-shrink: 1;
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	text-align: center;
-	padding: 2.5% 2.5% 2.5% 0;
+	padding: 2.5% 1.25rem 2.5% 0;
 }
 #weightloss-tab-y-labels{
 	flex-basis: 30%;
@@ -407,24 +407,9 @@ body {
 	flex: 1;
 	font-size: 0.65em;
 }
-#history-axis-labels{
-	flex-basis: 10%;
-}
-.history-axis-label{
-	font-size: 0.6em;
-}
-#history-y-labels{
-	flex-basis: 10%;
-	flex-shrink: 1;
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	text-align: center;
-	padding-right: 2.5%;
-}
-#reversion-warning{
-	color: rgb(213, 25, 50);
-	font-size: 0.9em;
+#weight-axis-label{
+	text-align: right;
+	padding-right: 1.25rem;
 }
 .graph-weight{
 	flex: 0.5;
@@ -486,7 +471,7 @@ body {
 	box-shadow: 0px 0px 1px rgba(0,0,0,0.2);
 	flex: 1;
 	border-radius: 5px;
-	background: rgba(0,0,0,0.2);
+	background: rgba(0,0,0,0.1);
 }
 .mode-switch-button{
 	display: flex;

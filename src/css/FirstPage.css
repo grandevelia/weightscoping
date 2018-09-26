@@ -1,5 +1,15 @@
 #intro-wrap{
 	text-align: center;
+	width: calc(100% - 4rem);
+	display: flex;
+	justify-content: center;
+}
+.first-page-container{
+	display: flex;
+	flex-direction: column;
+	flex-basis: 60%;
+	padding: 2.5%;
+	align-items: center;
 }
 #intro-wrap input {
 	display: none;
@@ -13,10 +23,13 @@
 	cursor: pointer;
 }
 #alcohol-yes+label{
-	background-color: rgb(17,215,26);
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 100%);
+	transition: ease-in-out 0.125s;
+	margin-right: 1.25%;
 }
 #alcohol-yes+label:hover{
-	background-color: rgb(7,200,6);
+	background-color: rgb(27, 152, 202);
 }
 #alcohol-no+label{
 	background-color: rgb(245,37,26);
@@ -32,34 +45,44 @@
 #intro-wrap input.alcohol-selected+label{
 	box-shadow: 0px 0px 2px 2px rgb(87,187,240);
 }
-.login-or-register-option{
-	box-shadow: 0px 1px 1px rgba(0,0,0,0.3);
-	font-size: 1em;
-	padding: 2.5% 5%;
-	color: white;
-	border: none;
-	margin: 0 2.5%;
+.app-intro{
+	margin-bottom: 2.5%;
 }
 #login-or-register{
 	display: flex;
 	flex-direction: row;
+	justify-content: space-around;
+	width: 70%;
+}
+.login-or-register-option{
+	padding: 2.5% 7.5%;
+	color: white;
+	border: none;
+	outline: none;
+	display: flex;
+	flex: 1;
 	align-items: center;
 	justify-content: center;
-	width: 40%;
-	margin: auto;
+	text-shadow: 0px 0px 1px rgba(0,0,0,0.3);
 }
 .login-or-register-option:hover{
 	cursor: pointer;
 }
 #first-page-register{
 	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 100%);
+	transition: ease-in-out 0.125s;
+	margin-right: 1.25%;
 }
 #first-page-login{
-	background-color: rgb(57, 228, 192);
+	background-color: rgb(27, 202, 195);
+	background: linear-gradient(to top left, rgba(57, 228, 192, 0.9), rgba(8, 243, 243, 0.9) 100%);
+	transition: ease-in-out 0.125s;
+	margin-left: 1.25%;
 }
 #first-page-register:hover{
 	background-color: rgb(27, 152, 202);
 }
 #first-page-login:hover{
-	background-color: rgb(27, 202, 195);
+	background-color: rgb(27, 182, 175);
 }

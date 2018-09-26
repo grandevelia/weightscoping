@@ -6,7 +6,7 @@ import '../css/FifthPage.css';
 export default class SixthPage extends Component {
 	render(){
 		return(
-			<div id='fifth-page'>
+			<div id='sixth-page'>
 				<div id='payment-area'>
 					{this.props.paymentOption === null ?
 						<div>

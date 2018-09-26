@@ -6,7 +6,7 @@ import Layout from './Layout';
 import { Route } from 'react-router-dom';
 import FirstPage from './FirstPage';
 import SecondPage from './SecondPage';
-import ThirdPage from './ThirdPage';
+import ThirdPage from './ThirdPage.jsx';
 import FourthPage from './FourthPage';
 import PaymentPrompt from './PaymentPrompt';
 import FifthPage from './FifthPage';
@@ -41,7 +41,7 @@ class Intro extends Component {
 					<PaymentPrompt {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
 				<Route path='/FifthPage' render={() => 
-					<FifthPage updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
+					<FifthPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/> 
 				<Route path='/SixthPage' render={() => 
 					<SixthPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 

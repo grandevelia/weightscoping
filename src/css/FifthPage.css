@@ -1,24 +1,39 @@
 #fifth-page{
-	width: 90%;
-	margin: auto;
+	width: calc(100% - 4rem);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+#sixth-page{
+	width: calc(100% - 4rem);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	text-align: center;
 }
 #signup-area{
 	text-align: center;
+}
+#signup-form{
+	display: flex;
+	flex-direction: column;
 }
 #signup-area input{
 	height: 2rem;
 	margin-bottom: 1.25%;
 }
 #signup-area button{
+	border: none;
 	height: 2rem;
 	margin-bottom: 1.25%;
-	background-color: rgba(37, 172, 198, 0.9);
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 110%);
+	transition: ease-in-out 0.125s;
 	color: white;
 }
 #signup-area button:hover{
 	cursor: pointer;
-	background-color: rgb(37, 172, 198);
+	background-color: rgb(27, 152, 202);
 }
 #payment-area{
 	display: flex;
@@ -41,38 +56,48 @@
 	flex-basis: 30%;
 	margin: 1.25%;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.4);
-	padding: 5%;
+	padding: 2.5%;
 	text-align: center;
 }
-.option-header{
+#sixth-page .payment-option > *{
+	margin: 1rem 0;
+}
+#sixth-page .option-header{
 	font-weight: bold;
 	margin-bottom: 5%;
 	font-size: 1.125em;
 }
-.option-text{
+#sixth-page .option-text{
 	margin-bottom: 5%;
 	flex: 1;
 }
-.option-select{
-	height: 2rem;
-	line-height: 2rem;
+#sixth-page .option-select{
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	font-size: 0.9em;
 	color: white;
-	background-color: rgba(37, 172, 198, 0.9);
-	border: 1px solid rgba(80,80,80,0.1);
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 110%);
+	transition: ease-in-out 0.125s;
+	padding: 5% 1rem;
+	width: 100% !important;
+	color: white;
 }
 .option-select:hover{
 	cursor: pointer;
-	background-color: rgb(37, 172, 198);
+	background-color: rgb(27, 152, 202) !important;
 }
 /***Confirmation Area****/
 #confirmation-area{
 	position: relative;
+	text-align: center;
 }
 #account-confirmation{
 	display: flex;
 	flex-direction: column;
 	width: 37.5%;
+	min-width: 12.5rem;
 	height: 100%;
 	margin: auto;
 	justify-content: space-between;
@@ -85,7 +110,8 @@
 	font-weight: bold;
 }
 #registration-title{
-	font-size: 1.75em;
+	font-size: 1.25em;
+	text-align: center;
 	margin-bottom: 2.5%;
 }
 #check-area{

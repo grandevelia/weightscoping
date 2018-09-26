@@ -26,7 +26,7 @@ class FifthPage extends Component {
 	render(){
 		if (this.props.alcohol === null){
 			return <Redirect to="/" />
-		} else if (this.props.carbRanks.indexOf(null) >= 0){
+		} else if (this.props.carbRanks.includes(null)){
 			return <Redirect to="/SecondPage" />
 		} else if (this.props.heightInches === null){
 			return <Redirect to="/ThirdPage" />
@@ -35,11 +35,10 @@ class FifthPage extends Component {
 		}
 		return(
 			<div id='fifth-page'>
-				<div>
 				{this.props.confirmationSent !== true ?
 					<div id='signup-area'>
 						<h2>It's Time To Get Thin.</h2>
-						<form className='box-form' onSubmit={this.onSubmit}>
+						<form id='signup-form' onSubmit={this.onSubmit}>
 							{
 								this.props.errors && this.props.errors.length > 0 ? 
 									<div className='feedback'>
@@ -64,7 +63,8 @@ class FifthPage extends Component {
 							}} />
 							<button className='form-submit' type="submit">Submit</button>
 						</form>
-					</div> :
+					</div> 
+				:
 					<div id='confirmation-area'>
 						<div id='account-confirmation'>
 							<div id='registration-title'>Account Created!</div>
@@ -83,7 +83,6 @@ class FifthPage extends Component {
 						</div>
 					</div>
 				}
-				</div>
 				<Link to='/FourthPage' className='intro-nav back'>Back</Link>
 			</div>
 		)

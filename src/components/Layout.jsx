@@ -29,7 +29,9 @@ export default class Layout extends Component {
 							<NavItem current={this.props.pageName} pageName="/SixthPage" icon={5} active={this.props.intro.paymentOption !== null}/>
 						</div>
 					</div>
-					{ this.props.children }
+					<div id='page-area'>
+						{ this.props.children }
+					</div>
 				</div>
 				<Footer></Footer>
 			</div>

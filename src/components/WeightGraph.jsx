@@ -27,7 +27,7 @@ export default class WeightGraph extends Component {
                             <div id='axis-labels'>
                                 <div className='axis-label'>Allowed</div>
                                 <div className='axis-label'>Not Allowed</div>
-                                <div className='axis-label'>Weight</div>
+                                <div className='axis-label' id='weight-axis-label'>Weight</div>
                             </div>
                     }
                     <div id='graph-title'>Progress</div>

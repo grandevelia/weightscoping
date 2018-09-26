@@ -2,6 +2,9 @@
 	text-align: center;
 	position: relative;
 	padding: 2.5%;
+	width: calc(100% - 4rem);
+	display: flex;
+	justify-content: center;
 }
 #login-form{
 	font-size: 1.25rem;
@@ -13,7 +16,7 @@
 	padding: 2.5%;
 	justify-content: space-around;
 	position: relative;
-	background-color: rgba(255,255,255,0.4);
+	background-color: rgba(205,205,205,0.4);
 	box-shadow: 0px 1px 1px rgba(0,0,0,.5);
 }
 #input-area{
@@ -32,13 +35,15 @@
 	font-size: 0.5em;
 }
 #login-submit{
-	background-color: rgb(21,184,47);
+	background-color: rgb(8, 40, 109);
+	background: linear-gradient(to bottom right, rgb(19, 180, 224, 0.8), rgb(6, 100, 223, 0.8));
 	color: white;
 	border: none;
+	transition: ease-in-out 0.125s;
 }
 #login-submit:hover{
 	cursor: pointer;
-	background-color: rgb(11,164,27);
+	background-color: rgb(6, 100, 223);
 }
 .forgot-container{
 	display: flex;

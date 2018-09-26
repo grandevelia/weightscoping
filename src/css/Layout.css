@@ -36,6 +36,8 @@
 }
 #main-area{
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
   min-height: 75vh;
 }
 #main-area > div:nth-of-type(2){
@@ -43,14 +45,17 @@
 }
 #navigation-area{
   padding: 1rem;
-  min-height: 15rem;
-  flex-basis: 5%;
+  display: flex;
+  justify-content: center;
+  width: 4rem;
+  flex-shrink: 1;
 }
 #nav-container{
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  height: 15rem;
+  align-items: center;
+  flex: 1;
 }
 .nav-item{
   height: 1.5rem;
@@ -65,7 +70,9 @@
   justify-content: center;
   font-size: 0.8em;
 }
-.nav-item fa{
+#page-area{
+  flex: 1;
+  display: flex;
 }
 .complete{
   border-color: rgb(27, 228, 158);

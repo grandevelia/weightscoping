@@ -28,8 +28,9 @@ class SecondPage extends Component {
 		let positions = this.props.carbRanks;
 		return (
 			<div id='second-wrap'>
-				<h2 className='page-intro'>What carbs do you love the most?</h2>
-				<h4>(Drag and drop from most favorite to least)</h4>
+				
+				<h3 className="page-intro">Rate the following in order of how much you enjoy them</h3>
+				<div id='drag-and-drop-hint'>(Drag and drop from most favorite to least)</div>
 
 				<InteractionArea options={carbOptions} positions={positions} moveOption={(optionId, toId) => this.moveOption(optionId, toId)}/>
 

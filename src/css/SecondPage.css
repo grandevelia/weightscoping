@@ -1,5 +1,14 @@
 #second-wrap{
 	text-align: center;
+	position: relative;
+	padding: 0 2.5%;
+	width: calc(100% - 4rem);
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+#drag-and-drop-hint{
+	margin-bottom: 2.5%;
 }
 #interaction-area{
 	display: flex;
@@ -39,6 +48,12 @@
 	padding: 0.75rem;
 	margin: 0.25rem;
 	box-shadow: 0px 0px 1px rgba(0,0,0,0.3);
+}
+.carb-option:hover{
+	cursor: grab;
+}
+.carb-option:hover:active{
+	cursor: grabbing;
 }
 .target-hover-child{
     opacity: 0.5;

@@ -113,7 +113,12 @@ a{
   margin-left: 2vw;
 }
 #login{
-  color: rgb(21,184,47);
+  color: rgb(27, 202, 195);
+  transition: ease-in-out 0.125s;
+}
+#login:hover{
+  cursor: pointer;
+  color: rgb(57,242, 225);
 }
 #logout{
   color: rgb(284,21,47);

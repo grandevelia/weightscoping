@@ -69,7 +69,7 @@
 }
 /***** Notifications *****/
 #notification-header-section{
-    font-size: 1.25em;
+    font-size: 1em;
 }
 .fa-bell{
     position: absolute;
@@ -84,7 +84,7 @@
 	top: 5%;
 	height: 100%;
 	width: 10vw;
-	font-size: 0.6em;
+	font-size: 0.65em;
 }
 #notification-header-section:hover #notification-detail-area{
 	display: flex;
@@ -141,7 +141,7 @@
 .lightbox-notification-title-area{
     display: flex;
     flex-basis: 20%;
-    padding: 2.5% 2.5% 2.5% 0;
+    padding: 0 0 2.5% 0;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
