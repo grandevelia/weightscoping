@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { weights, notifications, auth } from "../actions";
 import { planTitles, weightStringFromKg, allowedCarbs, disallowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions, interpolateDates, guessWeightsToNow } from './utils';
 import PaypalButton from './PaypalButton';
-import ProgressSummary from './ProgressSummary';
 import WeightGraph from './WeightGraph';
 
 import moment from 'moment';
@@ -12,13 +11,23 @@ import '../css/UserDashboard.css';
 let paymentFracs = [0.25,0.1,0.0];
 
 class UserDashboard extends Component {
-	state = {
-		weights: null,
-		dates: null,
-		ids: null,
-		startingIndex: null
+	componentDidMount(){
+		if (this.props.weights.length && this.props.weights[0] === null){
+			this.props.fetchWeights();
+		}
 	}
-	setupWeight(){
+	updateValue(e){
+		this.setState({monetary_value:e.target.value});
+	}
+	updateSettings(key, value){
+		this.props.updateUserSettings(key,value);
+	}
+	render(){
+		if (this.props.weights.length && this.props.weights[0] === null){
+			return (
+				<div>Loading Weights...</div>
+			)
+		}
 
 		let user = this.props.auth.user;
 		let weights = []
@@ -30,7 +39,11 @@ class UserDashboard extends Component {
 			weights.push(this.props.weights[key]['weight_kg']);
 			ids.push(this.props.weights[key]['id']);
 			return "";
-        });
+		});
+		
+        let initialWeight  = weights[user.starting_weight];
+		let currentWeight = weights[weights.length - 1 ];
+		
 		//Adjust starting index to account for points  interpolated from 0 through starting weight
         let newStartingIndex = moment(dates[user.starting_weight]).diff(moment(dates[0]), "days");
         
@@ -48,84 +61,129 @@ class UserDashboard extends Component {
         dates = interpData.dates;
 		ids = interpData.indexes;
 
-		this.setState({
-			weights: weights,
-			dates: dates,
-			ids: ids,
-			startingIndex: newStartingIndex
-		})
-	}
-	componentDidMount(){
-		if (this.props.weights.length && this.props.weights[0] === null){
-			this.props.fetchWeights().then(() => {
-				this.setupWeight();
-			});
-		} else {
-			this.setupWeight();
-		}
-	}
-	updateWeight(weight, id){
-		let index = 0;
-		for (let i = 0; i < this.state.ids.length; i ++){
-			if (this.state.ids[i] === id){
-				index = i;
-				break;
-			}
-		}
-		this.props.updateWeight(weight, id);
-		let newWeights = this.state.weights;
-		newWeights[index] = weight;
-		this.setState({weights: newWeights});
-	}
-	addWeight(weight, date){
-		let index = 0;
-		for (let i = 0; i < this.state.dates.length; i ++){
-			if (this.state.dates[i] === date){
-				index = i;
-				break;
-			}
-		}
-		this.props.addWeight(weight, date);
-		let newWeights = this.state.weights;
-		newWeights[index] = weight;
-		this.setState({weights: newWeights});
-	}
-	updateValue(e){
-		this.setState({monetary_value:e.target.value});
-	}
-	updateSettings(key, value){
-		this.props.updateUserSettings(key,value);
-	}
-	render(){
-		if ((this.props.weights.length && this.props.weights[0] === null) || this.state.weights === null){
-			return (
-				<div>Loading Weights...</div>
-			)
-		}
-		let user = this.props.auth.user;
-		let weights = this.state.weights;
 		let totalOwed = 0;
 		let remainingOwed = 0;
 
 		let level, mWeights, modStart, weightAvgs;
 		if (user.mode === "0"){
 
-			level = lossmodeLevel(weights[this.state.startingIndex], user.ideal_weight_kg, weights[weights.length-1]);
+			level = lossmodeLevel(weights[newStartingIndex], user.ideal_weight_kg, weights[weights.length-1]);
 			totalOwed = paymentFracs[user.payment_option-1]*level*user.monetary_value;
 			remainingOwed = totalOwed-user.amount_paid;
 
 		} else {
 			level = 7;
 			
-			let mData = setupAverages(this.state.weights, this.state.dates, this.state.startingIndex);
+			let mData = setupAverages(weights, dates, newStartingIndex);
 			mWeights = mData.weights;
 			modStart = mData.startIndex;
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
+		
 		return (
 			<div id='dashboard-wrap'>
-				<ProgressSummary weights={this.state.weights} user={user}/>
+				<div id='top-area'>
+					<div id='primary-status'>
+						<div className='primary-status-section'>
+
+							<div className='primary-status-inner-section'>
+								<div className='top-label'>Mode:</div>
+								<div className='top-entry' id='current-mode'>
+								{
+									user.mode === "0" ?
+										"Weight Loss"
+									:
+										"Maintentance"
+								}
+								</div>
+							</div>
+
+							<div className='primary-status-inner-section'>
+								<div className='top-label'>Current Weight</div>
+								<div className='top-entry'>{ weightStringFromKg(currentWeight, user['weight_units']) }</div>
+							</div>
+
+						</div>
+						<div className='primary-status-section'>
+							<div className='primary-status-header'>You may have</div>
+							<div className='primary-status-content'>
+								{ 
+									level < 7 || user.mode === "0" ? 
+										allowedCarbs(level, user.carb_ranks) 
+									:
+										['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
+											let curr = weightAvgs[k];
+											if (curr <= user.ideal_weight_kg){
+												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+											}
+										}).filter(e => e)).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+											if (weightAvgs[19] <= user.ideal_weight_kg){
+												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+											}
+										})).join(', ')
+								}
+							</div>
+						</div>
+						<div className='primary-status-section'>
+							<div className='primary-status-header'>You may not have</div>
+							<div className='primary-status-content'>
+								{ 
+									level < 7 || user.mode === "0" ? 
+										disallowedCarbs(level, user.carb_ranks) 
+									:
+										Object.keys(weightAvgs).map((k, i) => {
+											let curr = weightAvgs[k];
+											if (curr > user.ideal_weight_kg){
+												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+											}
+										}).filter(e => e).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+											if (weightAvgs[19] > user.ideal_weight_kg){
+												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+											}
+										})).join(', ')
+									}
+							</div>
+						</div>
+					</div>
+					<div id='secondary-status'>
+
+						<div className='secondary-status-section'>
+							<div className='top-label'>You started at</div>
+							<div className='top-entry'>{ weightStringFromKg(initialWeight, user.weight_units) }</div>
+						</div>
+
+						<div className='secondary-status-section'>
+							<div className='center-label top-label'>You've {initialWeight - currentWeight >= 0 ? "lost" : "gained"}</div>
+							<div className='top-entry'>
+							{
+								initialWeight - currentWeight >= 0 ? weightStringFromKg(initialWeight - currentWeight, user['weight_units']) :
+								weightStringFromKg(currentWeight - initialWeight, user['weight_units'])
+							}
+							</div>
+						</div>
+
+						<div className='secondary-status-section'>
+							<div className='primary-status-header'>Next target weight: </div>
+								<div className='top-entry'>
+									{
+										level < 7 ? 
+											weightStringFromKg(weights[newStartingIndex]-(level+2)*(weights[newStartingIndex] - user.ideal_weight_kg)/8, user.weight_units)
+										: 
+											"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
+									}
+								</div>
+						</div>
+						<div className='secondary-status-section'>
+							<div className='top-label'>Ideal weight</div>
+							<div className='top-entry'>
+							{
+								weightStringFromKg(user['ideal_weight_kg'], user['weight_units'])
+							}
+							</div>
+						</div>
+					</div>
+				</div>
 				{user.amount_paid < totalOwed ? 
 					<div id='payment-info-area'>
 						<div className='payment-option'>
@@ -143,83 +201,35 @@ class UserDashboard extends Component {
 					</div>
 					:
 					<div id='lower-area'>
-						<div id='dashboard-third'>
-							{
-								user.mode === "1" ?
-									<div className='mode-switch'>
-										<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
-											Switch to Weight Loss Mode
-										</div>
-									</div>
-								: this.state.weights[this.state.weights.length - 1] <= user.ideal_weight_kg ?
-									<div className='mode-switch'>
-										<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
-											Switch to Maintenance Mode
-										</div>
-									</div>
-								: null
-							}
-							<div id='level-area'>
-								<div className='level-area-section'>
-									<div className='level-area-header'>You are at level</div>
-									<div className='level-area-content'>{level}</div>
-									<div className='level-area-header'>Next target weight: </div>
-									<div className='level-area-content'>
-										{
-											level < 7 ? 
-												weightStringFromKg(weights[this.state.startingIndex]-(level+2)*(weights[this.state.startingIndex] - user.ideal_weight_kg)/8, user.weight_units)
-											: 
-												"Maintain weight under " + weightStringFromKg(user.ideal_weight_kg, user.weight_units)
-										}
-									</div>
-								</div>
-
-								<div className='level-area-section'>
-									<div className='level-area-header'>You may have</div>
-									<div className='level-area-content'>
-										{ 
-											level < 7 || user.mode === "0" ? 
-												allowedCarbs(level, user.carb_ranks) 
-											:
-												['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
-													let curr = weightAvgs[k];
-													if (curr <= user.ideal_weight_kg){
-														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
-													}
-												}).filter(e => e)).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
-													if (weightAvgs[19] <= user.ideal_weight_kg){
-														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
-													}
-												})).join(', ')
-										}
-									</div>
-								</div>
-								<div className='level-area-section'>
-									<div className='level-area-header'>You may not have</div>
-									<div className='level-area-content'>
-										{ 
-											level < 7 || user.mode === "0" ? 
-												disallowedCarbs(level, user.carb_ranks) 
-											:
-												Object.keys(weightAvgs).map((k, i) => {
-													let curr = weightAvgs[k];
-													if (curr > user.ideal_weight_kg){
-														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
-													}
-												}).filter(e => e).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
-													if (weightAvgs[19] > user.ideal_weight_kg){
-														return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
-													}
-												})).join(', ')
-											}
-									</div>
-								</div>
-							</div>
-						</div>
+						
 						<div id='dashboard-fourth'>
-							<WeightGraph user={user} level={level} weights={this.state.weights} dates={this.state.dates} ids={this.state.ids} startingIndex={this.state.startingIndex} updateWeight={(weight_kg, id) => this.updateWeight(weight_kg, id)} addWeight={(weight_kg, date) => this.addWeight(weight_kg, date)}/>
+							<WeightGraph 
+								user={user} 
+								level={level} 
+								weights={weights} 
+								dates={dates} 
+								ids={ids} 
+								startingIndex={newStartingIndex} 
+								updateWeight={this.props.updateWeight} 
+								addWeight={this.props.addWeight}
+							/>
 						</div>
 					</div>
+				}
+				{
+					user.mode === "1" ?
+						<div className='mode-switch'>
+							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
+								Switch to Weight Loss Mode
+							</div>
+						</div>
+					: weights[weights.length - 1] <= user.ideal_weight_kg ?
+						<div className='mode-switch'>
+							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
+								Switch to Maintenance Mode
+							</div>
+						</div>
+					: null
 				}
 			</div>
 		)

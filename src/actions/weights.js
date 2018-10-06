@@ -1,4 +1,5 @@
 import { addNotification } from './notifications';
+import { updateUserSettings } from './auth';
 import moment from 'moment';
 
 export const fetchWeights = () => {
@@ -72,6 +73,11 @@ export const addWeight = (weight_kg, date_added) => {
 							}
 						}
 					}
+				}
+
+				//if this new weight is before the user's current starting index, increment the starting index
+				if (moment(weights[user.starting_weight].date_added).isAfter(date_added)){
+					dispatch(updateUserSettings("starting_weight", user.starting_weight + 1));
 				}
 
 				return dispatch({type: 'ADD_WEIGHT', weight: res.data});

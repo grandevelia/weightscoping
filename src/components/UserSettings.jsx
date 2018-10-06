@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { auth, weights } from "../actions";
-import ProgressSummary from './ProgressSummary';
 import '../css/UserDashboard.css';
 import { planTitles } from './utils';
 
@@ -44,7 +43,6 @@ class UserSettings extends Component {
         let user = this.props.auth.user;
         return (
             <div id='settings-outer'>
-                <ProgressSummary />
                 <div id='settings-area'>
                     <h4 id='settings-title'>Settings</h4>
                     <div className='settings-option'>
