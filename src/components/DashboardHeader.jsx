@@ -86,6 +86,7 @@ class DashboardHeader extends Component {
                         <i className='fa fa-angle-down fa-lg'></i>
                     </Link>
                     <div className='dropdown-content'>
+                        <Link to="/Home/UserDashboard" className="dropdown-item">Status</Link>
                         <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
                         <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
                     </div>
