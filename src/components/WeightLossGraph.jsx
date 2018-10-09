@@ -246,8 +246,6 @@ export default class WeightHistoryGraph extends Component{
                 newProjection[i] = targetWeight;
             }
             this.setState({futureWeights: newProjection}, () => this.renderGraph());
-        } else if (weightClass === "PAST"){
-            console.log("lol here boi")
         }
     }
 	convertWeight(weight){
@@ -440,8 +438,6 @@ export default class WeightHistoryGraph extends Component{
             <div id='graph-area'>
                 <div id='graph-top'>
                     <div id='axis-labels' className='axis-labels'>
-                        <div className='axis-label'>Allowed</div>
-                        <div className='axis-label'>Not Allowed</div>
                         <div className='axis-label' id='weight-axis-label'>Weight</div>
                     </div>
                     <div id='graph-view-options'>
@@ -563,6 +559,12 @@ export default class WeightHistoryGraph extends Component{
                             {
                                 dayRatio > 85 ?
                                     allWeights.map((weight,i) => {
+                                        let weightString = weightStringFromKg(weight, user.weight_units);
+                                        if (user.weight_units === "Pounds"){
+                                            weightString = weightString.substring(0, weightString.length - 7);
+                                        } else if (user.weight_units === "Kilograms"){
+                                            weightString = weightString.substring(0, weightString.length - 10);
+                                        }
                                         if (i < this.state.pastProjecting){
                                             return (
                                                 <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), allDates[i])}>
@@ -571,7 +573,6 @@ export default class WeightHistoryGraph extends Component{
                                                 </form>
                                             )
                                         } else if (i < this.state.pastProjecting + this.props.weights.length){
-                                            let weightString = weightStringFromKg(weight, user.weight_units);
                                             return (
                                                 <form key={i} className='graph-weight' onSubmit={
                                                     allIds[i] === null ? 
@@ -579,27 +580,14 @@ export default class WeightHistoryGraph extends Component{
                                                     :
                                                         (e) => this.submitWeight(e, i, allDates[i], allIds[i])
                                                 }>
-                                                    <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue=
-                                                    {
-                                                        user.weight_units !== "Kilograms" ? 
-                                                            weightString.substring(0, weightString.length - 7)
-                                                        :
-                                                            weightString.substring(0, weightString.length - 10)
-                                                    } />
+                                                    <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue={weightString} />
                                                     <input type='submit' className='weight-submit'/>
                                                 </form>
                                             )
                                         } else {
-                                            let weightString = weightStringFromKg(weight, user.weight_units);
                                             return (
                                                 <div key={i} className='graph-weight future-graph-weight'>
-                                                    <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value=
-                                                    {
-                                                        user.weight_units !== "Kilograms" ? 
-                                                            weightString.substring(0, weightString.length - 7)
-                                                        :
-                                                            weightString.substring(0, weightString.length - 10)
-                                                    }/>
+                                                    <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value={weightString}/>
                                                 </div>
                                             )
                                         }

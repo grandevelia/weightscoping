@@ -20,7 +20,16 @@ export default class WeightGraph extends Component {
                             addWeight={this.props.addWeight}
                         />
                     : 
-                        <MModeGraph level={this.props.level} user={user} weights={this.props.weights} dates={this.props.dates} ids={this.props.ids} startingIndex={this.props.startingIndex} updateWeight={this.props.updateWeight} addWeight={this.props.addWeight}/>
+                        <MModeGraph 
+                            level={this.props.level} 
+                            user={user} 
+                            weights={this.props.weights} 
+                            dates={this.props.dates} 
+                            ids={this.props.ids} 
+                            startingIndex={this.props.startingIndex} 
+                            updateWeight={this.props.updateWeight} 
+                            addWeight={this.props.addWeight}
+                        />
                 }
             </div>
         )

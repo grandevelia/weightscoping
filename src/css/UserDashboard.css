@@ -310,6 +310,16 @@ body {
 	position: relative;
 	height: 90%;
 }
+#m-graph-display{
+	flex-basis: 85%;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	position: relative;
+	width: 100vw;
+	max-width: 100vw;
+	height: 100%;
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+}
 #weight-input-container{
 	position: relative;
 	height: 5%;
@@ -426,12 +436,6 @@ body {
 	border-top: 1px dashed black;
 	z-index: 999;
 }
-#graph-middle-top{
-	display: flex;
-	flex-direction: row;
-	flex-basis: 95%;
-	padding: 0 1.25%;
-}
 #y-labels{
 	flex-basis: 30%;
 	flex-shrink: 1;
@@ -511,14 +515,11 @@ body {
 	justify-content: flex-end;
 	display: flex;
 	align-items: center;
-	font-weight: 600;
+	font-weight: bold;
 	color: rgb(0,0,0,0.7);
 }
 .tab-graph-section{
 	flex: 1;
-}
-#tab-date-label, #tab-weight-label{
-	flex: 0.25;
 }
 #settings-outer{
 	width: 100%;
@@ -579,71 +580,67 @@ body {
 	background-color: rgb(27, 152, 188);
 	cursor: pointer;
 }
-
+#graph-container{
+	display: flex;
+	flex-direction: row;
+	height: 90%;
+	position: relative;
+}
+#graph-container:hover{
+	cursor: pointer;
+}
 .tab-date{
-	display: inline-flex;
-	vertical-align: top;
+	display: flex;
 	flex-direction: column;
 	flex: 1;
-	height: 100%;
 	min-width: 1px;
 	position: relative;
 }
-.m-graph-date{
-	font-size: 0.6em;
-	position: absolute;
-	bottom: 100%;
-	height: 5%;
-	width: 100%;
-	white-space: normal;
+.avg-section{
+	flex: 1;
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	background-color: rgb(250,250,250);
-	color: black;
-	border-left: 1px solid rgba(0,0,0,0.2);
-	border-top: 1px solid rgba(0,0,0,0.2);
+	justify-content: center;
+	font-weight: bold;
+	font-size: 0.6em;
+	border-top: 1px solid rgba(255,255,255,0.4);
+	border-left: 1px solid rgba(255,255,255,0.4);
+}
+.onMonth{
+	color: rgba(255,255,255, 0.7);
+}
+.offMonth{
+	color: rgba(0,0,0,0.7);
+}
+.weight-ok.onMonth{
+	background-color: rgba(55, 119, 236, 0.7);
+}
+.weight-ok.offMonth{
+	background-color: rgba(55, 119, 236, 0.4);
+}
+.weight-not-ok.onMonth{
+	background-color: rgba(213, 25, 50, 0.7);
+}
+.weight-not-ok.offMonth{
+	background-color: rgba(213, 25, 50, 0.4);
+}
+.no-data.onMonth{
+	background-color: rgba(0,0,0,0.7);
+}
+.noData.offMonth{
+	background-color: rgba(0,0,0,0.4);
 }
 #tab-y-labels{
-	width: 20%;
+	flex-basis: 15%;
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	text-align: center;
 	padding: 2.5% 1.25rem 2.5% 0;
 }
-#weightloss-tab-y-labels{
-	height: 100%;
-	width: 30%;
-	border-right: 2px solid rgba(0,0,0,0.2);
-	background: rgba(255,255,255,0.9);
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	text-align: center;
-	padding: 2.5% 2.5% 2.5% 0;
-}
-#tab-axis-labels{
-	flex-basis: 20%;
-	flex-shrink: 1;
-	position: relative;
-	display: flex;
-}
-.tab-axis-label{
-	padding: 1.25%;
-	flex: 1;
-	font-size: 0.65em;
-}
 #weight-axis-label{
 	text-align: right;
 	padding-right: 1.25rem;
-}
-.weight-line{
-	position: absolute;
-	right: 50%;
-	height: 2px;
-	background: black;
-	transform-origin: right center;
 }
 .past-weight{
 	background-color: rgb(200,200,200);
