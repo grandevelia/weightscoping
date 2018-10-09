@@ -22,7 +22,7 @@ class SecondPage extends Component {
 	}
 	render(){
 		if (this.props.alcohol === null){
-			return <Redirect to="/" />
+			return <Redirect to="/FirstPage" />
 		}
 		this.checkAlcoholChange();
 		let positions = this.props.carbRanks;
@@ -41,7 +41,7 @@ class SecondPage extends Component {
 					: null
 				}
 				<p>
-					<Link to='/' className='intro-nav back'>Back</Link>
+					<Link to='/FirstPage' className='intro-nav back'>Back</Link>
 				</p>
 			</div>
 		)

@@ -37,10 +37,10 @@ class DashboardHeader extends Component {
         return (
             <div id='dashboard-nav-links'>
                 <div className='nav-wrapper'>
-                    <Link to="/Home/UserDashboard" className="navbar-link" id='home-link'>Reductiscope</Link>
+                    <Link to="/" className="navbar-link" id='home-link'>Reductiscope</Link>
                 </div>
                 <div className='nav-wrapper'>
-                    <Link to="/Home/Plans" className="navbar-link" id='plan-link'>Plan: {"\"" + planTitles[user.payment_option-1] + "\""}</Link>
+                    <Link to="/Home/Plans" className="navbar-link" id='plan-link'>{user ? "Plan: \"" + planTitles[user.payment_option-1] + "\"" : null}</Link>
                 </div>
                 <div className='nav-wrapper'>
                     <Link to="/Home/FAQ" className="navbar-link" id='faq-link'>FAQ</Link>
@@ -50,49 +50,62 @@ class DashboardHeader extends Component {
                 </div>
                 <div className='nav-wrapper'></div>
                 <div className='nav-wrapper'></div>
-                <div className='nav-wrapper' id='notification-header-section'>
-                    <i className="fa fa-bell" aria-hidden="true"></i>
-                    <div id='navbar-notification-notice'>
-                        {unreadCount > 0 ? <div className='notification-num'>{unreadCount}</div> : null}
-                        <div id='notification-detail-area'>
-                        {
-                            notifications.map((i, index) => {
-                                return (
-                                    <div key={index} className='notification-detail' onClick={() => this.showNotification(i)}>
-                                        <div className='notification-title-area'>
-                                            {!i.read ? 
-                                            <div className='notification-title'>
-                                                <div className='notification-circle'></div>
-                                                New Notification
+                { user ? 
+                    <div className='nav-wrapper' id='notification-header-section'>
+                        <i className="fa fa-bell" aria-hidden="true"></i>
+                        <div id='navbar-notification-notice'>
+                            {unreadCount > 0 ? <div className='notification-num'>{unreadCount}</div> : null}
+                            <div id='notification-detail-area'>
+                            {
+                                notifications.map((i, index) => {
+                                    return (
+                                        <div key={index} className='notification-detail' onClick={() => this.showNotification(i)}>
+                                            <div className='notification-title-area'>
+                                                {!i.read ? 
+                                                <div className='notification-title'>
+                                                    <div className='notification-circle'></div>
+                                                    New Notification
+                                                </div>
+                                                : null }
+                                                <div className='notification-date'>{i.date}</div>
                                             </div>
-                                            : null }
-                                            <div className='notification-date'>{i.date}</div>
+                                            <div className='notification-body'>
+                                                {i.message.length > 40 ? i.message.substring(0, 40) + "..." : i.message}
+                                            </div>
+                                            <div className='notification-see-more'>
+                                                View
+                                            </div>
                                         </div>
-                                        <div className='notification-body'>
-                                            {i.message.length > 40 ? i.message.substring(0, 40) + "..." : i.message}
-                                        </div>
-                                        <div className='notification-see-more'>
-                                            View
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
+                                    )
+                                })
+                            }
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className='nav-wrapper'>
-                    <Link to="/Home/UserSettings" className="navbar-link dropdown" id='settings-link'>{user.email.substring(0, user.email.indexOf('@'))}			
-                        <i className='fa fa-angle-down fa-lg'></i>
-                    </Link>
-                    <div className='dropdown-content'>
-                        <Link to="/Home/UserDashboard" className="dropdown-item">Status</Link>
-                        <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
-                        <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
+                :  
+                    <div className='nav-wrapper'>
+                        <Link to='/Intro' className="navbar-link">Sign Up</Link>
                     </div>
-                </div>
+                }
+                { user ? 
+                    <div className='nav-wrapper'>
+                        <Link to="/Home/UserSettings" className="navbar-link dropdown" id='settings-link'>{user.email.substring(0, user.email.indexOf('@'))}			
+                            <i className='fa fa-angle-down fa-lg'></i>
+                        </Link>
+                        <div className='dropdown-content'>
+                            <Link to="/Home/UserDashboard" className="dropdown-item">Status</Link>
+                            <Link to="/Home/UserSettings" className='dropdown-item'>Settings</Link>
+                            <div id='logout' className='dropdown-item' onClick={() => this.handleLogout()}>Logout</div>
+                        </div>
+                    </div>
+                :
+                    <div className='nav-wrapper'>
+                        <Link to='/Login' className="navbar-link">Login</Link>
+                    </div>
+                }
+
                 {
-                    this.state.notificationLightbox !== null ?
+                    user && this.state.notificationLightbox !== null ?
                         <NotificationLightbox closeNotification={() => this.closeNotification()} content={this.state.notificationLightbox} />
                     : null
                 }

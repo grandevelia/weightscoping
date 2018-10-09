@@ -45,10 +45,10 @@ export default class WeightHistoryGraph extends Component{
     }
     renderGraph(scrollLeft = null){
         let scroll = this.scroll.current;
-        let graphPixelsHeight = scroll.clientHeight;
         let graphPixelsWidth = scroll.clientWidth;
 
         let canvas = this.canvas.current.getContext('2d');
+        let graphPixelsHeight = this.canvas.current.height;
         canvas.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
         canvas.beginPath();
 
@@ -104,8 +104,7 @@ export default class WeightHistoryGraph extends Component{
             }
             allWeights.map((weight, i) => {
                 let currLeft = graphPixelsWidth * sectionPercent * i;
-                let currDate = moment(allDates[i]);
-                let monthIndex = currDate.month() % 2;
+                let monthIndex = moment(allDates[i]).month() % 2;
                 if (i >= this.state.pastProjecting){
                     canvas.fillStyle = 'rgba(213, 25, 50, ' + monthOpacity[monthIndex] + ')';
                     if (weight < yWeight){
@@ -115,11 +114,6 @@ export default class WeightHistoryGraph extends Component{
                     canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')';
                 }
                 canvas.fillRect(currLeft, rectBottom, graphPixelsWidth * sectionPercent - 1, rectHeight - 1);
-
-                if (y === 0 && daysInFrame < 10 && graphPixelsWidth * sectionPercent > 75){
-                    canvas.fillStyle = 'rgb(0,0,0)';
-                    canvas.fillText(currDate.format("YYYY-MM-DD"), currLeft + 0.25 * graphPixelsWidth * sectionPercent, 15);
-                }
                 return "";
             })
             rectBottom += rectHeight;
@@ -140,6 +134,7 @@ export default class WeightHistoryGraph extends Component{
             if (this.state.graphEnd.format("YYYY-MM-DD") === allDates[i]){
                 endIndex = i;
             }
+            return "";
         })
         if (scrollLeft === null){
             //subtract current days in frame - 1 to end index so it appears on the right when setting scrollLeft
@@ -211,6 +206,7 @@ export default class WeightHistoryGraph extends Component{
         this.setState({
             graphStart: start,
             graphEnd: end,
+            showDatePicker: false,
             futureProjecting : futureProjecting,
             futureWeights: futureWeights,
             futureDates: futuresDates,
@@ -432,14 +428,12 @@ export default class WeightHistoryGraph extends Component{
         let daysInFrame = Math.ceil(this.state.graphEnd.diff(this.state.graphStart, "days", true));
 
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
-        let canvasHeight = window.innerHeight * 0.85 * 0.9;
+        let canvasHeight = window.innerHeight * 0.95 * 0.92 * 0.90;
 
-        let renderInputs = true;
-        if (canvasWidth/daysInFrame < 85){
-            renderInputs = false;
-        }
+        let dayRatio = canvasWidth/daysInFrame;
+
         if (allWeights.length > daysInFrame){
-            canvasWidth = canvasWidth * (allWeights.length) / daysInFrame;
+            canvasWidth = dayRatio * (allWeights.length);
         }
         let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, allWeights[this.state.hoverIndex]);
         return (
@@ -518,8 +512,104 @@ export default class WeightHistoryGraph extends Component{
                     }
                         
                     <div id='graph-scroller' ref={this.scroll}>
+                        <div id='dates-container' style={{width: canvasWidth}}>
+                            {
+                                allDates.map((date,i) => {
+                                    date = moment(date);
+                                    return (
+                                        <div key={i} className='graph-date'>
+                                        {
+                                            dayRatio > 60 ?
+                                                date.date() === 1 ?
+                                                    date.format("MMM")
+                                                :
+                                                    date.format("D")
+                                            : dayRatio > 30 ?
+                                                date.date() === 1 ?
+                                                    date.format("MMM")
+                                                : i % 2 === 0 ?
+                                                    date.format("D")
+                                                : null
+                                            : dayRatio > 15 ?
+                                                date.date() === 1 ?
+                                                    date.format("MMM")
+                                                : date.date() % 7 === 0 ?
+                                                    date.format("D")
+                                                : null
+                                            : dayRatio > 3 ?
+                                                date.date() === 1 ?
+                                                    date.month() === 0 ?
+                                                        date.format("YYYY")
+                                                    :
+                                                        date.format("MMM")
+                                                : null
+                                            : dayRatio > 1 ?
+                                                date.date() === 1 ?
+                                                    date.month() === 0 ?
+                                                        date.format("YYYY")
+                                                    : date.month() % 3 === 0 ?
+                                                        date.format("MMM")
+                                                    : null
+                                                : null
+                                            : null
+                                        }
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <canvas id='tab-graph-display' style={{width: canvasWidth}} ref={this.canvas} width={canvasWidth} height={canvasHeight} onMouseMove={(e) => this.showGraphLines(e)} onClick={(e) => this.clickAddWeight(e)}></canvas>
+                        <div id='weight-input-container' style={{width: canvasWidth}}>
+                            {
+                                dayRatio > 85 ?
+                                    allWeights.map((weight,i) => {
+                                        if (i < this.state.pastProjecting){
+                                            return (
+                                                <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), allDates[i])}>
+                                                    <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
+                                                    <input type='submit' className='weight-submit' />
+                                                </form>
+                                            )
+                                        } else if (i < this.state.pastProjecting + this.props.weights.length){
+                                            let weightString = weightStringFromKg(weight, user.weight_units);
+                                            return (
+                                                <form key={i} className='graph-weight' onSubmit={
+                                                    allIds[i] === null ? 
+                                                        (e) => this.submitWeight(e, i, allDates[i]) 
+                                                    :
+                                                        (e) => this.submitWeight(e, i, allDates[i], allIds[i])
+                                                }>
+                                                    <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue=
+                                                    {
+                                                        user.weight_units !== "Kilograms" ? 
+                                                            weightString.substring(0, weightString.length - 7)
+                                                        :
+                                                            weightString.substring(0, weightString.length - 10)
+                                                    } />
+                                                    <input type='submit' className='weight-submit'/>
+                                                </form>
+                                            )
+                                        } else {
+                                            let weightString = weightStringFromKg(weight, user.weight_units);
+                                            return (
+                                                <div key={i} className='graph-weight future-graph-weight'>
+                                                    <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value=
+                                                    {
+                                                        user.weight_units !== "Kilograms" ? 
+                                                            weightString.substring(0, weightString.length - 7)
+                                                        :
+                                                            weightString.substring(0, weightString.length - 10)
+                                                    }/>
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                :
+                                    null
+                            }
+                        </div>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX} onClick={(e) => this.clickAddWeight(e)}></div>
-                        <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
+                        <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: "calc(" + this.state.lineY + "px + 5%)"}} ref={this.coordY}></div>
                         <div id='click-adder' className={this.state.showClickAddWeight ? "show" : ""} style={{left: this.state.addWeightLeft, top: this.state.addWeightTop - 0.125 * canvasHeight}}>
                             <div id='adder-close' onClick={() => this.closeAdder()}><i className='fa fa-times'></i></div>
                             <div id='click-adder-title'>
@@ -546,56 +636,6 @@ export default class WeightHistoryGraph extends Component{
                                         <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} className='graph-weight-number' type='number' step="0.01" />
                                         <input type='submit' className='weight-submit'/>
                                     </form>
-                            }
-                        </div>
-                        <canvas id='tab-graph-display' ref={this.canvas} width={canvasWidth} height={canvasHeight} onMouseMove={(e) => this.showGraphLines(e)} onClick={(e) => this.clickAddWeight(e)}></canvas>
-                        <div id='weight-input-container'>
-                            {
-                                renderInputs ?
-                                    allWeights.map((weight,i) => {
-                                        if (i < this.state.pastProjecting){
-                                            return (
-                                                <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), allDates[i])} style={{width: canvasWidth/allWeights.length}}>
-                                                    <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
-                                                    <input type='submit' className='weight-submit' />
-                                                </form>
-                                            )
-                                        } else if (i < this.state.pastProjecting + this.props.weights.length){
-                                            let weightString = weightStringFromKg(weight, user.weight_units);
-                                            return (
-                                                <form key={i} className='graph-weight' onSubmit={
-                                                    allIds[i] === null ? 
-                                                        (e) => this.submitWeight(e, i, allDates[i]) 
-                                                    :
-                                                        (e) => this.submitWeight(e, i, allDates[i], allIds[i])
-                                                } style={{width: canvasWidth/allWeights.length}}>
-                                                    <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue=
-                                                    {
-                                                        user.weight_units !== "Kilograms" ? 
-                                                            weightString.substring(0, weightString.length - 7)
-                                                        :
-                                                            weightString.substring(0, weightString.length - 10)
-                                                    } />
-                                                    <input type='submit' className='weight-submit'/>
-                                                </form>
-                                            )
-                                        } else {
-                                            let weightString = weightStringFromKg(weight, user.weight_units);
-                                            return (
-                                                <div key={i} className='graph-weight future-graph-weight' style={{width: canvasWidth/allWeights.length}}>
-                                                    <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value=
-                                                    {
-                                                        user.weight_units !== "Kilograms" ? 
-                                                            weightString.substring(0, weightString.length - 7)
-                                                        :
-                                                            weightString.substring(0, weightString.length - 10)
-                                                    }/>
-                                                </div>
-                                            )
-                                        }
-                                    })
-                                :
-                                    null
                             }
                         </div>
                     </div>

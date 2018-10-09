@@ -12,11 +12,8 @@ import PaymentPrompt from './PaymentPrompt';
 import FifthPage from './FifthPage';
 import SixthPage from './SixthPage';
 import SignupOption from './SignupOption';
-import Login from './Login';
 import RegistrationConfirmation from './RegistrationConfirmation';
 import CompleteRegistration from './CompleteRegistration';
-import ForgotPassword from './ForgotPassword';
-import ResetPassword from './ResetPassword';
 
 class Intro extends Component {
 	updateIntroState(update){
@@ -25,35 +22,32 @@ class Intro extends Component {
 	render(){
 		return(
 			<Layout email={this.props.auth.email} pageName={this.props.location.pathname} intro={this.props.intro}>
-				<Route exact path={this.props.match.path} render={() => 
+				<Route exact path='/Intro/FirstPage' render={() => 
 					<FirstPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/SecondPage' render={() => 
+				<Route path='/Intro/SecondPage' render={() => 
 					<SecondPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/ThirdPage' render={() => 
+				<Route path='/Intro/ThirdPage' render={() => 
 					<ThirdPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/FourthPage' render={() => 
+				<Route path='/Intro/FourthPage' render={() => 
 					<FourthPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/PaymentPrompt' render={() => 
+				<Route path='/Intro/PaymentPrompt' render={() => 
 					<PaymentPrompt {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/FifthPage' render={() => 
+				<Route path='/Intro/FifthPage' render={() => 
 					<FifthPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/> 
-				<Route path='/SixthPage' render={() => 
+				<Route path='/Intro/SixthPage' render={() => 
 					<SixthPage {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path='/SignupOption' render={() => 
+				<Route path='/Intro/SignupOption' render={() => 
 					<SignupOption {...this.props.intro} updateIntroState={(key,value) => this.updateIntroState(key,value)}/>} 
 				/>
-				<Route path="/RegistrationConfirmation" component={ RegistrationConfirmation } />
-				<Route path="/CompleteRegistration" component={ CompleteRegistration } />
-				<Route path='/Login' component={ Login } />
-                <Route path="/ForgotPassword" component={ ForgotPassword } />
-                <Route path="/ResetPassword" component={ ResetPassword } />
+				<Route path="/Intro/RegistrationConfirmation" component={ RegistrationConfirmation } />
+				<Route path="/Intro/CompleteRegistration" component={ CompleteRegistration } />
 			</Layout>
 		);
 	}

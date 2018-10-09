@@ -21,12 +21,12 @@ export default class Layout extends Component {
 				<div id='main-area'>
 					<div id='navigation-area'>
 						<div id='nav-container'>
-							<NavItem current={this.props.pageName} pageName="/" icon={0} active={this.props.intro.alcohol !== null}/>
-							<NavItem current={this.props.pageName} pageName="/SecondPage" icon={1} active={this.props.intro.carbRanks.indexOf(null) < 0}/>
-							<NavItem current={this.props.pageName} pageName="/ThirdPage/" icon={2} active={this.props.intro.heightInches !== null}/>
-							<NavItem current={this.props.pageName} pageName="/FourthPage" icon={3} active={this.props.intro.weightKg !== null}/>
-							<NavItem current={this.props.pageName} pageName="/FifthPage" icon={4} active={this.props.email !== null}/>
-							<NavItem current={this.props.pageName} pageName="/SixthPage" icon={5} active={this.props.intro.paymentOption !== null}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/FirstPage" icon={0} active={this.props.intro.alcohol !== null}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/SecondPage" icon={1} active={this.props.intro.carbRanks.indexOf(null) < 0}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/ThirdPage/" icon={2} active={this.props.intro.heightInches !== null}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/FourthPage" icon={3} active={this.props.intro.weightKg !== null}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/FifthPage" icon={4} active={this.props.email !== null}/>
+							<NavItem current={this.props.pageName} pageName="/Intro/SixthPage" icon={5} active={this.props.intro.paymentOption !== null}/>
 						</div>
 					</div>
 					<div id='page-area'>

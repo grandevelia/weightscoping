@@ -11,6 +11,10 @@ import weightScoping from './reducers';
 import Intro from './components/Intro';
 import Home from './components/Home';
 import NotFound from './components/NotFound';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+import Login from './components/Login';
+import Main from './components/Main';
 
 let store = createStore(weightScoping, applyMiddleware(thunk))
 
@@ -26,8 +30,14 @@ class RootContainerComponent extends Component {
                 <Route path="/Home" render={() => 
                   <Home weights={this.props.weights} />
                 } />
-                <Route path="/" render={ () => 
+                <Route path="/Intro" render={ () => 
                   <Intro auth={ this.props.auth } />} 
+                />
+			        	<Route path='/Login' component={ Login } />
+                <Route path="/ForgotPassword" component={ ForgotPassword } />
+                <Route path="/ResetPassword" component={ ResetPassword } />
+                <Route exact path="/" render={() => 
+                  <Main />} 
                 />
                 <Route component={ NotFound } />
             </Switch>

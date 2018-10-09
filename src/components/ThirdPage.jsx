@@ -37,7 +37,7 @@ export default class ThirdPage extends Component {
 	render(){
 		
 		if (this.props.alcohol === null){
-			return <Redirect to="/" />
+			return <Redirect to="/FirstPage" />
 		} else if (this.props.carbRanks.includes(null)){
 			return <Redirect to="/SecondPage" />
 		}

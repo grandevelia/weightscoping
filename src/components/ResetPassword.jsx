@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Navbar from './Navbar';
+import { logo } from '../css/images/logo.svg'
 import '../css/Login.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -36,42 +38,55 @@ class ResetPassword extends Component {
 	}
     render(){
         return (
-            <div>
-                {this.state.confirming ? 
-                    this.props.auth.reset ?
-                        <form onSubmit={(e) => this.onSubmit(e)} id='reset-input-area'>
-                            <input
-                                type="password" 
-                                id="password" 
-                                placeholder='New Password'
-							    onChange={e => {this.setState({password: e.target.value})}} 
-                            />
-							<input
-                                type="password" 
-                                id="confirm-password" 
-                                placeholder='Confirm Password'
-                                onChange={e => {this.setState({confirmPassword: e.target.value})}}
-                            />
-                            <input
-                                id='update-password-submit'
-                                type="submit"
-                            />
-                        </form>
-                    :
-                    <div className='reset-failed forgot-container'>
-                        Invalid Username and Key
-                    </div> 
-                :
-                    this.props.auth.reset ?
-                        <div id='reset-complete' className='reset-okay forgot-container'>
-                            <p>Your password has been updated</p>
-                            <Link to='/Login'>Log In</Link>
-                        </div> 
+            <div className='content'>
+				<style>
+					@import url('https://fonts.googleapis.com/css?family=Raleway');
+				</style>
+				<div className="top-wrap">
+					<Navbar></Navbar>
+					<header className="app-header">
+			          <img src={logo} className="app-logo" alt="logo" />
+			          <h1 className="app-title">Your Love of Food Can Make You Thin</h1>
+			        </header>
+			    </div>
+				<div id='main-area'>
+                    {
+                        this.state.confirming ? 
+                            this.props.auth.reset ?
+                                <form onSubmit={(e) => this.onSubmit(e)} id='reset-input-area'>
+                                    <input
+                                        type="password" 
+                                        id="password" 
+                                        placeholder='New Password'
+                                        onChange={e => {this.setState({password: e.target.value})}} 
+                                    />
+                                    <input
+                                        type="password" 
+                                        id="confirm-password" 
+                                        placeholder='Confirm Password'
+                                        onChange={e => {this.setState({confirmPassword: e.target.value})}}
+                                    />
+                                    <input
+                                        id='update-password-submit'
+                                        type="submit"
+                                    />
+                                </form>
+                            :
+                            <div className='reset-failed forgot-container'>
+                                Invalid Username and Key
+                            </div> 
+                        : this.props.auth.reset ?
+
+                            <div id='reset-complete' className='reset-okay forgot-container'>
+                                <p>Your password has been updated</p>
+                                <Link to='/Login'>Log In</Link>
+                            </div> 
                         :
-                        <div className='reset-failed forgot-container'>
-                            {this.props.auth.errors.error}
-                        </div> 
-             }
+                            <div className='reset-failed forgot-container'>
+                                {this.props.auth.errors.error}
+                            </div> 
+                    }
+                </div>
             </div>
         )
     }

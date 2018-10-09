@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Navbar from './Navbar';
+import { logo } from '../css/images/logo.svg'
 import '../css/Login.css';
 import { connect } from 'react-redux';
 import { auth } from "../actions";
@@ -21,29 +23,42 @@ class ForgotPassword extends Component {
     }
     render(){
         return (
-            <div>
-            {this.props.auth.reset === null ?
-                <form id='forgot-input-area' className='forgot-container' onSubmit={(e) => this.submitReset(e)}>
-                    <input
-                        type='text' 
-                        id='forgot-pass-email' 
-                        placeholder='Enter Your Email'
-                        onChange={e => this.setState({email: e.target.value})}
-                    />
-                    <input
-                        type='submit'
-                        id='forgot-pass-submit'
-                    />
-                </form> 
-            : this.props.auth.reset === true ?
-                <div className='reset-okay forgot-container'>
-                    A reset link was sent to {this.props.email}. Click the link it contains to reset your password.
-                </div> 
-            :
-                <div className='reset-failed forgot-container'>
-                    Your password could not be reset.
-                </div> 
-            }
+            <div className='content'>
+				<style>
+					@import url('https://fonts.googleapis.com/css?family=Raleway');
+				</style>
+				<div className="top-wrap">
+					<Navbar></Navbar>
+					<header className="app-header">
+			          <img src={logo} className="app-logo" alt="logo" />
+			          <h1 className="app-title">Your Love of Food Can Make You Thin</h1>
+			        </header>
+			    </div>
+				<div id='main-area'>
+                    {
+                        this.props.auth.reset === null ?
+                            <form id='forgot-input-area' className='forgot-container' onSubmit={(e) => this.submitReset(e)}>
+                                <input
+                                    type='text' 
+                                    id='forgot-pass-email' 
+                                    placeholder='Enter Your Email'
+                                    onChange={e => this.setState({email: e.target.value})}
+                                />
+                                <input
+                                    type='submit'
+                                    id='forgot-pass-submit'
+                                />
+                            </form> 
+                        : this.props.auth.reset === true ?
+                            <div className='reset-okay forgot-container'>
+                                A reset link was sent to {this.props.email}. Click the link it contains to reset your password.
+                            </div> 
+                        :
+                            <div className='reset-failed forgot-container'>
+                                Your password could not be reset.
+                            </div> 
+                    }
+                </div>
             </div>
         )
     }

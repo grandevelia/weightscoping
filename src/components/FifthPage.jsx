@@ -25,7 +25,7 @@ class FifthPage extends Component {
 	}
 	render(){
 		if (this.props.alcohol === null){
-			return <Redirect to="/" />
+			return <Redirect to="/FirstPage" />
 		} else if (this.props.carbRanks.includes(null)){
 			return <Redirect to="/SecondPage" />
 		} else if (this.props.heightInches === null){
