@@ -19,13 +19,13 @@ export default class WeightHistoryGraph extends Component{
         }
         this.showDatePicker = this.showDatePicker.bind(this);
         this.setDateRange = this.setDateRange.bind(this);
-        let projectionData = this.futureProject(6);
+        let projectionData = this.futureProject(7);
         
         this.state = {
             inputs: inputState,
             showDatePicker: false,
-            graphStart: moment().subtract(14, "days"),
-            graphEnd: moment(),
+            daysInFrame: 14,
+            frameEndIndex: props.weights.length + projectionData.futureProjecting - 1,
             futureProjecting : projectionData.futureProjecting,
             futureWeights: projectionData.futureWeights,
             futureDates: projectionData.futureDates,
@@ -43,7 +43,7 @@ export default class WeightHistoryGraph extends Component{
             addWeightIndex: 0
         }
     }
-    renderGraph(scrollLeft = null){
+    renderGraph(scrollLeft){
         let scroll = this.scroll.current;
         let graphPixelsWidth = scroll.clientWidth;
 
@@ -53,96 +53,86 @@ export default class WeightHistoryGraph extends Component{
         canvas.beginPath();
 
         let user = this.props.user;
-		
-        /*
-        *	Percentage height of graph for each level
-        *	Total height expressed in terms of graph height
-        *	Zero all weights by subtracting minWeight
-        *
-        *	Each section is 1/numSections of zeroed initialWeight kg
-        *	In terms of percentage of graph height, each section is (initial - min) / (numSections * range)
-        */
-
-        let numLevels = 8;
-        let levelMap = Array( numLevels ).fill().map((x,i) => i);
         let initialWeight = this.props.weights[this.props.startingIndex];
+
+        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
+        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
+        
+        let weightsInFrame;
+        if (this.state.daysInFrame < this.props.weights.length){
+            weightsInFrame = weights.slice(this.state.frameEndIndex - this.state.daysInFrame, this.state.frameEndIndex);
+        } else {
+            weightsInFrame = weights.slice(this.state.pastProjecting);
+        }
     
-        //Divide by numLevels here since there are numSections - 1 = numLevels increments between the sections
-        let kgPerSection = (initialWeight - user.ideal_weight_kg)/numLevels;
+        let frameMax = 1.02 * Math.max(...weightsInFrame);
+        let frameMin = 0.98 * Math.min(...weightsInFrame);
 
-        let allWeights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
-        let allDates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
-        let daysInFrame = Math.ceil(this.state.graphEnd.diff(this.state.graphStart, "days", true));
-        let globalMax = 1.02 * Math.max(...allWeights);
-        let globalMin = 0.98 * Math.min(user.ideal_weight_kg * 0.95, ...this.props.weights, ...this.state.futureWeights);
+        let lowestLevel = lossmodeLevel(initialWeight, user.ideal_weight_kg, frameMax);
+        let highestLevel = lossmodeLevel(initialWeight, user.ideal_weight_kg, frameMin);
+        
+        let kgPerSection = (initialWeight - user.ideal_weight_kg)/8;
+        let levelMap = Array( 8 ).fill().map((x, i) => {
+            return i  * kgPerSection + user.ideal_weight_kg;
+        });
+        levelMap.reverse();
+        levelMap.splice(0 , 1);
+        levelMap.splice(0, lowestLevel);
+        levelMap.push(frameMin);
+        //Horizontal portion of canvas taken up by each day
+        let dayPercent = 1/this.state.daysInFrame;
 
-        //Extra height if user has weights above starting weight
-        let portionAboveStarting = ( (globalMax - globalMin) - (initialWeight - globalMin) ) / ( globalMax - globalMin );
-
-        //Extra height for portion below ideal weight
-        let portionBelowIdeal = (user.ideal_weight_kg - globalMin) / (globalMax - globalMin);
-
-        //Height per level section (note there are 2 sections in level 0)
-        let portionPerSection = (1 - portionAboveStarting - portionBelowIdeal)/8;
-
-        //Portion of graph taken up by each day
-        let sectionPercent = 1/daysInFrame;
-
-        let rectBottom = 0;
         canvas.strokeStyle = "rgb(0, 0, 0)";
         let monthOpacity = ["0.7", "0.4"];
-        levelMap.map(y => {
-            let yWeight = initialWeight - (y + 1) * kgPerSection;
-            let rectHeight;
-            if (y === 0){
-                yWeight += kgPerSection;     
-                rectHeight = (portionAboveStarting + 2 * portionPerSection) * graphPixelsHeight;
-            } else if (y !== levelMap[levelMap.length - 1]){
-                rectHeight = portionPerSection * graphPixelsHeight;
-            } else {
-                rectHeight = portionBelowIdeal * graphPixelsHeight;
-            }
-            allWeights.map((weight, i) => {
-                let currLeft = graphPixelsWidth * sectionPercent * i;
-                let monthIndex = moment(allDates[i]).month() % 2;
-                if (i >= this.state.pastProjecting){
+        let compDate = this.props.dates[0].clone().subtract(1, "days");
+        
+        weights.map((weight, i) => {
+            let rectBottom = 0;
+            let currLeft = graphPixelsWidth * dayPercent * i;
+            let currDate = dates[i];
+            let monthIndex = currDate.month() % 2;
+
+            levelMap.map( (levelWeight, j) => {
+                let rectHeight = ( frameMax - levelWeight )/( frameMax - frameMin ) - rectBottom;
+
+                if (currDate.isAfter(compDate)){
                     canvas.fillStyle = 'rgba(213, 25, 50, ' + monthOpacity[monthIndex] + ')';
-                    if (weight < yWeight){
+                    if ( j > 0){
+                        if (weight < levelMap[j - 1]){
+                            canvas.fillStyle = 'rgba(55, 119, 236, ' + monthOpacity[monthIndex] + ')';
+                        }
+                    } else {
                         canvas.fillStyle = 'rgba(55, 119, 236, ' + monthOpacity[monthIndex] + ')';
                     }
                 } else {
                     canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')';
                 }
-                canvas.fillRect(currLeft, rectBottom, graphPixelsWidth * sectionPercent - 1, rectHeight - 1);
+                canvas.fillRect(currLeft, graphPixelsHeight * rectBottom, graphPixelsWidth * dayPercent - 1, graphPixelsHeight * rectHeight - 1);
+                rectBottom += rectHeight;
                 return "";
             })
-            rectBottom += rectHeight;
+
             return "";
-        });
-        let endIndex = 0;
-        let currentFutureWeights = this.props.weights.concat(this.state.futureWeights)
-        currentFutureWeights.map((weight, i) => {
-            let currLeft = graphPixelsWidth * sectionPercent * (i + this.state.pastProjecting);
-            //Line graph
-            if (i !== 0 ){
-                canvas.moveTo(currLeft + graphPixelsWidth * sectionPercent, graphPixelsHeight * ((globalMax - globalMin) - (weight - globalMin))/(globalMax - globalMin));
-                canvas.lineTo(currLeft, graphPixelsHeight * ((globalMax - globalMin) - (currentFutureWeights[i-1] - globalMin))/(globalMax - globalMin));
-            } else {
-                canvas.moveTo(currLeft + graphPixelsWidth * sectionPercent, graphPixelsHeight * ((globalMax - globalMin) - (weight - globalMin))/(globalMax - globalMin));
-                canvas.lineTo(currLeft, graphPixelsHeight * ((globalMax - globalMin) - (weight - globalMin))/(globalMax - globalMin));
-            }
-            if (this.state.graphEnd.format("YYYY-MM-DD") === allDates[i]){
-                endIndex = i;
+        })
+
+        //Line graph
+        weights.map((weight, i) => {
+            let currDate = dates[i];
+
+            //Only draw lines for weights added by user or projected into future
+            if (currDate.isAfter(compDate)){
+                let currLeft = graphPixelsWidth * dayPercent * i;
+                canvas.moveTo(currLeft + graphPixelsWidth * dayPercent, graphPixelsHeight * ( frameMax - weight )/( frameMax - frameMin ));
+
+                if (i !== this.state.pastProjecting ){
+                    canvas.lineTo(currLeft, graphPixelsHeight * ( frameMax - weights[i-1] )/( frameMax - frameMin ) );
+                } else {
+                    canvas.lineTo(currLeft, graphPixelsHeight * ( frameMax - weight )/(frameMax - frameMin));
+                }
             }
             return "";
         })
-        if (scrollLeft === null){
-            //subtract current days in frame - 1 to end index so it appears on the right when setting scrollLeft
-            endIndex -= Math.floor(this.state.graphEnd.diff(this.state.graphStart, "days", true)) - 1;
-            this.scroll.current.scrollLeft = graphPixelsWidth * sectionPercent * endIndex;
-        } else {
-            this.scroll.current.scrollLeft = scrollLeft;
-        }
+        this.scroll.current.scrollLeft = scrollLeft;
         canvas.stroke();
 
         //If canvas width has changed, mouse coordinates may be too large and extend the size until next mouseover event
@@ -151,7 +141,7 @@ export default class WeightHistoryGraph extends Component{
     }
     componentDidMount(){
         this.handleResize();
-        window.addEventListener('resize', this.handleResize)
+        window.addEventListener('resize', this.handleResize);
     }
     handleResize = () => {
         this.setState({
@@ -159,16 +149,43 @@ export default class WeightHistoryGraph extends Component{
             windowWidth: window.innerWidth,
             graphX: 0
         }, () => {
-            this.renderGraph();
+            this.renderGraph(this.canvas.current.getBoundingClientRect().width);
         });
     }
+    handleScroll = () => {
+        let scroll = this.scroll.current;
+        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
+        let startIndex = this.state.endIndez - this.state.daysInFrame;
+        let newStartIndex = Math.floor(weights.length * scroll.scrollLeft/this.canvas.current.width);
+        if (newStartIndex !== startIndex){
+            this.setState({
+                frameEndIndex: newStartIndex + this.state.daysInFrame
+            }, () => {
+                this.renderGraph(this.scroll.current.scrollLeft);
+            });
+        }
+    }
     componentWillUnmount() {
-        window.removeEventListener('resize', this.handleResize)
+        window.removeEventListener('resize', this.handleResize);
     }
     showDatePicker(status){
         this.setState({showDatePicker: status});
     }
+    scaleGraph(n){
+        let end;
+        if (this.state.futureProjecting > 0){
+            end = this.state.futureDates[this.state.futureDates.length - 1];
+        } else {
+            end = moment();
+        }
+        let start = end.clone().subtract(n, "days");
+        this.setDateRange(start, end);
+    }
     setDateRange(start, end){
+        if (this.props.dates[0].isAfter(end)){
+            end = this.props.dates[0];
+            alert("You must keep at least 1 added weight in the window");
+        }
         let futureProjecting = this.state.futureProjecting;
         let futureWeights = this.state.futureWeights;
         let futuresDates = this.state.futureDates;
@@ -177,8 +194,10 @@ export default class WeightHistoryGraph extends Component{
         let pastWeights = this.state.pastWeights;
         let pastDates = this.state.pastDates;
 
+        let frameEndIndex = this.state.frameEndIndex;
         if (end.isAfter(moment())){
-            let data = this.futureProject(Math.ceil(end.diff(moment(), "days", true)));
+            let daysInFuture = Math.ceil(end.diff(moment(), "days", true));
+            let data = this.futureProject(daysInFuture);
             if (data === null){
                 alert("Invalid Date");
                 return;
@@ -186,15 +205,19 @@ export default class WeightHistoryGraph extends Component{
             futureProjecting = data.futureProjecting;
             futureWeights = data.futureWeights;
             futuresDates = data.futureDates;
+            frameEndIndex = frameEndIndex + daysInFuture - this.state.futureProjecting;
+        } else {
+            frameEndIndex = this.state.pastProjecting + this.props.dates.length - Math.ceil(this.props.dates[this.props.dates.length - 1].diff(end, "days", true)) - 1;
         }
 
-        let currStart = moment(this.props.dates[0]);
+        let currStart = this.props.dates[0];
         if (currStart.isAfter(start)){
             pastProjecting = Math.floor(currStart.diff(start, "days", true));
+            frameEndIndex = frameEndIndex + pastProjecting - this.state.pastProjecting;
             pastWeights = Array(pastProjecting).fill().map(x => {return 0});
             pastDates = [];
             for (let i = 1; i <= pastProjecting; i ++){
-                let newDate = currStart.subtract(1, "days").format("YYYY-MM-DD");
+                let newDate = currStart.clone().subtract(i, "days");
                 pastDates.unshift(newDate);
             }
         } else {
@@ -203,9 +226,13 @@ export default class WeightHistoryGraph extends Component{
             pastDates = [];
         }
 
+        let daysInFrame = Math.ceil(end.diff(start, "days", true));
+        if (daysInFrame > frameEndIndex){
+            frameEndIndex = daysInFrame;
+        }
         this.setState({
-            graphStart: start,
-            graphEnd: end,
+            daysInFrame: daysInFrame,
+            frameEndIndex: frameEndIndex,
             showDatePicker: false,
             futureProjecting : futureProjecting,
             futureWeights: futureWeights,
@@ -214,69 +241,7 @@ export default class WeightHistoryGraph extends Component{
             pastWeights: pastWeights,
             pastDates: pastDates,
             hoverIndex: 0
-        }, () => this.renderGraph());
-    }
-    changeWeight(e, i, weightClass="STANDARD"){
-        e.preventDefault();
-        if (weightClass === "STANDARD"){
-            let newInputs = this.state.inputs;
-            newInputs[i] = e.target.value;
-            this.setState({inputs: newInputs}, () => this.renderGraph());
-        } else if (weightClass === "FUTURE"){
-            let newProjection = this.state.futureWeights;
-            let targetWeight = this.convertWeight(parseInt(e.target.value,10));
-            if(!targetWeight){
-                targetWeight = 0;
-            }
-            if (i > 0){
-                //When a user changes a projected weights, all weights before that day are filled
-                let anchorWeight = this.props.weights[this.props.weights.length-1];
-                let interpWeights = [];
-                interpWeights.push(anchorWeight);
-                interpWeights.push(targetWeight);
-
-                let interpDates = [];
-                let now = moment();
-                interpDates.push(now.format("YYYY-MM-DD"));
-                interpDates.push(now.add(i+1, "days").format("YYYY-MM-DD"));
-
-                let interpSection = interpolateDates(interpWeights, interpDates).weights.slice(1);
-                newProjection = interpSection.concat(newProjection.slice(i+1));
-            } else {
-                newProjection[i] = targetWeight;
-            }
-            this.setState({futureWeights: newProjection}, () => this.renderGraph());
-        }
-    }
-	convertWeight(weight){
-		let weightUnits = this.props.user.weight_units;
-		if (weightUnits === "Pounds"){
-			return poundsToKg(weight);
-		}
-		return weight;
-	}
-    submitWeight(e, i, date, id=null){
-        e.preventDefault();
-        if (this.state.inputs[i] === ""){
-            return
-        }
-        let newWeight = parseInt(this.state.inputs[i], 10);
-        if (id === null){
-            this.props.addWeight(this.convertWeight(newWeight), date)
-            .then(() => {
-                this.renderGraph(this.scroll.current.scrollLeft);
-            })
-        } else {
-            this.props.updateWeight(this.convertWeight(newWeight), id)
-            .then(() => {
-                this.renderGraph(this.scroll.current.scrollLeft);
-            })
-        }
-    }
-    scaleGraph(n){
-        let end = this.state.graphEnd.clone();
-        let start = this.state.graphEnd.subtract(n, "days");
-        this.setDateRange(start, end);
+        }, () => this.renderGraph(this.canvas.current.width));
     }
     futureProject(daysToProject, setState=false){
         let weights = this.props.weights;
@@ -293,8 +258,8 @@ export default class WeightHistoryGraph extends Component{
         let futureWeights, futureDates;
         //Get last day, add the same weight state.projecting days later, interpolate between
         futureDates = [];
-        futureDates.push(dates[dates.length-1]);
-        futureDates.push(moment(futureDates[0]).add(daysToProject, "days").format("YYYY-MM-DD"));
+        futureDates.push(dates[dates.length-1].clone());
+        futureDates.push(futureDates[0].clone().add(daysToProject, "days"));
 
         futureWeights = [];
         futureWeights.push(weights[weights.length-1]);
@@ -315,9 +280,67 @@ export default class WeightHistoryGraph extends Component{
         } else {
             this.setState({
                 futureProjecting : daysToProject,
+                daysInFrame: this.state.daysInFrame - this.state.futureProjecting + daysToProject,
                 futureWeights: futureWeights,
                 futureDates: futureDates
             }, () => this.renderGraph(this.canvas.current.getBoundingClientRect().width));
+        }
+    }
+    changeWeight(e, i, weightClass="STANDARD"){
+        e.preventDefault();
+        if (weightClass === "STANDARD"){
+            let newInputs = this.state.inputs;
+            newInputs[i] = e.target.value;
+            this.setState({inputs: newInputs}, () => this.renderGraph(this.scroll.current.scrollLeft));
+        } else if (weightClass === "FUTURE"){
+            let newProjection = this.state.futureWeights;
+            let targetWeight = this.convertWeight(parseInt(e.target.value,10));
+            if(!targetWeight){
+                targetWeight = 0;
+            }
+            if (i > 0){
+                //When a user changes a projected weights, all weights before that day are filled
+                let anchorWeight = this.props.weights[this.props.weights.length-1];
+                let interpWeights = [];
+                interpWeights.push(anchorWeight);
+                interpWeights.push(targetWeight);
+
+                let interpDates = [];
+                let now = moment();
+                interpDates.push(now);
+                interpDates.push(now.add(i+1, "days"));
+
+                let interpSection = interpolateDates(interpWeights, interpDates).weights.slice(1);
+                newProjection = interpSection.concat(newProjection.slice(i+1));
+            } else {
+                newProjection[i] = targetWeight;
+            }
+            this.setState({futureWeights: newProjection}, () => this.renderGraph(this.scroll.current.scrollLeft));
+        }
+    }
+	convertWeight(weight){
+		let weightUnits = this.props.user.weight_units;
+		if (weightUnits === "Pounds"){
+			return poundsToKg(weight);
+		}
+		return weight;
+	}
+    submitWeight(e, i, date, id=null){
+        e.preventDefault();
+        if (this.state.inputs[i] === ""){
+            return
+        }
+        let newWeight = parseInt(this.state.inputs[i], 10);
+        if (id === null){
+            this.props.addWeight(this.convertWeight(newWeight), date.format("YYYYY-MM-DD"))
+            .then(() => {
+                this.renderGraph(this.scroll.current.scrollLeft);
+            })
+        } else {
+            this.props.updateWeight(this.convertWeight(newWeight), id)
+            .then(() => {
+                this.renderGraph(this.scroll.current.scrollLeft);
+            })
         }
     }
 	allowedIcons(level, carbRanks){
@@ -375,28 +398,33 @@ export default class WeightHistoryGraph extends Component{
         
         //Mouse position relative to scrolled canvas left
         let mouseX = e.clientX - canvasBox.left;
+        
+        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
 
-        let allWeights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
-
-        let boundingWidth = allWeights.length;
+        let boundingWidth = weights.length;
         let weightIndex = Math.floor(boundingWidth * mouseX/canvasBox.width);
 
         //When past projecting
-        if (weightIndex >= allWeights.length){
-            weightIndex = allWeights.length - 1;
+        if (weightIndex >= weights.length){
+            weightIndex = weights.length - 1;
         } else if (weightIndex < 0){
             weightIndex = 0;
         }
 
         let lineX = canvasBox.width * (weightIndex+1) / boundingWidth;
 
-        let currWeight = allWeights[weightIndex];
+        let weightsInFrame;
+        if (this.state.daysInFrame < this.props.weights.length){
+            weightsInFrame = weights.slice(this.state.frameEndIndex - this.state.daysInFrame, this.state.frameEndIndex);
+        } else {
+            weightsInFrame = weights.slice(this.state.pastProjecting);
+        }
+        let frameMax = 1.02 * Math.max(...weightsInFrame);
+        let frameMin = 0.98 * Math.min(...weightsInFrame);
 
-        let minWeight = 0.98 * Math.min(0.95 * this.props.user.ideal_weight_kg, ...this.props.weights, ...this.state.futureWeights);
-        let maxWeight = 1.02 * Math.max(...allWeights);
         let lineY;
         if (weightIndex >= this.state.pastProjecting){
-            lineY = Math.max(canvasBox.height * (currWeight - minWeight)/(maxWeight - minWeight), 0);
+            lineY = canvasBox.height * (1 - (frameMax - weights[weightIndex]) / (frameMax - frameMin));
         } else {
             lineY = canvasBox.height;
         }
@@ -418,22 +446,24 @@ export default class WeightHistoryGraph extends Component{
     }
     render(){
         let user = this.props.user;
-        let allWeights = this.state.pastWeights.concat(this.props.weights.concat(this.state.futureWeights));
-        let allDates = this.state.pastDates.concat(this.props.dates.concat(this.state.futureDates));
-        let allIds = Array(this.state.pastProjecting).fill().map(x => {return null}).concat(this.props.ids).concat(Array(this.state.futureProjecting).fill().map(x => {return null}));
+
+        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
+        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
+        let ids = Array(this.state.pastProjecting).fill().map(x => {return null}).concat(this.props.ids).concat(Array(this.state.futureProjecting).fill().map(x => {return null}));
+
         let initialWeight = this.props.weights[this.props.startingIndex];
 
-        let daysInFrame = Math.ceil(this.state.graphEnd.diff(this.state.graphStart, "days", true));
+        let daysInFrame = this.state.daysInFrame;
 
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.95 * 0.92 * 0.90;
 
         let dayRatio = canvasWidth/daysInFrame;
-
-        if (allWeights.length > daysInFrame){
-            canvasWidth = dayRatio * (allWeights.length);
+        if (weights.length > daysInFrame){
+            canvasWidth = dayRatio * (weights.length);
         }
-        let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, allWeights[this.state.hoverIndex]);
+
+        let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, weights[this.state.hoverIndex]);
         return (
             <div id='graph-area'>
                 <div id='graph-top'>
@@ -476,8 +506,8 @@ export default class WeightHistoryGraph extends Component{
                         this.state.hoverIndex >= this.state.pastProjecting ? 
 
                             <div id='graph-hover'>
-                                <div id='graph-hover-weight'>{weightStringFromKg(allWeights[this.state.hoverIndex], user.weight_units)}</div>
-                                <div id='graph-hover-date'>{allDates[this.state.hoverIndex]}</div>
+                                <div id='graph-hover-weight'>{weightStringFromKg(weights[this.state.hoverIndex], user.weight_units)}</div>
+                                <div id='graph-hover-date'>{dates[this.state.hoverIndex].format("YYYY-MM-DD")}</div>
                                 <div id='graph-hover-level'>{"Level " + level}</div>
                                 <div id='graph-hover-allowed'>
                                     <div className='graph-hover-allowed-title'>Allowed</div>
@@ -493,7 +523,7 @@ export default class WeightHistoryGraph extends Component{
                                 </div>
 
                                 {
-                                    allIds[this.state.hoverIndex] === null ?
+                                    ids[this.state.hoverIndex] === null ?
                                         <div id='graph-hover-interpolated'>Estimated Weight</div>
                                     : null
                                 }
@@ -502,16 +532,15 @@ export default class WeightHistoryGraph extends Component{
                         :
                             <div id='graph-hover'>
                                 <div id='graph-hover-weight'>Empty Weight</div>
-                                <div id='graph-hover-date'>{allDates[this.state.hoverIndex]}</div>
+                                <div id='graph-hover-date'>{dates[this.state.hoverIndex].format("YYYY-MM-DD")}</div>
                                 <div id='click-hint'>Click the graph to add a weight</div>
                             </div>
                     }
                         
-                    <div id='graph-scroller' ref={this.scroll}>
+                    <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll}>
                         <div id='dates-container' style={{width: canvasWidth}}>
                             {
-                                allDates.map((date,i) => {
-                                    date = moment(date);
+                                dates.map((date,i) => {
                                     return (
                                         <div key={i} className='graph-date'>
                                         {
@@ -558,7 +587,7 @@ export default class WeightHistoryGraph extends Component{
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
                                 dayRatio > 85 ?
-                                    allWeights.map((weight,i) => {
+                                weights.map((weight,i) => {
                                         let weightString = weightStringFromKg(weight, user.weight_units);
                                         if (user.weight_units === "Pounds"){
                                             weightString = weightString.substring(0, weightString.length - 7);
@@ -567,7 +596,7 @@ export default class WeightHistoryGraph extends Component{
                                         }
                                         if (i < this.state.pastProjecting){
                                             return (
-                                                <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), allDates[i])}>
+                                                <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}>
                                                     <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
                                                     <input type='submit' className='weight-submit' />
                                                 </form>
@@ -575,10 +604,10 @@ export default class WeightHistoryGraph extends Component{
                                         } else if (i < this.state.pastProjecting + this.props.weights.length){
                                             return (
                                                 <form key={i} className='graph-weight' onSubmit={
-                                                    allIds[i] === null ? 
-                                                        (e) => this.submitWeight(e, i, allDates[i]) 
+                                                    ids[i] === null ? 
+                                                        (e) => this.submitWeight(e, i, dates[i]) 
                                                     :
-                                                        (e) => this.submitWeight(e, i, allDates[i], allIds[i])
+                                                        (e) => this.submitWeight(e, i, dates[i], dates[i])
                                                 }>
                                                     <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue={weightString} />
                                                     <input type='submit' className='weight-submit'/>
@@ -602,10 +631,10 @@ export default class WeightHistoryGraph extends Component{
                             <div id='adder-close' onClick={() => this.closeAdder()}><i className='fa fa-times'></i></div>
                             <div id='click-adder-title'>
                                 {
-                                    allIds[this.state.addWeightIndex] === null ?
-                                        "Add a weight for " + allDates[this.state.addWeightIndex]
+                                    ids[this.state.addWeightIndex] === null ?
+                                        "Add a weight for " + dates[this.state.addWeightIndex].format("YYYY-MM-DD")
                                     :
-                                        "Change weight for " + allDates[this.state.addWeightIndex] + " from " + weightStringFromKg(allWeights[this.state.addWeightIndex], user.weight_units) + " to: "
+                                        "Change weight for " + dates[this.state.addWeightIndex].format("YYYY-MM-DD") + " from " + weightStringFromKg(weights[this.state.addWeightIndex], user.weight_units) + " to: "
                                 }
                             </div>
                             {
@@ -613,14 +642,14 @@ export default class WeightHistoryGraph extends Component{
 
                                     <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length), "FUTURE")} className='graph-weight-number' type='number' step="0.01"/>
 
-                                : allIds[this.state.addWeightIndex] === null ? 
-                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, allDates[this.state.addWeightIndex])}>
+                                : ids[this.state.addWeightIndex] === null ? 
+                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex])}>
                                         <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} className='graph-weight-number' type='number' step="0.01" />
                                         <input type='submit' className='weight-submit'/>
                                     </form>
                                         
                                 :
-                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, allDates[this.state.addWeightIndex], allIds[this.state.addWeightIndex])}>
+                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex], ids[this.state.addWeightIndex])}>
                                         <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} className='graph-weight-number' type='number' step="0.01" />
                                         <input type='submit' className='weight-submit'/>
                                     </form>

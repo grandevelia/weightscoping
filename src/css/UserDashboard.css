@@ -118,6 +118,7 @@ body {
 }
 .primary-status-content{
 	font-size: 0.9em;
+	overflow-y: scroll;
 }
 /****** Graph Styles Start Here ******/
 #lower-area{

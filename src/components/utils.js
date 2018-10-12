@@ -96,7 +96,7 @@ export function weightStringFromKg(weightKg, targetUnit){
 
 	if (targetUnit === "Pounds"){
 
- 		return Math.round(kgToPounds(weightKg)*10)/10 + " pounds";
+ 		return parseFloat(Math.round(kgToPounds(weightKg)*100)/100).toFixed(2) + " pounds";
 
  	} else if (targetUnit === "Stones"){
  		let stone = kgToStone(weightKg);
@@ -107,7 +107,7 @@ export function weightStringFromKg(weightKg, targetUnit){
  			return Math.round(remainder * 14);
  		}
  	}
- 	return Math.round(weightKg*10)/10 + " Kilograms";
+ 	return parseFloat(Math.round(weightKg*100)/100).toFixed(2) + " Kilograms";
 }
 export function	calcHeightInches(units, primary, secondary){
 	if (units === "Feet / Inches"){
@@ -141,15 +141,17 @@ export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
 		indexes = [];
 	}
 	for (let i = 0; i < dateArr.length - 1; i ++){
-		let currDate = moment(dateArr[i]);
-		let dateDiff = moment(dateArr[i+1]).diff(currDate, "days")
+		let currDate = dateArr[i];
+		let dateDiff = Math.ceil(dateArr[i+1].diff(currDate, "days", true));
 		if (dateDiff > 1){
 			let currWeight = weightArr[i];
 			let nextWeight = weightArr[i+1];
 			let weightPerDay = (nextWeight - currWeight)/dateDiff;
 
 			for (let j = 1; j < dateDiff; j ++){
-				dateArr.splice(i+j, 0, currDate.add(1, "days").format("YYYY-MM-DD"));
+
+				currDate.add(1, "days");
+				dateArr.splice(i+j, 0, moment(currDate.clone().format("YYYY-MM-DD")));
 				weightArr.splice(i+j, 0, currWeight + (weightPerDay * j));
 				if (originalIds === false){
 					indexes.push(i + j);	
@@ -269,9 +271,9 @@ export const modeReversionDays = (weightAvgs, idealWeight) => {
 export const guessWeightsToNow = (weights, dates, ids=false) => {
 	let lastDay = dates[dates.length-1];
 	let lastWeight = weights[dates.length-1];
-	let dayDiff = moment().diff(moment(lastDay), "days");
+	let dayDiff = moment().diff(lastDay, "days");
 	for (let i = 1; i <= dayDiff; i ++){
-		dates.push(moment(lastDay).add(1*i, "day").format("YYYY-MM-DD"));
+		dates.push(moment(lastDay.clone().add(i, "days").format("YYYY-MM-DD")));
 		weights.push(lastWeight);
 		if (ids !== false){
 			ids.push(null);
@@ -292,9 +294,6 @@ export const setupAverages = (weights, dates, startingWeight) => {
 	* param startingWeight original index of mode switch
 	*/
 
-	/*let currentData = guessWeightsToNow(weights, dates)
-	weights = currentData.weights;
-	dates = currentData.dates;*/
 	//interpolate missing data
 	let preStartWeights = weights.slice(0, startingWeight + 1);
 	let preStartDates = dates.slice(0, startingWeight + 1);
