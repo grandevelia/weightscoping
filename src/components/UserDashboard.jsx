@@ -211,7 +211,7 @@ class UserDashboard extends Component {
 								ids={ids} 
 								startingIndex={newStartingIndex} 
 								updateWeight={this.props.updateWeight} 
-								addWeight={this.props.addWeight}
+								addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
 							/>
 						</div>
 					</div>
