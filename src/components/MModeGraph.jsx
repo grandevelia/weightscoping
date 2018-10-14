@@ -6,6 +6,7 @@ import moment from 'moment';
 export default class WeightHistoryGraph extends Component {
     constructor(props){
         super(props);
+        /*
         this.scroll = React.createRef();
         this.graph = React.createRef();
 
@@ -38,8 +39,9 @@ export default class WeightHistoryGraph extends Component {
             addWeightTop: 0,
             addWeightLeft: 0,
             addWeightIndex: 0
-        }
+        }*/
     }
+    /*
     componentDidMount(){
         this.scroll.current.scrollLeft = 1000000000000000;
     }
@@ -286,7 +288,7 @@ export default class WeightHistoryGraph extends Component {
             addWeightLeft: this.state.lineX,
             addWeightIndex: this.state.hoverIndex
         })
-    }
+    }*/
     render(){
         /*let user = this.props.user;
         let numLevels = maintenanceAvgs.length;
