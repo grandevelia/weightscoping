@@ -288,7 +288,7 @@ export default class WeightHistoryGraph extends Component {
         })
     }
     render(){
-        let user = this.props.user;
+        /*let user = this.props.user;
         let numLevels = maintenanceAvgs.length;
         let levelMap = Array( numLevels ).fill().map((x,i) => i);
         let weights = this.state.pastWeights.concat(this.props.weights.concat(this.state.futureWeights));
@@ -305,6 +305,7 @@ export default class WeightHistoryGraph extends Component {
         if (weights.length > daysInFrame){
             graphWidth = dayRatio * (weights.length);
         }
+        */
         return (
             <div id='graph-area'>
             {/*
