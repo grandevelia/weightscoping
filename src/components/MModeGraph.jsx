@@ -307,6 +307,7 @@ export default class WeightHistoryGraph extends Component {
         }
         return (
             <div id='graph-area'>
+            {/*
                 <div id='graph-top'>
                     <div id='graph-view-options'>
                         <div className='view-section'>
@@ -520,6 +521,7 @@ export default class WeightHistoryGraph extends Component {
                         </div>
                     </div>
                 </div>
+                        */}
             </div>
         )
     }
