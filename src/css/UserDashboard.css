@@ -343,7 +343,7 @@ body {
 	font-size: 0.7rem;
 	font-weight: bold;
 	color: rgba(0,0,0,0.7);
-	width: 0;
+	width: 10rem;
 	height: 25%;
 	border-radius: 3px;
 	background: rgba(255,255,255,0.7);
@@ -355,7 +355,6 @@ body {
 	visibility: hidden;
 }
 #click-adder.show{
-	width: 10rem;
 	visibility: visible;
 	transition: ease-in 0.125s;
 }
