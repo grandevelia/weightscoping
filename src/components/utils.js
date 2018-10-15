@@ -142,7 +142,7 @@ export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
 	}
 	for (let i = 0; i < dateArr.length - 1; i ++){
 		let currDate = dateArr[i];
-		let dateDiff = Math.ceil(dateArr[i+1].diff(currDate, "days", true));
+		let dateDiff = Math.ceil(moment(dateArr[i+1]).diff(moment(currDate), "days", true));
 		if (dateDiff > 1){
 			let currWeight = weightArr[i];
 			let nextWeight = weightArr[i+1];
@@ -150,8 +150,8 @@ export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
 
 			for (let j = 1; j < dateDiff; j ++){
 
-				currDate.add(1, "days");
-				dateArr.splice(i+j, 0, moment(currDate.clone().format("YYYY-MM-DD")));
+				let newDate = moment(currDate).add(j, "days");
+				dateArr.splice(i+j, 0, newDate.format("YYYY-MM-DD"));
 				weightArr.splice(i+j, 0, currWeight + (weightPerDay * j));
 				if (originalIds === false){
 					indexes.push(i + j);	
@@ -271,9 +271,9 @@ export const modeReversionDays = (weightAvgs, idealWeight) => {
 export const guessWeightsToNow = (weights, dates, ids=false) => {
 	let lastDay = dates[dates.length-1];
 	let lastWeight = weights[dates.length-1];
-	let dayDiff = moment().diff(lastDay, "days");
+	let dayDiff = moment().diff(moment(lastDay), "days");
 	for (let i = 1; i <= dayDiff; i ++){
-		dates.push(moment(lastDay.clone().add(i, "days").format("YYYY-MM-DD")));
+		dates.push(moment(lastDay).add(i, "days").format("YYYY-MM-DD"));
 		weights.push(lastWeight);
 		if (ids !== false){
 			ids.push(null);

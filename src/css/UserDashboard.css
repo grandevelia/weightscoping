@@ -291,7 +291,7 @@ body {
 	height: 100%;
 	border-bottom: 1px solid rgba(0,0,0,0.1);
 }
-#tab-graph-display:hover{
+#line-graph-display:hover{
 	cursor: pointer;
 }
 #dates-container{
@@ -307,9 +307,25 @@ body {
 	align-items: center;
 	justify-content: center;
 }
-#tab-graph-display {
+#level-graph-display{
+	height: 45%;
 	position: relative;
-	height: 90%;
+	display: flex;
+	flex-direction: row;
+}
+.level-graph-date{
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+.level-section{
+	flex: 1;
+	border-left: 1px solid rgba(255,255,255,0.4);
+	border-top: 1px solid rgba(255,255,255,0.4);
+}
+#line-graph-display {
+	position: relative;
+	height: 45%;
 }
 #m-graph-display{
 	flex-basis: 85%;
@@ -397,7 +413,7 @@ body {
 	display: flex;
 	position: absolute;
 	left: 2.5%;
-	top: 10%;
+	top: 50%;
 	justify-content: space-between;
 	border-radius: 2px;
 	background: rgba(255,255,255,0.5);
@@ -518,7 +534,7 @@ body {
 	font-weight: bold;
 	color: rgb(0,0,0,0.7);
 }
-.tab-graph-section{
+.line-graph-section{
 	flex: 1;
 }
 #settings-outer{
@@ -608,27 +624,20 @@ body {
 }
 .onMonth{
 	color: rgba(255,255,255, 0.7);
+	opacity: 0.2;
 }
 .offMonth{
 	color: rgba(0,0,0,0.7);
+	opacity: 0.05;
 }
-.weight-ok.onMonth{
-	background-color: rgba(55, 119, 236, 0.7);
+.weight-ok{
+	background-color: rgb(55, 119, 236);
 }
-.weight-ok.offMonth{
-	background-color: rgba(55, 119, 236, 0.4);
+.weight-not-ok{
+	background-color: rgb(213, 25, 50);
 }
-.weight-not-ok.onMonth{
-	background-color: rgba(213, 25, 50, 0.7);
-}
-.weight-not-ok.offMonth{
-	background-color: rgba(213, 25, 50, 0.4);
-}
-.no-data.onMonth{
-	background-color: rgba(0,0,0,0.7);
-}
-.noData.offMonth{
-	background-color: rgba(0,0,0,0.4);
+.no-data{
+	background-color: rgb(0,0,0);
 }
 #tab-y-labels{
 	flex-basis: 15%;

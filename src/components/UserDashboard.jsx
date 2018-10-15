@@ -35,7 +35,7 @@ class UserDashboard extends Component {
 		let ids = [];
 		//Split user weight data into arrays for easier manipulation
 		Object.keys(this.props.weights).map(key => {
-			dates.push(moment(this.props.weights[key]['date_added']));
+			dates.push(this.props.weights[key]['date_added']);
 			weights.push(this.props.weights[key]['weight_kg']);
 			ids.push(this.props.weights[key]['id']);
 			return "";
@@ -45,7 +45,7 @@ class UserDashboard extends Component {
 		let currentWeight = weights[weights.length - 1 ];
 		
 		//Adjust starting index to account for points  interpolated from 0 through starting weight
-        let newStartingIndex = dates[user.starting_weight].diff(dates[0], "days");
+        let newStartingIndex = moment(dates[user.starting_weight]).diff(dates[0], "days");
         
         //interpolate missing data
         let interpData = interpolateDates(weights, dates, ids);
