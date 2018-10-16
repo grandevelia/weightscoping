@@ -535,6 +535,7 @@ export default class WeightHistoryGraph extends Component{
                         <div className='view-section' id='past-view-section'>
                             <div className='view-section-title'>Past</div>
                             <div className='view-section-option' onClick={() => this.scaleGraph(7)}>7D</div>
+                            <div className='view-section-option' onClick={() => this.scaleGraph(14)}>Default</div>
                             <div className='view-section-option' onClick={() => this.scaleGraph(30)}>1M</div>
                             <div className='view-section-option' onClick={() => this.scaleGraph(182)}>6M</div>
                             <div className='view-section-option' onClick={() => this.scaleGraph(moment().dayOfYear())}>YTD</div>
@@ -643,14 +644,16 @@ export default class WeightHistoryGraph extends Component{
                             {
                                 weights.map((weight, i) => {
                                     return (
-                                        <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'}>
+                                        <div key={i} 
+                                            className={dates[i] === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'} 
+                                            style={daysInFrame < 30 ? {padding: "0 2px"} : daysInFrame < 50 ? {padding: "0 1px"} : {padding: "0 0"}}>
                                             {
                                                 levelMap.map((levelWeight, j) => {
                                                     let weightOk = weight < levelWeight;
                                                     return (
                                                         <div key={j} className={weightOk ? "level-section weight-ok" : "level-section weight-not-ok"}>
                                                             {
-                                                                dayRatio > 15 ?
+                                                                dayRatio > 30 ?
                                                                     this.levelIcon(j, user.carb_ranks, weightOk)
                                                                 :null
                                                             }

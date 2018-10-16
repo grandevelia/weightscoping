@@ -149,7 +149,7 @@ class UserDashboard extends Component {
 					<div id='secondary-status'>
 
 						<div className='secondary-status-section'>
-							<div className='top-label'>You started at</div>
+							<div className='top-label'>Starting Weight</div>
 							<div className='top-entry'>{ weightStringFromKg(initialWeight, user.weight_units) }</div>
 						</div>
 
