@@ -6,7 +6,6 @@ import moment from 'moment';
 export default class WeightHistoryGraph extends Component {
     constructor(props){
         super(props);
-        /*
         this.scroll = React.createRef();
         this.graph = React.createRef();
 
@@ -39,9 +38,9 @@ export default class WeightHistoryGraph extends Component {
             addWeightTop: 0,
             addWeightLeft: 0,
             addWeightIndex: 0
-        }*/
+        }
     }
-    /*
+    
     componentDidMount(){
         this.scroll.current.scrollLeft = 1000000000000000;
     }
@@ -288,9 +287,9 @@ export default class WeightHistoryGraph extends Component {
             addWeightLeft: this.state.lineX,
             addWeightIndex: this.state.hoverIndex
         })
-    }*/
+    }
     render(){
-        /*let user = this.props.user;
+        let user = this.props.user;
         let numLevels = maintenanceAvgs.length;
         let levelMap = Array( numLevels ).fill().map((x,i) => i);
         let weights = this.state.pastWeights.concat(this.props.weights.concat(this.state.futureWeights));
@@ -307,10 +306,9 @@ export default class WeightHistoryGraph extends Component {
         if (weights.length > daysInFrame){
             graphWidth = dayRatio * (weights.length);
         }
-        */
+        
         return (
             <div id='graph-area'>
-            {/*
                 <div id='graph-top'>
                     <div id='graph-view-options'>
                         <div className='view-section'>
@@ -524,7 +522,6 @@ export default class WeightHistoryGraph extends Component {
                         </div>
                     </div>
                 </div>
-                        */}
             </div>
         )
     }

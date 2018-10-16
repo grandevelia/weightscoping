@@ -388,6 +388,7 @@ body {
 }
 #click-adder{
 	position: absolute;
+	z-index: 9999;
 	align-items: center;
 	font-size: 0.7rem;
 	font-weight: bold;
@@ -529,7 +530,6 @@ body {
 	transform: translateX(-50%);
 	white-space: nowrap;
 	background: black;
-	z-index: 99999999;
 	font-size: 0.6em;
 	color: rgb(107, 256, 228);
 	padding: 0.25rem;
