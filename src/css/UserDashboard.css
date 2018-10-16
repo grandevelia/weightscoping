@@ -308,7 +308,7 @@ body {
 	justify-content: center;
 }
 #level-graph-display{
-	height: 45%;
+	height: 60%;
 	position: relative;
 	display: flex;
 	flex-direction: row;
@@ -317,15 +317,45 @@ body {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
+	padding: 0 2px;
+	border-radius: 5px;
+	opacity: 0.75;
 }
 .level-section{
 	flex: 1;
-	border-left: 1px solid rgba(255,255,255,0.4);
-	border-top: 1px solid rgba(255,255,255,0.4);
+	border-bottom: 1px solid rgba(255,255,255,0.5);
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.level-section:first-of-type{
+	border-radius: 5px 5px 0px 0px;
+}
+.level-section:last-of-type{
+	border-radius: 0px 0px 5px 5px;
+	border-bottom: none;
+}
+.level-graph-today{
+	flex: 2;
+	opacity: 1;
+}
+.level-graph-today .level-section{
+	border-left: 2px solid rgba(91, 255, 50, 0.637);
+	border-right: 2px solid rgba(91, 255, 50, 0.637);
+}
+.level-graph-today .level-section:first-of-type{
+	border-top: 2px solid rgba(91, 255, 50, 0.637);
+}
+.level-graph-today .level-section:last-of-type{
+	border-bottom: 2px solid rgba(91, 255, 50, 0.637);
+}
+.level-graph-today .icon{
+	background: rgba(255,255,255,0.9);
 }
 #line-graph-display {
 	position: relative;
-	height: 45%;
+	height: 30%;
 }
 #m-graph-display{
 	flex-basis: 85%;
@@ -348,6 +378,9 @@ body {
 	display: flex;
 	flex-direction: row;
 	position: relative;
+}
+.graph-weight.level-graph-today{
+	flex: 2;
 }
 .graph-weight-number{
 	width: 75%;
@@ -438,7 +471,7 @@ body {
 #mouse-coordinate-x{
 	position: absolute;
 	left: 0;
-	bottom: 5%;
+	bottom: 0%;
 	border-right: 1px dashed black;
 	z-index: 999;
 }
@@ -448,7 +481,7 @@ body {
 #mouse-coordinate-y{
 	position: absolute;
 	left: 0;
-	bottom: 5%;
+	bottom: 0%;
 	border-top: 1px dashed black;
 	z-index: 999;
 }
@@ -492,9 +525,12 @@ body {
 	display: none;
 	position: absolute;
 	top: -1rem;
+	left: 50%;
+	transform: translateX(-50%);
 	white-space: nowrap;
 	background: black;
-	z-index: 9;
+	z-index: 99999999;
+	font-size: 0.6em;
 	color: rgb(107, 256, 228);
 	padding: 0.25rem;
 	border-radius: 5px;
@@ -628,10 +664,10 @@ body {
 }
 .offMonth{
 	color: rgba(0,0,0,0.7);
-	opacity: 0.05;
+	opacity: 0.1;
 }
 .weight-ok{
-	background-color: rgb(55, 119, 236);
+	background-color: rgb(55, 157, 236);
 }
 .weight-not-ok{
 	background-color: rgb(213, 25, 50);

@@ -51,9 +51,6 @@ export default class WeightHistoryGraph extends Component{
         canvas.clearRect(0, 0, this.canvas.current.width, graphPixelsHeight);
         canvas.beginPath();
 
-        let user = this.props.user;
-        let initialWeight = this.props.weights[this.props.startingIndex];
-
         let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
         let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
         
@@ -66,62 +63,36 @@ export default class WeightHistoryGraph extends Component{
     
         let frameMax = 1.02 * Math.max(...weightsInFrame);
         let frameMin = 0.98 * Math.min(...weightsInFrame);
-
-        let lowestLevel = lossmodeLevel(initialWeight, user.ideal_weight_kg, frameMax);
         
-        let kgPerSection = (initialWeight - user.ideal_weight_kg)/8;
-        let levelMap = Array( 8 ).fill().map((x, i) => {
-            return i  * kgPerSection + user.ideal_weight_kg;
-        });
-        levelMap.reverse();
-        levelMap.splice(0 , 1);
-        levelMap.splice(0, lowestLevel);
-        levelMap.push(frameMin);
         //Horizontal portion of canvas taken up by each day
         let dayPercent = 1/this.state.daysInFrame;
 
         canvas.strokeStyle = "rgb(0, 0, 0)";
-        let monthOpacity = ["0.2", "0.05"];
+        let monthOpacity = ["0.6", "0.9"];
         let compDate = moment(this.props.dates[0]).subtract(1, "days");
         
-        weights.map((weight, i) => {
-            //let rectBottom = 0;
-            let currLeft = graphPixelsWidth * dayPercent * i;
-            let currDate = dates[i];
-            let monthIndex = moment(currDate).month() % 2;
-
-            /*levelMap.map( (levelWeight, j) => {
-                let rectHeight = ( frameMax - levelWeight )/( frameMax - frameMin ) - rectBottom;
-
-                if (currDate.isAfter(compDate)){
-                    canvas.fillStyle = 'rgba(213, 25, 50, ' + monthOpacity[monthIndex] + ')';
-                    if ( j > 0){
-                        if (weight < levelMap[j - 1]){
-                            canvas.fillStyle = 'rgba(55, 119, 236, ' + monthOpacity[monthIndex] + ')';
-                        }
-                    } else {
-                        canvas.fillStyle = 'rgba(55, 119, 236, ' + monthOpacity[monthIndex] + ')';
-                    }
-                } else {
-                    canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')';
-                }
-                canvas.fillRect(currLeft, graphPixelsHeight * rectBottom, graphPixelsWidth * dayPercent - 1, graphPixelsHeight * rectHeight - 1);
-                rectBottom += rectHeight;
-                return "";
-            })*/
-            canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')';
-            canvas.fillRect(currLeft, 0, graphPixelsWidth * dayPercent - 1, graphPixelsHeight);
-            return "";
-        })
-
         //Line graph
         weights.map((weight, i) => {
             let currDate = moment(dates[i]);
+            let dayMod = 1;
+            let monthIndex = currDate.month() % 2;
+            canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')';
+            let currLeft;
+            if (currDate.isAfter(moment())){
+                currLeft = graphPixelsWidth * dayPercent * (i + 1);
+            } else if (currDate.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD")){
+                dayMod = 2;
+                canvas.fillStyle = 'rgb(55, 157, 236)';
+                currLeft = graphPixelsWidth * dayPercent * i;
+            } else {
+                currLeft = graphPixelsWidth * dayPercent * i;
+            }
+
+            canvas.fillRect(currLeft, 0, dayMod * graphPixelsWidth * dayPercent - 1, graphPixelsHeight);
 
             //Only draw lines for weights added by user or projected into future
             if (currDate.isAfter(compDate)){
-                let currLeft = graphPixelsWidth * dayPercent * i;
-                canvas.moveTo(currLeft + graphPixelsWidth * dayPercent, graphPixelsHeight * ( frameMax - weight )/( frameMax - frameMin ));
+                canvas.moveTo(currLeft + dayMod * graphPixelsWidth * dayPercent, graphPixelsHeight * ( frameMax - weight )/( frameMax - frameMin ));
 
                 if (i !== this.state.pastProjecting ){
                     canvas.lineTo(currLeft, graphPixelsHeight * ( frameMax - weights[i-1] )/( frameMax - frameMin ) );
@@ -216,7 +187,7 @@ export default class WeightHistoryGraph extends Component{
             pastWeights = Array(pastProjecting).fill().map(x => {return 0});
             pastDates = [];
             for (let i = 1; i <= pastProjecting; i ++){
-                let newDate = currStart.clone().subtract(i, "days");
+                let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
                 pastDates.unshift(newDate);
             }
         } else {
@@ -374,7 +345,57 @@ export default class WeightHistoryGraph extends Component{
 				})}
 			</div>
 		);
-	}
+    }
+    levelIcon(index, carbRanks, allowed){
+
+		if (isNaN(index)){
+			return <div className='loading-icons'>Loading...</div>
+        }
+        let innerIndex = carbRanks[ carbOrder[ index ] ];
+        if (allowed){
+            return (
+                <div className='allowed-icons'>
+                    {
+                        index !== 6 ? 
+                            <div className='icon icon-allowed' id={iconIndex[ innerIndex ] + "-icon"}>
+                                <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
+                            </div>
+                        :
+                            Array( carbRanks.length - index).fill().map( (x, j) => j + index).map(j => {
+                                innerIndex = carbRanks[ carbOrder[ j ] ];
+                                return (
+                                    <div key={j} className='icon icon-allowed' id={iconIndex[innerIndex] + "-icon"}>
+                                        <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
+                                    </div>
+                                )
+                            })
+                    }
+                </div>
+            );
+        } else {
+            return (
+                <div className='disallowed-icons'>
+                    {
+                        index !== 6 ? 
+                            <div className='icon icon-disallowed' id={iconIndex[ innerIndex ] + "-icon"}>
+                                <div className='icon-cross'></div>
+                                <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
+                            </div>
+                        :
+                            Array( carbRanks.length - index).fill().map( (x, j) => j + index).map(j => {
+                                innerIndex = carbRanks[ carbOrder[ j ] ];
+                                return (
+                                    <div key={j} className='icon icon-disallowed' id={iconIndex[innerIndex] + "-icon"}>
+								        <div className='icon-cross'></div>
+                                        <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
+                                    </div>
+                                )
+                            })
+                    }
+                </div>
+            );
+        }
+    }
 	disallowedIcons(level, carbRanks) {
         let arr = Array( carbOptions.length - level ).fill().map((x,i) => level + i);
         
@@ -404,18 +425,29 @@ export default class WeightHistoryGraph extends Component{
         let mouseX = e.clientX - canvasBox.left;
         
         let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
+        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
 
-        let boundingWidth = weights.length;
+        let boundingWidth = weights.length + 1;
         let weightIndex = Math.floor(boundingWidth * mouseX/canvasBox.width);
-
+        
         //When past projecting
         if (weightIndex >= weights.length){
             weightIndex = weights.length - 1;
         } else if (weightIndex < 0){
             weightIndex = 0;
         }
+        let lineX = canvasBox.width * (weightIndex + 1) / boundingWidth;
 
-        let lineX = canvasBox.width * (weightIndex+1) / boundingWidth;
+        let toComp = moment(dates[weightIndex]);
+        let today = moment();
+        if (toComp.isAfter(today)){
+            weightIndex -- ;
+            if (today.format("YYYY-MM-DD") === dates[weightIndex]){
+                lineX = canvasBox.width * (weightIndex + 2) / boundingWidth
+            }
+        } else if (today.format("YYYY-MM-DD") === dates[weightIndex]){
+            lineX = canvasBox.width * (weightIndex + 2) / boundingWidth
+        }
 
         let weightsInFrame;
         if (this.state.daysInFrame < this.props.weights.length){
@@ -464,11 +496,11 @@ export default class WeightHistoryGraph extends Component{
         let daysInFrame = this.state.daysInFrame;
 
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
-        let canvasHeight = window.innerHeight * 0.95 * 0.92 * 0.90 / 2;
+        let canvasHeight = window.innerHeight * 0.95 * 0.92 * 0.3;
 
         let dayRatio = canvasWidth/daysInFrame;
         if (weights.length > daysInFrame){
-            canvasWidth = dayRatio * (weights.length);
+            canvasWidth = dayRatio * (weights.length + 1);
         }
         let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, weights[this.state.hoverIndex]);
         
@@ -478,9 +510,7 @@ export default class WeightHistoryGraph extends Component{
         });
         levelMap.reverse();
         levelMap.splice(0 , 1);
-
-        let monthOpacity = ["0.2", "0.05"];
-
+        let today = moment().format("YYYY-MM-DD");
         return (
             <div id='graph-area'>
                 <div id='graph-top'>
@@ -554,15 +584,23 @@ export default class WeightHistoryGraph extends Component{
                             </div>
                     }
                         
-                    <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll}>
+                    <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll} onMouseMove={(e) => this.showGraphLines(e)} onClick={(e) => this.clickAddWeight(e)}>
                         <div id='dates-container' style={{width: canvasWidth}}>
                             {
                                 dates.map((date,i) => {
+                                    let markToday = false;
+                                    if (date === today){
+                                        markToday = true;
+                                    }
                                     date = moment(date)
                                     return (
-                                        <div key={i} className='graph-date'>
+                                        <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
                                         {
-                                            dayRatio > 60 ?
+                                            markToday ?
+                                                dayRatio > 20 ?
+                                                    "Today"
+                                                : null
+                                            : dayRatio > 60 ?
                                                 date.date() === 1 ?
                                                     date.format("MMM")
                                                 :
@@ -605,13 +643,17 @@ export default class WeightHistoryGraph extends Component{
                             {
                                 weights.map((weight, i) => {
                                     return (
-                                        <div key={i} className='level-graph-date'>
+                                        <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'}>
                                             {
                                                 levelMap.map((levelWeight, j) => {
-                                                    
+                                                    let weightOk = weight < levelWeight;
                                                     return (
-                                                        <div key={j} className={weight < levelWeight ? "level-section weight-ok" : "level-section weight-not-ok"}>
-
+                                                        <div key={j} className={weightOk ? "level-section weight-ok" : "level-section weight-not-ok"}>
+                                                            {
+                                                                dayRatio > 15 ?
+                                                                    this.levelIcon(j, user.carb_ranks, weightOk)
+                                                                :null
+                                                            }
                                                         </div>
                                                     )
                                                 })
@@ -621,7 +663,6 @@ export default class WeightHistoryGraph extends Component{
                                 })
                             }
                         </div>
-                        <canvas id='line-graph-display' style={{width: canvasWidth}} ref={this.canvas} width={canvasWidth} height={canvasHeight} onMouseMove={(e) => this.showGraphLines(e)} onClick={(e) => this.clickAddWeight(e)}></canvas>
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
                                 dayRatio > 85 ?
@@ -634,14 +675,14 @@ export default class WeightHistoryGraph extends Component{
                                         }
                                         if (i < this.state.pastProjecting){
                                             return (
-                                                <form key={i} className='graph-weight' onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}>
+                                                <form key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}>
                                                     <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
                                                     <input type='submit' className='weight-submit' />
                                                 </form>
                                             )
                                         } else if (i < this.state.pastProjecting + this.props.weights.length){
                                             return (
-                                                <form key={i} className='graph-weight' onSubmit={
+                                                <form key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} onSubmit={
                                                     ids[i] === null ? 
                                                         (e) => this.submitWeight(e, i, dates[i]) 
                                                     :
@@ -653,7 +694,7 @@ export default class WeightHistoryGraph extends Component{
                                             )
                                         } else {
                                             return (
-                                                <div key={i} className='graph-weight future-graph-weight'>
+                                                <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}>
                                                     <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value={weightString}/>
                                                 </div>
                                             )
@@ -663,8 +704,9 @@ export default class WeightHistoryGraph extends Component{
                                     null
                             }
                         </div>
+                        <canvas id='line-graph-display' style={{width: canvasWidth}} ref={this.canvas} width={canvasWidth} height={canvasHeight}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX} onClick={(e) => this.clickAddWeight(e)}></div>
-                        <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: "calc(" + this.state.lineY + "px + 5%)"}} ref={this.coordY}></div>
+                        <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
                         <div id='click-adder' 
                             className={this.state.showClickAddWeight ? "show" : ""} 
                             style={{left: this.state.addWeightLeft, top: this.state.addWeightTop - 0.125 * canvasHeight}}
