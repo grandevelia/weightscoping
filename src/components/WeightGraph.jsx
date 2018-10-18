@@ -165,6 +165,8 @@ export default class WeightGraph extends Component {
         let pastDates = this.state.pastDates;
 
         let frameEndIndex = this.state.frameEndIndex;
+
+        let daysInFrame = Math.ceil(end.diff(start, "days", true));
         if (end.isAfter(moment())){
             let daysInFuture = Math.ceil(end.diff(moment(), "days", true));
             let data = this.futureProject(daysInFuture);
@@ -183,6 +185,7 @@ export default class WeightGraph extends Component {
         let currStart = moment(this.props.dates[0]);
         if (currStart.isAfter(start)){
             pastProjecting = Math.floor(currStart.diff(start, "days", true));
+
             frameEndIndex = frameEndIndex + pastProjecting - this.state.pastProjecting;
             pastWeights = Array(pastProjecting).fill().map(x => {return 0});
             pastDates = [];
@@ -196,7 +199,23 @@ export default class WeightGraph extends Component {
             pastDates = [];
         }
 
-        let daysInFrame = Math.ceil(end.diff(start, "days", true));
+        let frameWidth = window.innerWidth * 0.975 * 0.975;
+        let pxPerDay = frameWidth/daysInFrame;
+        
+        if (pxPerDay < 30){
+            let pastAddition = Math.ceil(0.075 * frameWidth/pxPerDay);
+            pastProjecting += pastAddition;
+            if (pastDates.length){
+                currStart = moment(pastDates[0]);
+            } else {
+                currStart = moment(this.props.dates[0]);
+            }
+            for (let i = 1; i <= pastAddition; i ++){
+                let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
+                pastDates.unshift(newDate);
+                pastWeights.unshift(0);
+            }
+        }
         if (daysInFrame > frameEndIndex){
             frameEndIndex = daysInFrame;
         }
@@ -493,7 +512,7 @@ export default class WeightGraph extends Component {
         let ids = Array(this.state.pastProjecting).fill().map(x => {return null}).concat(this.props.ids).concat(Array(this.state.futureProjecting).fill().map(x => {return null}));
 
         let initialWeight = this.props.weights[this.props.startingIndex];
-        
+
         let weightAvgs, numLevels, levelMap;
         if (user.mode === "1"){
             numLevels = maintenanceAvgs.length;
@@ -514,9 +533,9 @@ export default class WeightGraph extends Component {
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.95 * 0.92 * 0.3;
 
-        let dayRatio = canvasWidth/daysInFrame;
+        let pxPerDay = canvasWidth/daysInFrame;
         if (weights.length > daysInFrame){
-            canvasWidth = dayRatio * (weights.length + 1);
+            canvasWidth = pxPerDay * (weights.length + 1); //+1 to account for double width today
         }
         let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, weights[this.state.hoverIndex]);
         let today = moment().format("YYYY-MM-DD");
@@ -595,8 +614,8 @@ export default class WeightGraph extends Component {
                             </div>
                     }
                         
-                    <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll} onMouseMove={(e) => this.showGraphLines(e)} onClick={(e) => this.clickAddWeight(e)}>
-                        <div id='dates-container' style={{width: canvasWidth}}>
+                    <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll} onMouseMove={(e) => this.showGraphLines(e)}>
+                        <div id='dates-container' style={{width: canvasWidth}} onClick={(e) => this.clickAddWeight(e)}>
                             {
                                 dates.map((date,i) => {
                                     let markToday = false;
@@ -608,34 +627,34 @@ export default class WeightGraph extends Component {
                                         <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
                                         {
                                             markToday ?
-                                                dayRatio > 20 ?
+                                                pxPerDay > 20 ?
                                                     "Today"
                                                 : null
-                                            : dayRatio > 60 ?
+                                            : pxPerDay > 60 ?
                                                 date.date() === 1 ?
                                                     date.format("MMM")
                                                 :
                                                     date.format("D")
-                                            : dayRatio > 30 ?
+                                            : pxPerDay > 30 ?
                                                 date.date() === 1 ?
                                                     date.format("MMM")
                                                 : i % 2 === 0 ?
                                                     date.format("D")
                                                 : null
-                                            : dayRatio > 15 ?
+                                            : pxPerDay > 15 ?
                                                 date.date() === 1 ?
                                                     date.format("MMM")
                                                 : date.date() % 7 === 0 ?
                                                     date.format("D")
                                                 : null
-                                            : dayRatio > 3 ?
+                                            : pxPerDay > 3 ?
                                                 date.date() === 1 ?
                                                     date.month() === 0 ?
                                                         date.format("YYYY")
                                                     :
                                                         date.format("MMM")
                                                 : null
-                                            : dayRatio > 1 ?
+                                            : pxPerDay > 1 ?
                                                 date.date() === 1 ?
                                                     date.month() === 0 ?
                                                         date.format("YYYY")
@@ -650,7 +669,7 @@ export default class WeightGraph extends Component {
                                 })
                             }
                         </div>
-                        <div id='level-graph-display' style={{width: canvasWidth}}>
+                        <div id='level-graph-display' style={{width: canvasWidth}} onClick={(e) => this.clickAddWeight(e)}>
                             
                             {
                                 user.mode === "0" ?
@@ -669,7 +688,7 @@ export default class WeightGraph extends Component {
                                                         return (
                                                             <div key={j} className={weightOk ? "level-section weight-ok" + onMonth : "level-section weight-not-ok" + onMonth}>
                                                                 {
-                                                                    dayRatio > 30 ?
+                                                                    pxPerDay > 30 ?
                                                                         this.levelIcon(j, user.carb_ranks, weightOk)
                                                                     :null
                                                                 }
@@ -714,7 +733,7 @@ export default class WeightGraph extends Component {
                                                         }
                                                         return (
                                                             <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data ' + onMonth : weightOk === true ? 'avg-section weight-ok ' + onMonth : 'avg-section weight-not-ok ' + onMonth }> 
-                                                                    {dayRatio > 15 ? weightString : null}
+                                                                    {pxPerDay > 15 ? weightString : null}
                                                             </div>
                                                         )
                                                     })
@@ -726,7 +745,7 @@ export default class WeightGraph extends Component {
                         </div>
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
-                                dayRatio > 85 ?
+                                pxPerDay > 85 ?
                                 weights.map((weight,i) => {
                                         let weightString = weightStringFromKg(weight, user.weight_units);
                                         if (user.weight_units === "Pounds"){
@@ -756,7 +775,12 @@ export default class WeightGraph extends Component {
                                         } else {
                                             return (
                                                 <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}>
-                                                    <input onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' type='number' step="0.01" value={weightString}/>
+                                                    <input 
+                                                        onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' 
+                                                        type='number' 
+                                                        step="0.01" 
+                                                        value={parseFloat(weightStringFromKg(this.state.futureWeights[i - this.props.weights.length - this.state.pastProjecting], user.weight_units))}
+                                                    />
                                                 </div>
                                             )
                                         }
@@ -765,9 +789,10 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight}></canvas>
+                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight} onClick={(e) => this.clickAddWeight(e)}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX} onClick={(e) => this.clickAddWeight(e)}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
+                        
                         <div id='click-adder' 
                             className={this.state.showClickAddWeight ? "show" : ""} 
                             style={{left: this.state.addWeightLeft, top: this.state.addWeightTop + 0.6 * canvasHeight/0.35}}
@@ -809,6 +834,23 @@ export default class WeightGraph extends Component {
                             }
                         </div>
                     </div>
+                    {
+                        pxPerDay < 30 ?
+                            <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
+                                {
+                                    levelMap.map((levelWeight, j) => {
+                                            return (
+                                                <div key={j} className="sidebar-section">
+                                                    {
+                                                        this.levelIcon(j, user.carb_ranks, true)
+                                                    }
+                                                </div>
+                                            )
+                                        })
+                                    }
+                            </div>
+                        : null
+                    }
                 </div>
             </div>
         )
