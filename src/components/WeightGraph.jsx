@@ -326,14 +326,18 @@ export default class WeightGraph extends Component {
         if (id === null){
             this.props.addWeight(this.convertWeight(newWeight), date)
             .then(() => {
-                this.futureProject(this.state.futureProjecting, true);
-                this.renderGraph(this.scroll.current.scrollLeft);
+                this.setState({showClickAddWeight: false}, () => {
+                    this.futureProject(this.state.futureProjecting, true);
+                    this.renderGraph(this.scroll.current.scrollLeft);
+                })
             })
         } else {
             this.props.updateWeight(this.convertWeight(newWeight), id)
             .then(() => {
-                this.futureProject(this.state.futureProjecting, true);
-                this.renderGraph(this.scroll.current.scrollLeft);
+                this.setState({showClickAddWeight: false}, () => {
+                    this.futureProject(this.state.futureProjecting, true);
+                    this.renderGraph(this.scroll.current.scrollLeft);
+                })
             })
         }
 
@@ -755,20 +759,34 @@ export default class WeightGraph extends Component {
                                         }
                                         if (i < this.state.pastProjecting){
                                             return (
-                                                <form key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}>
+                                                <form 
+                                                    key={i} 
+                                                    className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} 
+                                                    onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}
+                                                >
                                                     <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
                                                     <input type='submit' className='weight-submit' />
                                                 </form>
                                             )
                                         } else if (i < this.state.pastProjecting + this.props.weights.length){
                                             return (
-                                                <form key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} onSubmit={
-                                                    ids[i] === null ? 
-                                                        (e) => this.submitWeight(e, i, dates[i]) 
-                                                    :
-                                                        (e) => this.submitWeight(e, i, dates[i], ids[i])
-                                                }>
-                                                    <input onChange={(e) => this.changeWeight(e, i)} className='graph-weight-number' type='number' step="0.01" defaultValue={weightString} />
+                                                <form 
+                                                    key={i} 
+                                                    className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} 
+                                                    onSubmit={
+                                                        ids[i] === null ? 
+                                                            (e) => this.submitWeight(e, i, dates[i]) 
+                                                        :
+                                                            (e) => this.submitWeight(e, i, dates[i], ids[i])
+                                                    }
+                                                >
+                                                    <input 
+                                                        onChange={(e) => this.changeWeight(e, i)} 
+                                                        className='graph-weight-number' 
+                                                        type='number' 
+                                                        step="0.01" 
+                                                        defaultValue={weightString} 
+                                                    />
                                                     <input type='submit' className='weight-submit'/>
                                                 </form>
                                             )
@@ -811,7 +829,17 @@ export default class WeightGraph extends Component {
                                 this.state.addWeightIndex >= this.state.pastProjecting + this.props.weights.length ?
 
                                     <div>
-                                        <input value={parseFloat(weightStringFromKg(this.state.futureWeights[this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length)], user.weight_units))} onChange={(e) => this.changeWeight(e, this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length), "FUTURE")} className='graph-weight-number' type='number' step="0.01"/>
+                                        <input 
+                                            value={parseFloat(weightStringFromKg(this.state.futureWeights[this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length)], user.weight_units))} 
+                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length), "FUTURE")} className='graph-weight-number' 
+                                            type='number' 
+                                            step="0.01"
+                                            onKeyPress={e => {
+                                                if (e.key === "Enter"){
+                                                    this.closeAdder(e);
+                                                }
+                                            }}
+                                        />
 
                                         {
                                             weights[this.state.addWeightIndex] !== this.props.weights[this.props.weights.length-1] ? 
@@ -821,14 +849,32 @@ export default class WeightGraph extends Component {
                                         }
                                     </div>
                                 : ids[this.state.addWeightIndex] === null ? 
-                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex])}>
-                                        <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} className='graph-weight-number' type='number' step="0.01" value={this.state.inputs[this.state.addWeightIndex]}/>
+                                    <form 
+                                        className='graph-weight' 
+                                        onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex])}
+                                    >
+                                        <input 
+                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} 
+                                            className='graph-weight-number' 
+                                            type='number' 
+                                            step="0.01"
+                                            value={this.state.inputs[this.state.addWeightIndex]}
+                                        />
                                         <input type='submit' className='weight-submit'/>
                                     </form>
                                         
                                 :
-                                    <form className='graph-weight' onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex], ids[this.state.addWeightIndex])}>
-                                        <input onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} className='graph-weight-number' type='number' step="0.01" value={this.state.inputs[this.state.addWeightIndex]}/>
+                                    <form 
+                                        className='graph-weight' 
+                                        onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex], ids[this.state.addWeightIndex])}
+                                    >
+                                        <input 
+                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} 
+                                            className='graph-weight-number' 
+                                            type='number' 
+                                            step="0.01" 
+                                            value={this.state.inputs[this.state.addWeightIndex]}
+                                        />
                                         <input type='submit' className='weight-submit'/>
                                     </form>
                             }
