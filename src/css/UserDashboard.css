@@ -19,7 +19,7 @@ body {
 	height: 100%;
 	width: 100%;
 }
-#top-area{
+#status-bar{
 	position: relative;
 	width: 100%;
 	height: 25vh;
@@ -305,6 +305,7 @@ body {
 	flex: 1;
 	font-size: 0.6em;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 }

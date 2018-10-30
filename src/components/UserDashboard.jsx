@@ -83,7 +83,54 @@ class UserDashboard extends Component {
 		
 		return (
 			<div id='dashboard-wrap'>
-				<div id='top-area'>
+				{user.amount_paid < totalOwed ? 
+					<div id='payment-info-area'>
+						<div className='payment-option'>
+							<div className='option-header'>{planTitles[user.payment_option-1]}</div>
+							<div className='payment-amount'>You've committed: {"$"+remainingOwed.toFixed(2)}</div>
+							<PaypalButton updateSettings={(key, value) => this.updateSettings(key, value)} paymentAmount={remainingOwed} />
+						</div>
+						<div>Or Change Your Plan:
+							<select onChange={(e) => this.updateSettings("payment_option", e.target.value)} value={user.payment_option} className='settings-option-input'>
+								<option value={1}>{planTitles[0]}</option>
+								<option value={2}>{planTitles[1]}</option>
+								<option value={3}>{planTitles[2]}</option>
+							</select>
+						</div>
+					</div>
+					:
+					<div id='lower-area'>
+						
+						<div id='dashboard-fourth'>
+							<WeightGraph 
+								user={user} 
+								level={level} 
+								weights={weights} 
+								dates={dates} 
+								ids={ids} 
+								startingIndex={newStartingIndex} 
+								updateWeight={this.props.updateWeight} 
+								addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
+							/>
+						</div>
+					</div>
+				}
+				{
+					user.mode === "1" ?
+						<div className='mode-switch'>
+							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
+								Switch to Weight Loss Mode
+							</div>
+						</div>
+					: weights[weights.length - 1] <= user.ideal_weight_kg ?
+						<div className='mode-switch'>
+							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
+								Switch to Maintenance Mode
+							</div>
+						</div>
+					: null
+				}
+				<div id='status-bar'>
 					<div id='primary-status'>
 						<div className='primary-status-section'>
 
@@ -184,53 +231,6 @@ class UserDashboard extends Component {
 						</div>
 					</div>
 				</div>
-				{user.amount_paid < totalOwed ? 
-					<div id='payment-info-area'>
-						<div className='payment-option'>
-							<div className='option-header'>{planTitles[user.payment_option-1]}</div>
-							<div className='payment-amount'>You've committed: {"$"+remainingOwed.toFixed(2)}</div>
-							<PaypalButton updateSettings={(key, value) => this.updateSettings(key, value)} paymentAmount={remainingOwed} />
-						</div>
-						<div>Or Change Your Plan:
-							<select onChange={(e) => this.updateSettings("payment_option", e.target.value)} value={user.payment_option} className='settings-option-input'>
-								<option value={1}>{planTitles[0]}</option>
-								<option value={2}>{planTitles[1]}</option>
-								<option value={3}>{planTitles[2]}</option>
-							</select>
-						</div>
-					</div>
-					:
-					<div id='lower-area'>
-						
-						<div id='dashboard-fourth'>
-							<WeightGraph 
-								user={user} 
-								level={level} 
-								weights={weights} 
-								dates={dates} 
-								ids={ids} 
-								startingIndex={newStartingIndex} 
-								updateWeight={this.props.updateWeight} 
-								addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
-							/>
-						</div>
-					</div>
-				}
-				{
-					user.mode === "1" ?
-						<div className='mode-switch'>
-							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
-								Switch to Weight Loss Mode
-							</div>
-						</div>
-					: weights[weights.length - 1] <= user.ideal_weight_kg ?
-						<div className='mode-switch'>
-							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
-								Switch to Maintenance Mode
-							</div>
-						</div>
-					: null
-				}
 			</div>
 		)
 	}

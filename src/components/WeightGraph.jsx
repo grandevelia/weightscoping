@@ -3,6 +3,7 @@ import { iconIndex, carbOrder, carbOptions, weightStringFromKg,interpolateDates,
 import DatepickerArea from './DatepickerArea';
 import moment from 'moment';
 
+let dayLetters = ["N", "M", "T", "W", "R", "F", "S"];
 export default class WeightGraph extends Component {
     constructor(props){
         super(props);
@@ -42,7 +43,7 @@ export default class WeightGraph extends Component {
             addWeightIndex: 0
         }
     }
-    renderGraph(scrollLeft){
+    renderGraph(scrollLeft = null){
         let scroll = this.scroll.current;
         let graphPixelsWidth = scroll.getBoundingClientRect().width;
 
@@ -102,6 +103,14 @@ export default class WeightGraph extends Component {
             }
             return "";
         })
+        if (scrollLeft === null){
+            let daysInFrame = this.state.daysInFrame;
+            let graphWidth =  this.canvas.current.getBoundingClientRect().width;
+            console.log(graphWidth)
+            let pxPerDay = window.innerWidth * 0.975 * 0.975/daysInFrame;
+            let newLeft = (weights.length - 2*this.state.futureProjecting) * pxPerDay;
+            scrollLeft = newLeft;
+        }
         this.scroll.current.scrollLeft = scrollLeft;
         canvas.stroke();
 
@@ -119,7 +128,7 @@ export default class WeightGraph extends Component {
             windowWidth: window.innerWidth,
             lineX: 0
         }, () => {
-            this.renderGraph(this.canvas.current.getBoundingClientRect().width);
+            this.renderGraph();
         });
     }
     handleScroll = () => {
@@ -232,7 +241,7 @@ export default class WeightGraph extends Component {
             hoverIndex: 0,
             addWeightIndex: 0,
             addWeightLeft: 0
-        }, () => this.renderGraph(this.canvas.current.width));
+        }, () => this.renderGraph());
     }
     futureProject(daysToProject, setState=false){
         let weights = this.props.weights;
@@ -273,8 +282,9 @@ export default class WeightGraph extends Component {
                 futureProjecting : daysToProject,
                 daysInFrame: this.state.daysInFrame - this.state.futureProjecting + daysToProject,
                 futureWeights: futureWeights,
-                futureDates: futureDates
-            }, () => this.renderGraph(this.canvas.current.getBoundingClientRect().width));
+                futureDates: futureDates,
+                hoverIndex: 0
+            }, () => this.renderGraph());
         }
     }
     changeWeight(e, i, weightClass="STANDARD"){
@@ -541,6 +551,7 @@ export default class WeightGraph extends Component {
         if (weights.length > daysInFrame){
             canvasWidth = pxPerDay * (weights.length + 1); //+1 to account for double width today
         }
+
         let level = lossmodeLevel(initialWeight, user.ideal_weight_kg, weights[this.state.hoverIndex]);
         let today = moment().format("YYYY-MM-DD");
         return (
@@ -627,47 +638,57 @@ export default class WeightGraph extends Component {
                                         markToday = true;
                                     }
                                     date = moment(date)
+                                    let dateLetter = date.format('dddd');
+                                    let dateString = "";
+                                    if (markToday){
+                                        if (pxPerDay > 20){
+                                            dateString = "Today"
+                                        }
+                                    } else if (pxPerDay > 60){
+                                        if (date.date() === 1){
+                                            dateString = date.format("MMM")
+                                        } else {
+                                            dateString = date.format("D")
+                                        }
+                                    } else if (pxPerDay > 30){
+                                        dateLetter = date.format("ddd");
+                                        if (date.date() === 1){
+                                            dateString = date.format("MMM");
+                                        } else if (i % 2 === 0 ){
+                                            dateString = date.format("D");
+                                        }
+                                    } else if (pxPerDay > 15){
+                                        dateLetter = dayLetters[date.format("d")];
+                                        if (date.date() === 1){
+                                            dateString = date.format("MMM");
+                                        } else if (date.date() % 7 === 0){
+                                            dateString = date.format("D");
+                                        }
+                                    } else if (pxPerDay > 3){
+                                        if (date.date() === 1){
+                                            if (date.month() === 0){
+                                                dateString = date.format("YYYY");
+                                            } else {
+                                                dateString = date.format("MMM");
+                                            }
+                                        }
+                                    } else if (pxPerDay > 1){
+                                        if (date.date() === 1){
+                                            if (date.month() === 0){
+                                                dateString = date.format("YYYY");
+                                            } else if (date.month() % 3 === 0){
+                                                dateString = date.format("MMM");
+                                            }
+                                        }
+                                    }
                                     return (
                                         <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
-                                        {
-                                            markToday ?
-                                                pxPerDay > 20 ?
-                                                    "Today"
+                                            <div className='date-number-area'>{ dateString }</div>
+                                            {
+                                                pxPerDay > 15 ?
+                                                    <div className='date-letter-area'>{ dateLetter }</div>
                                                 : null
-                                            : pxPerDay > 60 ?
-                                                date.date() === 1 ?
-                                                    date.format("MMM")
-                                                :
-                                                    date.format("D")
-                                            : pxPerDay > 30 ?
-                                                date.date() === 1 ?
-                                                    date.format("MMM")
-                                                : i % 2 === 0 ?
-                                                    date.format("D")
-                                                : null
-                                            : pxPerDay > 15 ?
-                                                date.date() === 1 ?
-                                                    date.format("MMM")
-                                                : date.date() % 7 === 0 ?
-                                                    date.format("D")
-                                                : null
-                                            : pxPerDay > 3 ?
-                                                date.date() === 1 ?
-                                                    date.month() === 0 ?
-                                                        date.format("YYYY")
-                                                    :
-                                                        date.format("MMM")
-                                                : null
-                                            : pxPerDay > 1 ?
-                                                date.date() === 1 ?
-                                                    date.month() === 0 ?
-                                                        date.format("YYYY")
-                                                    : date.month() % 3 === 0 ?
-                                                        date.format("MMM")
-                                                    : null
-                                                : null
-                                            : null
-                                        }
+                                            }
                                         </div>
                                     )
                                 })
