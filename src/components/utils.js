@@ -1,7 +1,11 @@
 import moment from "moment";
 
+import SnackCarbIcon from '../images/snack_carb.svg';
+import HardAlcoholIcon from '../images/hard_alcohol.svg';
+import SoftDrinkIcon from '../images/soft_drink.svg';
+
 export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
-export const iconIndex = ["breads","pasta","potatoes","dessert","soft-drinks","snack-carbs","cereals","hard-alcohol","soft-alcohol"];
+export const iconIndex = ["BreadIcon", "PastaIcon", "PotatoIcon", "DessertIcon", SoftDrinkIcon, SnackCarbIcon, "CerealIcon", HardAlcoholIcon, "BeerIcon"];
 export const carbOrder = [5,0,4,1,6,2,3,7,8];
 export const maintenanceCarbOrder = [3,2,4,1,0,5,6,7,8];
 export const maintenanceAvgs = [3,5,7,10,14,19];

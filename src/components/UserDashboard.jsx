@@ -115,21 +115,6 @@ class UserDashboard extends Component {
 						</div>
 					</div>
 				}
-				{
-					user.mode === "1" ?
-						<div className='mode-switch'>
-							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>
-								Switch to Weight Loss Mode
-							</div>
-						</div>
-					: weights[weights.length - 1] <= user.ideal_weight_kg ?
-						<div className='mode-switch'>
-							<div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>
-								Switch to Maintenance Mode
-							</div>
-						</div>
-					: null
-				}
 				<div id='status-bar'>
 					<div id='primary-status'>
 						<div className='primary-status-section'>

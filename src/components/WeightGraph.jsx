@@ -20,24 +20,34 @@ export default class WeightGraph extends Component {
         this.showDatePicker = this.showDatePicker.bind(this);
         this.setDateRange = this.setDateRange.bind(this);
         let projectionData = this.futureProject(7);
-        
+
+        let currStart = moment(this.props.dates[0]);
+        let pastDates = [];
+        let pastWeights = [];
+        let daysInFrame = 14;
+        let pastProjecting = Math.ceil(0.075 * daysInFrame)
+        for (let i = 1; i <= pastProjecting; i ++){
+            let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
+            pastDates.unshift(newDate);
+            pastWeights.unshift(0);
+        }
+
         this.state = {
             inputs: inputs,
             showDatePicker: false,
-            daysInFrame: 14,
+            daysInFrame: daysInFrame,
             frameEndIndex: props.weights.length + projectionData.futureProjecting - 1,
             futureProjecting : projectionData.futureProjecting,
             futureWeights: projectionData.futureWeights,
             futureDates: projectionData.futureDates,
-            pastProjecting : 0,
-            pastWeights: [],
-            pastDates: [],
+            pastProjecting : pastProjecting,
+            pastWeights: pastWeights,
+            pastDates: pastDates,
             lineX: 0,
             lineY: 0,
             hoverIndex: 0,
             windowHeight: 0,
             windowWidth: 0,
-            showClickAddWeight: false,
             addWeightTop: 0,
             addWeightLeft: 0,
             addWeightIndex: 0
@@ -104,12 +114,7 @@ export default class WeightGraph extends Component {
             return "";
         })
         if (scrollLeft === null){
-            let daysInFrame = this.state.daysInFrame;
-            let graphWidth =  this.canvas.current.getBoundingClientRect().width;
-            console.log(graphWidth)
-            let pxPerDay = window.innerWidth * 0.975 * 0.975/daysInFrame;
-            let newLeft = (weights.length - 2*this.state.futureProjecting) * pxPerDay;
-            scrollLeft = newLeft;
+            scrollLeft = (weights.length - this.state.futureProjecting)/weights.length+1 * this.canvas.current.getBoundingClientRect().width - Math.ceil(this.scroll.current.getBoundingClientRect().width/2);
         }
         this.scroll.current.scrollLeft = scrollLeft;
         canvas.stroke();
@@ -207,27 +212,23 @@ export default class WeightGraph extends Component {
             pastWeights = [];
             pastDates = [];
         }
-
-        let frameWidth = window.innerWidth * 0.975 * 0.975;
-        let pxPerDay = frameWidth/daysInFrame;
         
-        if (pxPerDay < 30){
-            let pastAddition = Math.ceil(0.075 * frameWidth/pxPerDay);
-            pastProjecting += pastAddition;
-            if (pastDates.length){
-                currStart = moment(pastDates[0]);
-            } else {
-                currStart = moment(this.props.dates[0]);
-            }
-            for (let i = 1; i <= pastAddition; i ++){
-                let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
-                pastDates.unshift(newDate);
-                pastWeights.unshift(0);
-            }
+        let pastAddition = Math.ceil(0.075 * daysInFrame);
+        pastProjecting += pastAddition;
+        if (pastDates.length){
+            currStart = moment(pastDates[0]);
+        } else {
+            currStart = moment(this.props.dates[0]);
+        }
+        for (let i = 1; i <= pastAddition; i ++){
+            let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
+            pastDates.unshift(newDate);
+            pastWeights.unshift(0);
         }
         if (daysInFrame > frameEndIndex){
             frameEndIndex = daysInFrame;
         }
+
         this.setState({
             daysInFrame: daysInFrame,
             frameEndIndex: frameEndIndex,
@@ -280,7 +281,7 @@ export default class WeightGraph extends Component {
         } else {
             this.setState({
                 futureProjecting : daysToProject,
-                daysInFrame: this.state.daysInFrame - this.state.futureProjecting + daysToProject,
+                daysInFrame: Math.max(daysToProject, this.state.daysInFrame),
                 futureWeights: futureWeights,
                 futureDates: futureDates,
                 hoverIndex: 0
@@ -336,18 +337,14 @@ export default class WeightGraph extends Component {
         if (id === null){
             this.props.addWeight(this.convertWeight(newWeight), date)
             .then(() => {
-                this.setState({showClickAddWeight: false}, () => {
-                    this.futureProject(this.state.futureProjecting, true);
-                    this.renderGraph(this.scroll.current.scrollLeft);
-                })
+                this.futureProject(this.state.futureProjecting, true);
+                this.renderGraph(this.scroll.current.scrollLeft);
             })
         } else {
             this.props.updateWeight(this.convertWeight(newWeight), id)
             .then(() => {
-                this.setState({showClickAddWeight: false}, () => {
-                    this.futureProject(this.state.futureProjecting, true);
-                    this.renderGraph(this.scroll.current.scrollLeft);
-                })
+                this.futureProject(this.state.futureProjecting, true);
+                this.renderGraph(this.scroll.current.scrollLeft);
             })
         }
 
@@ -371,7 +368,8 @@ export default class WeightGraph extends Component {
 				{indexArr.map((x, i) => {
 					let index = carbRanks[ carbOrder[ i ] ];
 					return (
-						<div key={i} className='icon icon-allowed' id={iconIndex[index] + "-icon"}>
+						<div key={i} className='icon icon-allowed'>
+                            <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[index]} alt=''/>
 							<div className='icon-description'>{carbOptions[ index ]}</div>
 						</div>
 					)
@@ -390,14 +388,16 @@ export default class WeightGraph extends Component {
                 <div className='allowed-icons'>
                     {
                         index !== 6 ? 
-                            <div className='icon icon-allowed' id={iconIndex[ innerIndex ] + "-icon"}>
+                            <div className='icon icon-allowed'>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
                         :
                             Array( carbRanks.length - index).fill().map( (x, j) => j + index).map(j => {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
-                                    <div key={j} className='icon icon-allowed' id={iconIndex[innerIndex] + "-icon"}>
+                                    <div key={j} className='icon icon-allowed'>
+                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
                                 )
@@ -410,7 +410,8 @@ export default class WeightGraph extends Component {
                 <div className='disallowed-icons'>
                     {
                         index !== 6 ? 
-                            <div className='icon icon-disallowed' id={iconIndex[ innerIndex ] + "-icon"}>
+                            <div className='icon icon-disallowed'>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
                                 <div className='icon-cross'></div>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
@@ -418,7 +419,8 @@ export default class WeightGraph extends Component {
                             Array( carbRanks.length - index).fill().map( (x, j) => j + index).map(j => {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
-                                    <div key={j} className='icon icon-disallowed' id={iconIndex[innerIndex] + "-icon"}>
+                                    <div key={j} className='icon icon-disallowed'>
+                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
 								        <div className='icon-cross'></div>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
@@ -441,7 +443,8 @@ export default class WeightGraph extends Component {
 					if (i < carbRanks.length){
 						let index = carbRanks[ carbOrder[ i ] ];
 						return (
-							<div key={i} className='icon icon-diallowed' id={iconIndex[index] + "-icon"}>
+							<div key={i} className='icon icon-diallowed'>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[index]} alt=''/>
 								<div className='icon-cross'></div>
 								<div className='icon-description'>{carbOptions[ index ]}</div>
 							</div>
@@ -502,22 +505,6 @@ export default class WeightGraph extends Component {
             this.setState({lineX: lineX, lineY: lineY, hoverIndex: weightIndex});
         }
     }
-    clickAddWeight = (e) => {
-        let addWeightLeft = this.state.lineX;
-        if (e.clientX/window.innerWidth > 0.5){
-            addWeightLeft -= this.hover.current.getBoundingClientRect().width;
-        }
-        this.setState({
-            showClickAddWeight: true,
-            addWeightTop: e.clientY - this.canvas.current.getBoundingClientRect().top,
-            addWeightLeft: addWeightLeft,
-            addWeightIndex: this.state.hoverIndex
-        })
-    }
-    closeAdder(e){
-        e.stopPropagation();
-        this.setState({showClickAddWeight: false});
-    }
     render(){
         let user = this.props.user;
         
@@ -541,7 +528,6 @@ export default class WeightGraph extends Component {
             levelMap.splice(0 , 1);
         }
 
-
         let daysInFrame = this.state.daysInFrame;
 
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
@@ -558,8 +544,24 @@ export default class WeightGraph extends Component {
 
             <div id='graph-area'>
                 <div id='graph-top'>
-                    <div id='axis-labels' className='axis-labels'>
-                        <div className='axis-label' id='weight-axis-label'>Weight</div>
+                    <div id='graph-mode-section'>
+                        {
+                            user.mode === "1" ?
+                                <div className='mode-switch'>
+                                    <div className='mode-indicator'>Mode: Maintenance</div>
+                                    <div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>Switch to Weight Loss Mode</div>
+                                </div>
+                            : 
+                                <div className='mode-switch'>
+                                    <div className='mode-indicator'>Mode: Weight Loss</div>
+                                    {
+                                        weights[weights.length - 1] <= user.ideal_weight_kg ?
+                                            <div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>Switch to Maintenance</div>
+                                        :
+                                             null
+                                    }
+                                </div>
+                        }
                     </div>
                     <div id='graph-view-options'>
                         <div className='view-section'>
@@ -630,7 +632,7 @@ export default class WeightGraph extends Component {
                     }
                         
                     <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll} onMouseMove={(e) => this.showGraphLines(e)}>
-                        <div id='dates-container' style={{width: canvasWidth}} onClick={(e) => this.clickAddWeight(e)}>
+                        <div id='dates-container' style={{width: canvasWidth}}>
                             {
                                 dates.map((date,i) => {
                                     let markToday = false;
@@ -694,7 +696,7 @@ export default class WeightGraph extends Component {
                                 })
                             }
                         </div>
-                        <div id='level-graph-display' style={{width: canvasWidth}} onClick={(e) => this.clickAddWeight(e)}>
+                        <div id='level-graph-display' style={{width: canvasWidth}}>
                             
                             {
                                 user.mode === "0" ?
@@ -770,8 +772,8 @@ export default class WeightGraph extends Component {
                         </div>
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
-                                pxPerDay > 85 ?
-                                weights.map((weight,i) => {
+                                pxPerDay > 45 ?
+                                    weights.map((weight,i) => {
                                         let weightString = weightStringFromKg(weight, user.weight_units);
                                         if (user.weight_units === "Pounds"){
                                             weightString = weightString.substring(0, weightString.length - 7);
@@ -815,7 +817,8 @@ export default class WeightGraph extends Component {
                                             return (
                                                 <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}>
                                                     <input 
-                                                        onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} className='graph-weight-number' 
+                                                        onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} 
+                                                        className='graph-weight-number' 
                                                         type='number' 
                                                         step="0.01" 
                                                         value={parseFloat(weightStringFromKg(this.state.futureWeights[i - this.props.weights.length - this.state.pastProjecting], user.weight_units))}
@@ -828,96 +831,19 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight} onClick={(e) => this.clickAddWeight(e)}></canvas>
-                        <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX} onClick={(e) => this.clickAddWeight(e)}></div>
+                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight}></canvas>
+                        <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
-                        
-                        <div id='click-adder' 
-                            className={this.state.showClickAddWeight ? "show" : ""} 
-                            style={{left: this.state.addWeightLeft, top: this.state.addWeightTop + 0.6 * canvasHeight/0.35}}
-                            ref={this.hover}
-                        >
-                            <div id='adder-close' onClick={(e) => this.closeAdder(e)}><i className='fa fa-times'></i></div>
-                            <div id='click-adder-title'>
-                                {
-                                    ids[this.state.addWeightIndex] === null ?
-                                        "Add a weight for " + dates[this.state.addWeightIndex]
-                                    :
-                                        "Change weight for " + dates[this.state.addWeightIndex] + " from " + parseFloat(weightStringFromKg(weights[this.state.addWeightIndex], user.weight_units)) + " to: "
-                                }
-                            </div>
-                            {
-                                this.state.addWeightIndex >= this.state.pastProjecting + this.props.weights.length ?
-
-                                    <div>
-                                        <input 
-                                            value={parseFloat(weightStringFromKg(this.state.futureWeights[this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length)], user.weight_units))} 
-                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex - (this.state.pastProjecting + this.props.weights.length), "FUTURE")} className='graph-weight-number' 
-                                            type='number' 
-                                            step="0.01"
-                                            onKeyPress={e => {
-                                                if (e.key === "Enter"){
-                                                    this.closeAdder(e);
-                                                }
-                                            }}
-                                        />
-
-                                        {
-                                            weights[this.state.addWeightIndex] !== this.props.weights[this.props.weights.length-1] ? 
-                                                <button className='clear-weight' value={parseFloat(weightStringFromKg(weights[weights.length-1], user.weight_units))} onClick={(e) => this.changeWeight(e, this.state.addWeightIndex - this.props.weights.length - this.state.pastProjecting, "FUTURE")}>Reset</button>
-                                            : 
-                                                null
-                                        }
-                                    </div>
-                                : ids[this.state.addWeightIndex] === null ? 
-                                    <form 
-                                        className='graph-weight' 
-                                        onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex])}
-                                    >
-                                        <input 
-                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} 
-                                            className='graph-weight-number' 
-                                            type='number' 
-                                            step="0.01"
-                                            value={this.state.inputs[this.state.addWeightIndex]}
-                                        />
-                                        <input type='submit' className='weight-submit'/>
-                                    </form>
-                                        
-                                :
-                                    <form 
-                                        className='graph-weight' 
-                                        onSubmit={(e) => this.submitWeight(e, this.state.addWeightIndex, dates[this.state.addWeightIndex], ids[this.state.addWeightIndex])}
-                                    >
-                                        <input 
-                                            onChange={(e) => this.changeWeight(e, this.state.addWeightIndex)} 
-                                            className='graph-weight-number' 
-                                            type='number' 
-                                            step="0.01" 
-                                            value={this.state.inputs[this.state.addWeightIndex]}
-                                        />
-                                        <input type='submit' className='weight-submit'/>
-                                    </form>
-                            }
-                        </div>
                     </div>
-                    {
-                        pxPerDay < 30 ?
-                            <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
-                                {
-                                    levelMap.map((levelWeight, j) => {
-                                            return (
-                                                <div key={j} className="sidebar-section">
-                                                    {
-                                                        this.levelIcon(j, user.carb_ranks, true)
-                                                    }
-                                                </div>
-                                            )
-                                        })
-                                    }
-                            </div>
-                        : null
-                    }
+                    <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
+                        {
+                            levelMap.map((levelWeight, j) => {
+                                    return (
+                                        <div key={j} className="sidebar-section">{ this.levelIcon(j, user.carb_ranks, true) }</div>
+                                    )
+                                })
+                            }
+                    </div>
                 </div>
             </div>
         )
