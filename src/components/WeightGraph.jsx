@@ -59,6 +59,7 @@ export default class WeightGraph extends Component {
 
         let canvas = this.canvas.current.getContext('2d');
         let graphPixelsHeight = this.canvas.current.height;
+        console.log(graphPixelsWidth, 0.975 * 0.975 * window.innerWidth)
         canvas.clearRect(0, 0, this.canvas.current.width, graphPixelsHeight);
         canvas.beginPath();
 
