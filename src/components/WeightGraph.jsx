@@ -369,7 +369,7 @@ export default class WeightGraph extends Component {
 					let index = carbRanks[ carbOrder[ i ] ];
 					return (
 						<div key={i} className='icon icon-allowed'>
-                            <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[index]} alt=''/>
+                            <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[index]} alt=''/>
 							<div className='icon-description'>{carbOptions[ index ]}</div>
 						</div>
 					)
@@ -389,7 +389,7 @@ export default class WeightGraph extends Component {
                     {
                         index !== 6 ? 
                             <div className='icon icon-allowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
                         :
@@ -397,7 +397,7 @@ export default class WeightGraph extends Component {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
                                     <div key={j} className='icon icon-allowed'>
-                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
+                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
                                 )
@@ -411,7 +411,7 @@ export default class WeightGraph extends Component {
                     {
                         index !== 6 ? 
                             <div className='icon icon-disallowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
                                 <div className='icon-cross'></div>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
@@ -420,7 +420,7 @@ export default class WeightGraph extends Component {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
                                     <div key={j} className='icon icon-disallowed'>
-                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[innerIndex]} alt=''/>
+                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
 								        <div className='icon-cross'></div>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
@@ -444,7 +444,7 @@ export default class WeightGraph extends Component {
 						let index = carbRanks[ carbOrder[ i ] ];
 						return (
 							<div key={i} className='icon icon-diallowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", height: "100%"}} src={iconIndex[index]} alt=''/>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[index]} alt=''/>
 								<div className='icon-cross'></div>
 								<div className='icon-description'>{carbOptions[ index ]}</div>
 							</div>
@@ -597,7 +597,7 @@ export default class WeightGraph extends Component {
                 </div>
                 <div className='graph-middle' id='weight-loss-graph'>
                     {
-                        this.state.hoverIndex >= this.state.pastProjecting ? 
+                        /*this.state.hoverIndex >= this.state.pastProjecting ? 
 
                             <div id='graph-hover'>
                                 <div id='graph-hover-weight'>{weightStringFromKg(weights[this.state.hoverIndex], user.weight_units)}</div>
@@ -628,7 +628,7 @@ export default class WeightGraph extends Component {
                                 <div id='graph-hover-weight'>Empty Weight</div>
                                 <div id='graph-hover-date'>{dates[this.state.hoverIndex]}</div>
                                 <div id='click-hint'>Click the graph to add a weight</div>
-                            </div>
+                            </div>*/
                     }
                         
                     <div id='graph-scroller' ref={this.scroll} onScroll={this.handleScroll} onMouseMove={(e) => this.showGraphLines(e)}>
