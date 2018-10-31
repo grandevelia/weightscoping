@@ -55,11 +55,11 @@ export default class WeightGraph extends Component {
     }
     renderGraph(scrollLeft = null){
         let scroll = this.scroll.current;
-        let graphPixelsWidth = scroll.getBoundingClientRect().width;
+        let graphPixelsWidth = 0.975 * 0.975 * window.innerWidth;//scroll.getBoundingClientRect().width;
 
         let canvas = this.canvas.current.getContext('2d');
         let graphPixelsHeight = this.canvas.current.height;
-        console.log(graphPixelsWidth, 0.975 * 0.975 * window.innerWidth)
+        //console.log(graphPixelsWidth, h)
         canvas.clearRect(0, 0, this.canvas.current.width, graphPixelsHeight);
         canvas.beginPath();
 
