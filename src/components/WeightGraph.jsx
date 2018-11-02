@@ -780,7 +780,7 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight}></canvas>
+                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth, height: canvasHeight}} width={canvasWidth} height={canvasHeight}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
                     </div>

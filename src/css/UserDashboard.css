@@ -338,7 +338,6 @@ body {
 }
 #line-graph-display {
 	position: relative;
-	height: 30%;
 }
 #m-graph-display{
 	flex-basis: 85%;
