@@ -100,21 +100,16 @@ class UserDashboard extends Component {
 						</div>
 					</div>
 					:
-					<div id='lower-area'>
-						
-						<div id='dashboard-fourth'>
-							<WeightGraph 
-								user={user} 
-								level={level} 
-								weights={weights} 
-								dates={dates} 
-								ids={ids} 
-								startingIndex={newStartingIndex} 
-								updateWeight={this.props.updateWeight} 
-								addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
-							/>
-						</div>
-					</div>
+					<WeightGraph 
+						user={user} 
+						level={level} 
+						weights={weights} 
+						dates={dates} 
+						ids={ids} 
+						startingIndex={newStartingIndex} 
+						updateWeight={this.props.updateWeight} 
+						addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
+					/>
 				}
 				<div id='status-bar'>
 					<div id='primary-status'>
