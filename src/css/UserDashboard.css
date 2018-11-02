@@ -262,7 +262,6 @@ body {
 	height: 90vh;
 	min-height: 90vh;
 	display: flex;
-	flex: 1;
 	width: 100%;
 	flex-direction: row;
 	position: relative;
@@ -281,7 +280,7 @@ body {
 }
 #dates-container{
 	position: relative;
-	height: 5%;
+	height: 4.5vh;
 	display: flex;
 	flex-direction: row;
 }
@@ -294,7 +293,7 @@ body {
 	justify-content: center;
 }
 #level-graph-display{
-	height: 60%;
+	height: 54vh;
 	position: relative;
 	display: flex;
 	flex-direction: row;
@@ -355,7 +354,7 @@ body {
 }
 #weight-input-container{
 	position: relative;
-	height: 5%;
+	height: 4.5vh;
 	display: flex;
 	flex-direction: row;
 }

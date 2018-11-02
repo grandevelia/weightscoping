@@ -12,7 +12,6 @@ export default class WeightGraph extends Component {
         this.coordX = React.createRef();
         this.coordY = React.createRef();
         this.hover = React.createRef();
-        this.middle = React.createRef();
 
         let inputs = [];
         for (let i = 0; i < props.weights.length; i ++){
@@ -55,9 +54,7 @@ export default class WeightGraph extends Component {
         }
     }
     renderGraph(scrollLeft = null){
-
-        console.log(this.scroll.current.getBoundingClientRect().height, this.middle.current.getBoundingClientRect().height)
-        let graphPixelsWidth = 0.975 * 0.975 * window.innerWidth;
+        let graphPixelsWidth = 0.975 * 0.975 * window.innerWidth;//scroll.getBoundingClientRect().width;
 
         let canvas = this.canvas.current.getContext('2d');
         let graphPixelsHeight = this.canvas.current.height;
@@ -84,7 +81,7 @@ export default class WeightGraph extends Component {
         canvas.strokeStyle = "rgb(0, 0, 0)";
         let monthOpacity = ["0.6", "0.9"];
         let compDate = moment(this.props.dates[0]).subtract(1, "days");
-        //console.log(dayPercent, weightsInFrame, weights.length, this.state.daysInFrame, graphPixelsWidth);
+        console.log(dayPercent, weightsInFrame, weights.length, this.state.daysInFrame, graphPixelsWidth);
         //Line graph
         weights.map((weight, i) => {
             let currDate = moment(dates[i]);
@@ -545,7 +542,7 @@ export default class WeightGraph extends Component {
                         </div>
                     </div>
                 </div>
-                <div className='graph-middle' ref={this.middle}>
+                <div className='graph-middle'>
                     {
                         /*this.state.hoverIndex >= this.state.pastProjecting ? 
 
