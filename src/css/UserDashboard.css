@@ -385,9 +385,10 @@ body {
 }
 #graph-sidebar{
 	position: absolute;
-	top: 4.9%;
+	top: 5%;
 	left: 1.25%;
 	height: 60%;
+	max-height: 60%;
 	background: rgba(255,255,255,0.85);
 	color: rgba(0,0,0,0.7);
 	width: 7.1%;
@@ -674,7 +675,7 @@ body {
 #weight-edit-pullout{
 	position: absolute;
 	height: 5%;
-	top: 64.9%;
+	top: 65%;
 	left: 1.25%;
 	background-color: white;
 	display: flex;
