@@ -269,12 +269,12 @@ body {
 }
 #graph-scroller{
 	overflow-x: scroll;
+	display: flex;
 	position: relative;
 	flex-direction: column;
 	width: 100vw;
 	max-width: 100vw;
-	height: 90vh;
-	max-height: 90vh;
+	flex: 1;
 }
 #line-graph-display:hover{
 	cursor: pointer;
@@ -377,7 +377,7 @@ body {
 	position: absolute;
 	top: 5%;
 	left: 0;
-	height: 60%;
+	height: 54vh;
 	background: rgba(255,255,255,0.85);
 	color: rgba(0,0,0,0.7);
 	width: 7.1%;
