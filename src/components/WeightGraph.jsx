@@ -792,14 +792,6 @@ export default class WeightGraph extends Component {
                             })
                         }
                     </div>
-                    {
-                        //TODO possible only show submit button if weight has been changed instead
-                        pxPerDay > 15 ?
-                            <div id='weight-edit-pullout' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
-                                    Hello
-                            </div>
-                        : null
-                    }
                 </div>
             </div>
         )

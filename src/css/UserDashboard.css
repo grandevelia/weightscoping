@@ -375,7 +375,7 @@ body {
 }
 #graph-sidebar{
 	position: absolute;
-	top: 5%;
+	top: 4.5vh;
 	left: 0;
 	height: 54vh;
 	background: rgba(255,255,255,0.85);
@@ -660,23 +660,6 @@ body {
 }
 .past-weight{
 	background-color: rgb(200,200,200);
-}
-#weight-edit-pullout{
-	position: absolute;
-	height: 5%;
-	top: 65%;
-	left: 0;
-	background-color: white;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-end;
-	padding-right: 2.5%;
-	box-shadow: 1px 2px 1px rgba(0,0,0,.2);
-	border-radius: 0 5px 5px 0;
-	font-size: 0.7em;
-	font-weight: bold;
-	color: rgba(0,0,0,0.7);
 }
 @media only screen and (max-width: 775px){
 	#weightloss-tab-y-labels, #tab-y-labels{
