@@ -261,7 +261,7 @@ body {
 .graph-middle{
 	display: flex;
 	flex: 1;
-	max-width: 97.5vw;
+	width: 100%;
 	flex-direction: row;
 	position: relative;
 }
@@ -372,10 +372,9 @@ body {
 }
 #graph-sidebar{
 	position: absolute;
-	top: 5%;
+	top: 0;
 	left: 0;
-	height: 60%;
-	max-height: 60%;
+	height: 100%;
 	background: rgba(255,255,255,0.85);
 	color: rgba(0,0,0,0.7);
 	width: 7.1%;

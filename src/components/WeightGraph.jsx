@@ -543,7 +543,7 @@ export default class WeightGraph extends Component {
                         </div>
                     </div>
                 </div>
-                <div className='graph-middle' id='weight-loss-graph'>
+                <div className='graph-middle'>
                     {
                         /*this.state.hoverIndex >= this.state.pastProjecting ? 
 
