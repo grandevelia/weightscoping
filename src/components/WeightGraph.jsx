@@ -479,7 +479,7 @@ export default class WeightGraph extends Component {
         let daysInFrame = this.state.daysInFrame;
 
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
-        let canvasHeight = window.innerHeight * 0.9125 * 0.9 * 0.3;
+        let canvasHeight = window.innerHeight * 0.9 * 0.3;
 
         let pxPerDay = canvasWidth/daysInFrame;
         if (weights.length > daysInFrame){
