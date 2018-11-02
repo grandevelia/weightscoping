@@ -55,7 +55,7 @@ export const loadUser = () => {
 				return res.data;
 			} else if (res.status >= 400 && res.status < 500){
 				dispatch({type:'AUTHENTICATION_ERROR', data:res.data});
-				throw res.data;
+				//throw res.data;
 			}
 		})
 	}
@@ -84,7 +84,7 @@ export const login = (email, password) => {
 					data: res.data
 				})
 				return res.data;
-			} else if (res.status === 403 || res.status === 401){
+			} else if (res.status === 403 || res.status === 401 || res.status === 400){
 				dispatch({type: "LOGIN_FAILED", data:res.data});
 				throw res.data;
 			}

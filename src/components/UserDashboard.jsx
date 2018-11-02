@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
 import { weights, notifications, auth } from "../actions";
 import { planTitles, weightStringFromKg, allowedCarbs, disallowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions, interpolateDates, guessWeightsToNow } from './utils';
 import PaypalButton from './PaypalButton';

@@ -29,7 +29,7 @@ export const fetchWeights = () => {
 				return dispatch({type: 'FETCH_WEIGHTS', weights: res.data});
 			} else if (res.status === 401 || res.status === 403) {
 				dispatch({type: "AUTHENTICATION_ERROR", data: res.data});
-				throw res.data;
+				//throw res.data;
 			}
 		})
 	}

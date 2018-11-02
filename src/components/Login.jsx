@@ -20,6 +20,11 @@ class Login extends Component {
 		if (this.props.auth.isAuthenticated){
 			return <Redirect to='/Home/UserDashboard/' />
 		}
+		let showErrors = false;
+		if (this.props.errors['non_field_errors'] || this.props.errors['email'] || this.props.errors['password']){
+			console.log(this.props.errors['non_field_errors'], this.props.errors['email'], this.props.errors['password'])
+			showErrors = true;
+		}
 		return (
 			<div className='content'>
 				<style>
@@ -60,7 +65,12 @@ class Login extends Component {
 								onChange={e => {
 									this.setState({password: e.target.value})
 								}} />
-
+								{
+									showErrors ? 
+										<div id='login-invalid'>Invalid Username or Password</div>
+									:
+										null
+								}
 								<Link id='forgot-pass' to="/ForgotPassword">Forgot your password?</Link>
 							</div>
 							<button id='login-submit' type="submit">Login</button>

@@ -1,15 +1,16 @@
 {
-  "main.css": "css/main.1c03f5b2.css",
-  "main.css.map": "css/main.1c03f5b2.css.map",
-  "main.js": "js/main.7e0df94d.js",
-  "main.js.map": "js/main.7e0df94d.js.map",
+  "main.css": "css/main.cfaa9d11.css",
+  "main.css.map": "css/main.cfaa9d11.css.map",
+  "main.js": "js/main.674b3708.js",
+  "main.js.map": "js/main.674b3708.js.map",
   "media/fontawesome-webfont.eot": "media/fontawesome-webfont.674f50d2.eot",
   "media/fontawesome-webfont.svg?v=4.7.0": "media/fontawesome-webfont.912ec66d.svg",
   "media/fontawesome-webfont.ttf?v=4.7.0": "media/fontawesome-webfont.b06871f2.ttf",
   "media/fontawesome-webfont.woff2?v=4.7.0": "media/fontawesome-webfont.af7ae505.woff2",
   "media/fontawesome-webfont.woff?v=4.7.0": "media/fontawesome-webfont.fee66e71.woff",
-  "media/hard_alcohol.svg": "media/hard_alcohol.1673ed07.svg",
+  "media/hard_alcohol.png": "media/hard_alcohol.fe18b866.png",
   "media/logo.svg": "media/logo.5d5d9eef.svg",
-  "media/snack_carb.svg": "media/snack_carb.d5a4c9a7.svg",
-  "media/soft_drink.svg": "media/soft_drink.0f1c37ef.svg"
+  "media/snack_carb.png": "media/snack_carb.9f39415e.png",
+  "media/soft_alcohol.png": "media/soft_alcohol.962c5c0f.png",
+  "media/soft_drink.png": "media/soft_drink.f91b5a9a.png"
 }

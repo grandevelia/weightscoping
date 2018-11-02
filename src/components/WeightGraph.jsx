@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { iconIndex, carbOrder, carbOptions, weightStringFromKg,interpolateDates, poundsToKg, lossmodeLevel, maintenanceAvgs, calcAverages } from './utils';
+import { iconPaths, iconIndex, carbOrder, carbOptions, weightStringFromKg,interpolateDates, poundsToKg, lossmodeLevel, maintenanceAvgs, calcAverages } from './utils';
 import DatepickerArea from './DatepickerArea';
 import moment from 'moment';
 
@@ -54,7 +54,6 @@ export default class WeightGraph extends Component {
         }
     }
     renderGraph(scrollLeft = null){
-        let scroll = this.scroll.current;
         let graphPixelsWidth = 0.975 * 0.975 * window.innerWidth;//scroll.getBoundingClientRect().width;
 
         let canvas = this.canvas.current.getContext('2d');
@@ -115,7 +114,7 @@ export default class WeightGraph extends Component {
             return "";
         })
         if (scrollLeft === null){
-            scrollLeft = (weights.length - this.state.futureProjecting)/weights.length+1 * this.canvas.current.getBoundingClientRect().width - Math.ceil(this.scroll.current.getBoundingClientRect().width/2);
+            scrollLeft = (weights.length - this.state.futureProjecting)/(weights.length+1) * this.canvas.current.getBoundingClientRect().width - Math.ceil(this.scroll.current.getBoundingClientRect().width/2);
         }
         this.scroll.current.scrollLeft = scrollLeft;
         canvas.stroke();
@@ -350,34 +349,6 @@ export default class WeightGraph extends Component {
         }
 
     }
-	allowedIcons(level, carbRanks){
-		if (level === 0){
-			return (
-				<div className='allowed-icons'>
-					<div className='icon icon-allowed' id='non-incentive-icon'>
-						<div className='icon-description'>Non Incentive Food</div>
-					</div>
-				</div>
-			)
-		}
-		let indexArr = Array( level ).fill().map((x,i) => i);
-		return (
-			<div className='allowed-icons'>
-				<div className='icon icon-allowed' id='non-incentive-icon'>
-					<div className='icon-description'>Non Incentive Food</div>
-				</div>
-				{indexArr.map((x, i) => {
-					let index = carbRanks[ carbOrder[ i ] ];
-					return (
-						<div key={i} className='icon icon-allowed'>
-                            <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[index]} alt=''/>
-							<div className='icon-description'>{carbOptions[ index ]}</div>
-						</div>
-					)
-				})}
-			</div>
-		);
-    }
     levelIcon(index, carbRanks, allowed){
 
 		if (isNaN(index)){
@@ -386,11 +357,11 @@ export default class WeightGraph extends Component {
         let innerIndex = carbRanks[ carbOrder[ index ] ];
         if (allowed){
             return (
-                <div className='allowed-icons'>
+                <div className='allowed-icon-wrap'>
                     {
                         index !== 6 ? 
                             <div className='icon icon-allowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
+                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "15%", height: "75%"}} src={iconPaths[innerIndex]} alt=''/>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
                         :
@@ -398,7 +369,7 @@ export default class WeightGraph extends Component {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
                                     <div key={j} className='icon icon-allowed'>
-                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
+                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "15%", height: "75%"}} src={iconPaths[innerIndex]} alt=''/>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
                                 )
@@ -408,7 +379,7 @@ export default class WeightGraph extends Component {
             );
         } else {
             return (
-                <div className='disallowed-icons'>
+                <div className='disallowed-icon-wrap'>
                     {
                         index !== 6 ? 
                             <div className='icon icon-disallowed'>
@@ -431,30 +402,6 @@ export default class WeightGraph extends Component {
                 </div>
             );
         }
-    }
-	disallowedIcons(level, carbRanks) {
-        let arr = Array( carbOptions.length - level ).fill().map((x,i) => level + i);
-        
-		return (
-			<div className='disallowed-icons'>
-				{arr.map(i => {
-                    //For non-alcohol drinkers, carbRanks.length < than available indices
-                    //With alcoholic options as the last two entries in the carbOptions array,
-                    //using index only if it is < carbRanks.length avoids out of bounds errors
-					if (i < carbRanks.length){
-						let index = carbRanks[ carbOrder[ i ] ];
-						return (
-							<div key={i} className='icon icon-diallowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[index]} alt=''/>
-								<div className='icon-cross'></div>
-								<div className='icon-description'>{carbOptions[ index ]}</div>
-							</div>
-						)
-					}
-					return "";
-				})}
-			</div>
-		);
     }
     showGraphLines = (e) => {
         let canvasBox = this.canvas.current.getBoundingClientRect();
@@ -607,6 +554,7 @@ export default class WeightGraph extends Component {
                                 <div id='graph-hover-allowed'>
                                     <div className='graph-hover-allowed-title'>Allowed</div>
                                     <div className='graph-hover-icons'>
+                                        //TODO NOTE TO SELF: If this is needed, just iterate through all levels and use existing icon func, no need for two different functions
                                         {this.allowedIcons(level, user.carb_ranks)}
                                     </div>
                                 </div>
@@ -716,7 +664,7 @@ export default class WeightGraph extends Component {
                                                         return (
                                                             <div key={j} className={weightOk ? "level-section weight-ok" + onMonth : "level-section weight-not-ok" + onMonth}>
                                                                 {
-                                                                    pxPerDay > 30 ?
+                                                                    pxPerDay > 30 && moment(dates[i]).isAfter(moment().subtract(1, "days"))? 
                                                                         this.levelIcon(j, user.carb_ranks, weightOk)
                                                                     :null
                                                                 }
@@ -845,6 +793,14 @@ export default class WeightGraph extends Component {
                                 })
                             }
                     </div>
+                    {
+                        //TODO possible only show submit button if weight has been changed instead
+                        pxPerDay > 15 ?
+                            <div id='weight-edit-pullout' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
+                                    Hello
+                            </div>
+                        : null
+                    }
                 </div>
             </div>
         )

@@ -68,7 +68,7 @@ class UpdatePasswordSerializer(serializers.ModelSerializer):
 
 		try:
 			profile = Profile.objects.get(email=email, activation_key=key)
-			profile.password=password
+			profile.password=new_password
 			profile.save()
 			return profile
 
@@ -206,7 +206,7 @@ class LoginUserSerializer(serializers.Serializer):
 
 		if user:
 			return user
-		raise serializers.ValidationError("Unable to log in with provided credentials")
+		raise serializers.ValidationError("Invalid email or password")
 		
 class WeightSerializer(serializers.ModelSerializer):
 	class Meta:

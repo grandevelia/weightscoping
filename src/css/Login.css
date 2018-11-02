@@ -100,3 +100,9 @@
 	display: flex;
 	flex-direction: column;
 }
+#login-invalid{
+	color: rgba(255, 45, 45, 0.8);
+	font-size: 0.675em;
+	font-weight: bold;
+	margin: 2.5% 0;
+}

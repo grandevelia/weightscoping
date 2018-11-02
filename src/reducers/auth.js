@@ -14,7 +14,6 @@ const initialState = {
 
 export default function auth(state=initialState, action){
 	switch (action.type) {
-
 		case 'USER_LOADING':
 			return {...state, isLoading: true};
 
@@ -33,7 +32,10 @@ export default function auth(state=initialState, action){
 			return {...state, errors: action.data}
 
 		case 'AUTHENTICATION_ERROR':
-			return {...state, errors: action.data}
+			if (localStorage.getItem("token") !== null){
+				localStorage.removeItem("token");
+			}
+			return {...state}
 
 		case 'LOGIN_FAILED':
 			return {...state, errors: action.data}
