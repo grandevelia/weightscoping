@@ -259,6 +259,7 @@ body {
 	color: rgb(1, 76, 133);
 }
 .graph-middle{
+	height: 90%;
 	display: flex;
 	flex: 1;
 	width: 100%;
