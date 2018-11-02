@@ -787,11 +787,11 @@ export default class WeightGraph extends Component {
                     <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
                         {
                             levelMap.map((levelWeight, j) => {
-                                    return (
-                                        <div key={j} className="sidebar-section">{ this.levelIcon(j, user.carb_ranks, true) }</div>
-                                    )
-                                })
-                            }
+                                return (
+                                    <div key={j} className="sidebar-section">{ this.levelIcon(j, user.carb_ranks, true) }</div>
+                                )
+                            })
+                        }
                     </div>
                     {
                         //TODO possible only show submit button if weight has been changed instead
