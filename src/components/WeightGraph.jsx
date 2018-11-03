@@ -81,7 +81,6 @@ export default class WeightGraph extends Component {
         canvas.strokeStyle = "rgb(0, 0, 0)";
         let monthOpacity = ["0.6", "0.9"];
         let compDate = moment(this.props.dates[0]).subtract(1, "days");
-        console.log(dayPercent, weightsInFrame, weights.length, this.state.daysInFrame, graphPixelsWidth);
         //Line graph
         weights.map((weight, i) => {
             let currDate = moment(dates[i]);
@@ -98,7 +97,7 @@ export default class WeightGraph extends Component {
             } else {
                 currLeft = graphPixelsWidth * dayPercent * i;
             }
-
+            console.log(dayMod * graphPixelsWidth * dayPercent - 1)
             canvas.fillRect(currLeft, 0, dayMod * graphPixelsWidth * dayPercent - 1, graphPixelsHeight);
 
             //Only draw lines for weights added by user or projected into future
@@ -783,7 +782,7 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} width={canvasWidth} height={canvasHeight}></canvas>
+                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth + 'px', height: canvasHeight + 'px'}} width={canvasWidth} height={canvasHeight}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
                     </div>
