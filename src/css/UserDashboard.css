@@ -371,7 +371,7 @@ body {
 }
 #graph-sidebar{
 	position: absolute;
-	top: 4.5vh;
+	top: 0;
 	left: 0;
 	height: 54vh;
 	background: rgba(255,255,255,0.85);
