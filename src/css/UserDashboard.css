@@ -277,6 +277,7 @@ body {
 }
 #dates-container{
 	position: relative;
+	top: 0;
 	height: 4.5vh;
 	display: flex;
 	flex-direction: row;
@@ -371,7 +372,7 @@ body {
 }
 #graph-sidebar{
 	position: absolute;
-	top: 0;
+	top: 4.5vh;
 	left: 0;
 	height: 54vh;
 	background: rgba(255,255,255,0.85);
