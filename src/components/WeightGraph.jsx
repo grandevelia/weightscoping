@@ -453,6 +453,10 @@ export default class WeightGraph extends Component {
             this.setState({lineX: lineX, lineY: lineY, hoverIndex: weightIndex});
         }
     }
+    updateSetting(e, key, val){
+        e.preventDefault();
+        this.props.updateUserSettings(key, val);
+    }
     render(){
         let user = this.props.user;
         
@@ -496,14 +500,14 @@ export default class WeightGraph extends Component {
                             user.mode === "1" ?
                                 <div className='mode-switch'>
                                     <div className='mode-indicator'>Mode: Maintenance</div>
-                                    <div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "0")}>Switch to Weight Loss Mode</div>
+                                    <div className='mode-switch-button' onClick={(e) => this.updateSettings(e, "mode", "0")}>Switch to Weight Loss</div>
                                 </div>
                             : 
                                 <div className='mode-switch'>
                                     <div className='mode-indicator'>Mode: Weight Loss</div>
                                     {
                                         weights[weights.length - 1] <= user.ideal_weight_kg ?
-                                            <div className='mode-switch-button' onClick={() => this.props.updateUserSettings("mode", "1")}>Switch to Maintenance</div>
+                                            <div className='mode-switch-button' onClick={(e) => this.updateSettings(e, "mode", "1")}>Switch to Maintenance</div>
                                         :
                                              null
                                     }
@@ -779,7 +783,7 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth}} width={canvasWidth} height={canvasHeight}></canvas>
+                        <canvas id='line-graph-display' ref={this.canvas} width={canvasWidth} height={canvasHeight}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
                     </div>
