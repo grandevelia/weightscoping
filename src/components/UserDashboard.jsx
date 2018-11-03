@@ -109,6 +109,7 @@ class UserDashboard extends Component {
 						startingIndex={newStartingIndex} 
 						updateWeight={this.props.updateWeight} 
 						addWeight={(weightKg, date) => this.props.addWeight(weightKg, date)}
+						updateUserSettings={this.props.updateUserSettings}
 					/>
 				}
 				<div id='status-bar'>

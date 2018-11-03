@@ -97,7 +97,6 @@ export default class WeightGraph extends Component {
             } else {
                 currLeft = graphPixelsWidth * dayPercent * i;
             }
-            console.log(dayMod * graphPixelsWidth * dayPercent - 1)
             canvas.fillRect(currLeft, 0, dayMod * graphPixelsWidth * dayPercent - 1, graphPixelsHeight);
 
             //Only draw lines for weights added by user or projected into future
@@ -452,7 +451,7 @@ export default class WeightGraph extends Component {
             this.setState({lineX: lineX, lineY: lineY, hoverIndex: weightIndex});
         }
     }
-    updateSetting(e, key, val){
+    updateSettings(e, key, val){
         e.preventDefault();
         this.props.updateUserSettings(key, val);
     }
@@ -711,7 +710,7 @@ export default class WeightGraph extends Component {
                                                         }
                                                         return (
                                                             <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data ' + onMonth : weightOk === true ? 'avg-section weight-ok ' + onMonth : 'avg-section weight-not-ok ' + onMonth }> 
-                                                                    {pxPerDay > 15 ? weightString : null}
+                                                                    {pxPerDay > 30 ? weightString : null}
                                                             </div>
                                                         )
                                                     })
