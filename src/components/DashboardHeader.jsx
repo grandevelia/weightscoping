@@ -35,18 +35,18 @@ class DashboardHeader extends Component {
             return null;
         });
         return (
-            <div id='dashboard-nav-links'>
+            <div id='nav-links'>
                 <div className='nav-wrapper'>
                     <Link to="/" className="navbar-link" id='home-link'>Reductiscope</Link>
                 </div>
                 <div className='nav-wrapper'>
-                    <Link to="/Home/Plans" className="navbar-link" id='plan-link'>{user ? "Plan: \"" + planTitles[user.payment_option-1] + "\"" : null}</Link>
+                    <Link to="/Plans" className="navbar-link" id='plan-link'>{user ? "Plan: \"" + planTitles[user.payment_option-1] + "\"" : null}</Link>
                 </div>
                 <div className='nav-wrapper'>
-                    <Link to="/Home/FAQ" className="navbar-link" id='faq-link'>FAQ</Link>
+                    <Link to="/FAQ" className="navbar-link" id='faq-link'>FAQ</Link>
                 </div>
                 <div className='nav-wrapper'>
-                    <Link to="/Home/About" className="navbar-link" id='about-link'>About</Link>
+                    <Link to="/About" className="navbar-link" id='about-link'>About</Link>
                 </div>
                 <div className='nav-wrapper'></div>
                 <div className='nav-wrapper'></div>

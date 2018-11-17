@@ -1,104 +1,11 @@
 * {
   box-sizing: border-box;
 }
-.top-wrap{
-  text-align: center;
-  padding-top: 2.5%;
-  background-color: #222 !important;
-}
-.app-logo{
-  height: 80px;
-}
-.app-header{
-  background-color: rgba(0,0,0,0);
-  padding: 0 1.25% 1.25% 1.25%;
-  color: white;
-  position: relative;
-}
-.app-title{
-  font-size: 1.5em;
-}
-.app-intro{
-  font-size: large;
-}
-.intro-nav{
-  margin-top: 2.5%;
-  display: block;
-  color: black;
-}
-.back{
-  margin-top: 0.75%;
-  font-size: 0.8em;
-}
-.intro-nav:hover{
-  cursor: pointer;
-  color: rgb(178, 27, 198);
-}
-#main-area{
+#content{
+	min-height: 85vh;
+	height: 100%;
   display: flex;
-  flex-direction: row;
   align-items: stretch;
-  min-height: 75vh;
-}
-#main-area > div:nth-of-type(2){
-  flex: 1;
-}
-#navigation-area{
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  width: 4rem;
-  flex-shrink: 1;
-}
-#nav-container{
-  display: flex;
-  justify-content: space-between;
   flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-.nav-item{
-  height: 1.5rem;
-  line-height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-  border: 0.1rem solid rgb(0,0,0);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8em;
-}
-#page-area{
-  flex: 1;
-  display: flex;
-}
-.complete{
-  border-color: rgb(27, 228, 158);
-}
-.complete a{
-  color: rgb(27, 228, 158) !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.current{
-  color: rgb(27, 158, 228);
-  border-color: rgb(27, 158, 228);
-}
-.incomplete{
-  color: rgba(0,0,0,0.4);
-  border-color: rgba(0,0,0,0.4);
-}
-.complete:hover{
-  cursor: pointer;
-  color: black;
-}
-.complete a{
-  position: absolute;
-  background-color: rgba(0,0,0,0);
-  width: 100%;
-  height: 100%;
+  text-align: center;
 }

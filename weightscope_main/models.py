@@ -74,6 +74,7 @@ class Profile(AbstractUser):
 		choices=MODE_CHOICES,
 		default='0'
 	)
+	
 	REQUIRED_FIELDS=[]
 
 	def get_username(self):

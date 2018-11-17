@@ -28,7 +28,7 @@ EMAIL_HOST_PASSWORD = 'F4!lr0ck3Ts'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'reductiscope.com', '127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'weightscope.com', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework.authtoken',
     'webpack_loader',
-    'weightscope_main.apps.WeightscopeMainConfig',
+    'weightscope_main.apps.weightscopeMainConfig',
     'rest_framework',
     'knox',
 ]

@@ -11,7 +11,7 @@ def send_email(data):
     c = merge_two_dicts(c, data)
 
     subject = data['email_subject']
-    from_email = "no-reply@weightscoping.com"
+    from_email = "no-reply@reductiscope.com"
     to_email = data['email']
 
     msg_txt = render_to_string(BASE + "/templates/" + data['email_path'] + ".txt", c)

@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const iconPaths = ["BreadIcon", "PastaIcon", "PotatoIcon", "DessertIcon", require('../images/soft_drink.png'), require('../images/snack_carb.png'), "CerealIcon", require('../images/hard_alcohol.png'), require('../images/soft_alcohol.png')];
+export const iconPaths = ["BreadIcon", require('../images/pasta.png'), "PotatoIcon", "DessertIcon", require('../images/soft_drink.png'), require('../images/snack_carb.png'), "CerealIcon", require('../images/hard_alcohol.png'), require('../images/soft_alcohol.png')];
 export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
 export const iconIndex = ["breads","pasta","potatoes","dessert","soft-drinks","snack-carbs","cereals","hard-alcohol","soft-alcohol"];
 export const carbOrder = [5,0,4,1,6,2,3,7,8];

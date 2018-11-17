@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 
 const optionTarget = {
   drop(props, monitor) {
-    //console.log(props);
     props.moveOption(monitor.getItem().optionId, props.id);
   }
 };

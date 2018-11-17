@@ -25,6 +25,7 @@ export default function auth(state=initialState, action){
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 
 		case 'CONFIRMATION_SUCCESSFUL':
+			console.log(action.data)
 			localStorage.setItem("token", action.data.token);
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 
@@ -48,7 +49,11 @@ export default function auth(state=initialState, action){
 			localStorage.setItem("token", action.data.token);
     		return {...state, userConfirmed: false, email:action.data.email, confirmationSent:true, isAuthenticated: true};
 
-    	case 'REGISTRATION_ERROR':
+		case 'REGISTRATION_ERROR':
+			let errorKey = Object.keys(action.data)[0];
+			if (errorKey === 'email'){
+				action.data['email'] = "That email is already being used"
+			}
     		return {...state, errors: action.data, token:null, user:null, isAuthenticated:false, isLoading: false}
 
 		case 'REGISTRATION_FAILED':

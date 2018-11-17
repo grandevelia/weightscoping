@@ -1,12 +1,16 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-import '../css/SignupOption.css';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+
+import { connect } from 'react-redux';
+import { auth } from "../actions";
+
+import '../css/Intro.css';
 import { idealWeightString } from './utils';
 
-export default class SignupOption extends Component {
+class SignupOption extends Component {
 	render(){
 		let paymentOption = this.props.paymentOption;
-		let currency = "$";
+		let currency = "S";
 		let optionHeader;
 		let optionText;
 		let paymentModifier;
@@ -31,7 +35,7 @@ export default class SignupOption extends Component {
 		return (
 			<div id='option-page'>
 				<div id='payment-stem'>
-					Living at {idealWeightString(this.props.weightUnits, this.props.heightUnits, this.props.sex, 0, this.props.heightInches)} is worth {currency}<input onChange={(e) => this.props.updateIntroState({idealWeightValue:e.target.value})} type='number' value={this.props.idealWeightValue} /> to you.
+					Living at {idealWeightString(this.props.weightUnits, this.props.heightUnits, this.props.sex, 0, this.props.heightInches)} is worth {currency}<input onChange={(e) => this.props.updateUserSettings({idealWeightValue:e.target.value})} type='number' value={this.props.idealWeightValue} /> to you.
 				</div>
 				<div id='payment-system-info'>
 					<h4>You can change your plan, and payment amount, at any time.</h4>
@@ -50,3 +54,20 @@ export default class SignupOption extends Component {
 		)
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		auth: state.auth,
+		errors: state.auth.errors
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		updateUserSettings: (key, val) => {
+			return dispatch(auth.updateUserSettings(key, val));
+		}
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignupOption);

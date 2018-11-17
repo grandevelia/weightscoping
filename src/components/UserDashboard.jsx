@@ -81,7 +81,7 @@ class UserDashboard extends Component {
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-		
+		console.log(user)
 		return (
 			<div id='dashboard-wrap'>
 				{user.amount_paid < totalOwed ? 

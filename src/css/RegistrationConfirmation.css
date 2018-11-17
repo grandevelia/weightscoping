@@ -1,3 +1,9 @@
+#confirmation-wrap{
+	width: calc(100% - 4rem);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 #registration-confirmed{
 	display: flex;
 	flex-direction: column;

@@ -1,5 +1,5 @@
 """
-WSGI config for weightscope project.
+WSGI config for reductiscope project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

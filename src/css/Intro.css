@@ -1,0 +1,586 @@
+#intro-wrap{
+	text-align: center;
+	width: calc(100% - 4rem);
+	display: flex;
+	justify-content: center;
+
+}
+#main-area{
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+}
+.intro-nav{
+	margin-top: 2.5%;
+	display: block;
+	color: black;
+  }
+  .back{
+	margin-top: 0.75%;
+	font-size: 0.8em;
+  }
+  .intro-nav:hover{
+	cursor: pointer;
+	color: rgb(178, 27, 198);
+  }
+/*** Side Navigator ***/
+#navigation-area{
+	flex-basis: 5%;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-direction: column;
+}
+.nav-item{
+	height: 1.5rem;
+	line-height: 1.5rem;
+	width: 1.5rem;
+	border-radius: 50%;
+	border: 0.1rem solid rgb(0,0,0);
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8em;
+}
+.complete{
+	border-color: rgb(27, 228, 158);
+}
+.complete .fa{
+	color: rgb(27, 228, 158) !important;
+}
+.current{
+	color: rgb(27, 158, 228);
+	border-color: rgb(27, 158, 228);
+}
+.incomplete{
+	color: rgba(0,0,0,0.4);
+	border-color: rgba(0,0,0,0.4);
+}
+.complete:hover{
+	cursor: pointer;
+	color: black;
+}
+/*** Alcohol Page ***/
+#alcohol-page{
+	padding: 2.5%;
+}
+#alcohol-prompt{
+	font-size: 1.5em;
+	font-weight: bold;
+	color: rgba(0,0,0,0.6);
+	margin-bottom: 2.5%;
+}
+#button-area{
+	display: flex;
+	flex-direction: row;
+}
+.alcohol-button{
+	padding: 1.25% 2.5%;
+	color: white;
+	flex: 1;
+}
+.alcohol-button:hover{
+	cursor: pointer;
+}
+#alcohol-yes{
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 100%);
+	transition: ease-in-out 0.125s;
+	margin-right: 1.25%;
+}
+#alcohol-yes:hover{
+	background-color: rgb(27, 152, 202);
+}
+#alcohol-no{
+	background-color: rgb(245,37,26);
+	margin-left: 1.25%;
+}
+/*** Carb Ranking ***/
+#drag-and-drop-hint{
+	margin-bottom: 2.5%;
+}
+#interaction-area{
+	display: flex;
+	justify-content: space-around;
+	padding-bottom: 2.5%;
+}
+#carb-places{
+	display: flex;
+	flex-direction: column;
+	flex-basis: 60%;
+}
+.target-area{
+	margin: 0.25rem;
+	display: flex;
+	height: 2.75rem;
+	position: relative;
+	align-items: stretch;
+}
+.target-area span{
+	position: relative;
+	display: flex;
+	margin: 0 2.5% 0 0;
+  	justify-content: center;
+  	flex-direction: column;
+ 	text-align: center;
+}
+.selection-number{
+	text-align: left;
+	margin-left: 0.25%;
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.3);
+	position: relative;
+	display: flex;
+	flex: 1;
+}
+.carb-option{
+	text-align: center;
+	padding: 0.75rem;
+	margin: 0.25rem;
+	box-shadow: 0px 0px 1px rgba(0,0,0,0.3);
+}
+.carb-option:hover{
+	cursor: grab;
+}
+.carb-option:hover:active{
+	cursor: grabbing;
+}
+.target-hover-child{
+    opacity: 0.5;
+    border: 2px solid rgba(37, 250, 67);
+}
+.selected-option{
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: flex;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	flex-direction: column;
+	text-align: center;
+}
+
+/***** Sign up and Payment *****/
+#signup-area{
+	text-align: center;
+}
+#signup-form{
+	display: flex;
+	flex-direction: column;
+}
+#signup-area input{
+	height: 2rem;
+	margin-bottom: 1.25%;
+}
+#signup-area button{
+	border: none;
+	height: 2rem;
+	margin-bottom: 1.25%;
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 110%);
+	transition: ease-in-out 0.125s;
+	color: white;
+}
+#signup-area button:hover{
+	cursor: pointer;
+	background-color: rgb(27, 152, 202);
+}
+#payment-area{
+	display: flex;
+	flex-direction: column;
+	padding: 2.5%;
+	align-items: center;
+}
+#option-area{
+	display: flex;
+	text-align: center;
+	justify-content: space-between;
+}
+#payment-explanation{
+	text-align: center;
+	margin-bottom: 2.5%;
+}
+.payment-option{
+	display: flex;
+	flex-direction: column;
+	flex-basis: 30%;
+	margin: 1.25%;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+	padding: 2.5%;
+	text-align: center;
+}
+.payment-option > *{
+	margin: 1rem 0;
+}
+.option-header{
+	font-weight: bold;
+	margin-bottom: 5%;
+	font-size: 1.125em;
+}
+.option-text{
+	margin-bottom: 5%;
+	flex: 1;
+}
+.option-select{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 0.9em;
+	color: white;
+	background-color: rgb(57, 192, 228);
+	background: linear-gradient(to bottom left, rgba(23, 204, 253, 0.9), rgba(9, 123, 245, 0.9) 110%);
+	transition: ease-in-out 0.125s;
+	padding: 5% 1rem;
+	width: 100% !important;
+	color: white;
+}
+.option-select:hover{
+	cursor: pointer;
+	background-color: rgb(27, 152, 202) !important;
+}
+/***Confirmation Area****/
+#confirmation-area{
+	position: relative;
+	text-align: center;
+}
+#account-confirmation{
+	display: flex;
+	flex-direction: column;
+	width: 37.5%;
+	min-width: 12.5rem;
+	height: 100%;
+	margin: auto;
+	justify-content: space-between;
+	box-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+	background-color: rgb(172, 255, 198);
+	border: 10px solid rgba(0,0,0,0.175);
+	padding: 3%;
+	margin-top: 2.5%;
+	border-radius: 10px;
+	font-weight: bold;
+}
+#registration-title{
+	font-size: 1.25em;
+	text-align: center;
+	margin-bottom: 2.5%;
+}
+#check-area{
+	flex-basis: 70%;
+	flex: 1;
+	min-height: 9rem;
+	margin-bottom: 2.5%;
+	display: flex;
+	justify-content: center;
+	align-items: center; 
+}
+#confirmation-info{
+	font-size: 0.825em;
+	margin-bottom: 2.5%;
+	flex-basis: 15%;
+	color: rgb(33, 188, 85);
+}
+/***Confirmation Check****/
+#check-outer-wrap{
+	height: 8.5rem;
+	width: 8.5rem;
+	display: inline-block;
+	position: relative;
+	font-size: 6rem;
+	color: rgb(53, 198, 125);
+}
+#halfclip {
+	width: 50%;
+	height: 100%;
+	right: 0px;
+	position: absolute;
+	overflow: hidden;
+	transform-origin: left center;
+	transform: rotate(20deg);
+	animation: cliprotate 0.125s steps(1, end) 1 forwards;
+	-webkit-animation:cliprotate 0.125s steps(1, end) 1 forwards;
+}
+.halfcircle{
+	height: 100%;
+	border-radius: 50%;
+	border: solid 0.75rem transparent;
+	border-top-color: rgb(53, 198, 125);;
+	border-left-color: rgb(53, 198, 125);;
+	position: absolute;
+	right: 0px;
+}
+#clipped{
+	width: 200%;
+	animation: rotate 0.125s linear 2 forwards;
+	-webkit-animation:rotate 0.125s linear 2 forwards;
+}
+#fixed{
+	width: 100%;
+  	transform: rotate(195deg);
+	display:inline-block;
+  	animation: showfixed 0.25s steps(2) 1;
+    -webkit-animation:showfixed 0.25s linear 1;
+}
+.feedback{
+	padding: 1.25% 0;
+	margin: 0.5% 0;
+	color: rgba(255, 0, 25, 0.75);
+	font-weight: bold;
+}
+@-webkit-keyframes rotate {
+	 0% {transform: rotate(15deg);}
+ 	100% {transform: rotate(135deg);}
+}
+@keyframes rotate {
+ 	0% {transform: rotate(15deg);}
+ 	100% {transform: rotate(135deg);}
+}
+@-webkit-keyframes cliprotate {
+ 	0% {transform: rotate(60deg);}
+ 	100% {transform: rotate(240deg);}
+}
+@keyframes cliprotate {
+ 	0% {transform: rotate(60deg);}
+ 	100% {transform: rotate(240deg);}
+}
+@-webkit-keyframes showfixed {
+ 	0% {opacity: 0;}
+ 	49.9% {opacity: 0;}
+ 	50% {opacity: 1;}
+	100% {opacity: 1;}
+}
+.fa-check{
+	position: absolute;
+	top: 55%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+/*** User Info Page ***/
+#user-info-wrap{
+	width: 60%;
+}
+#user-info-form{
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+#user-info-form p{
+	display: flex;
+	justify-content: space-between;
+	margin: 1.25% 0;
+	min-height: 2rem;
+	align-items: center;
+}
+#user-info-wrap select{
+	width: 30%;
+}
+#biological-sex span#sex-button-area{
+	flex-basis: 40%;
+	display: flex;
+	justify-content: space-between;
+}
+#biological-sex span#sex-title{
+	flex-basis: 50%;
+	text-align: left;
+}
+#biological-sex input{
+	display: none;
+}
+#biological-sex label{
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background-color: rgb(26,37,245);
+	height: 2rem;
+	flex: 1;
+	color: white;
+	text-align: center;
+	font-size: 0.8em;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+#sex-female+label{
+	margin-right: 0.5%;
+}
+#sex-male+label{
+	margin-left: 0.625%;
+	margin-right: 0.5%;
+}
+#sex-other+label{
+	margin-left: 0.5%;
+}
+#biological-sex label:hover{
+	cursor: pointer;
+	background-color: rgb(16,27,205);
+}
+#sex-about{
+	height: 0.5rem !important;
+	font-size: 0.6em;
+	margin: 0 0 2.5% 0;
+	text-align: right;
+}
+#sex-about:hover{
+	cursor: pointer;
+}
+#sex-about-lightbox{
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
+	background-color: rgb(40,40,40);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	line-height: 1.5em;
+	width: 70%;
+	z-index: 99;
+	padding: 2.5% 5%;
+}
+#sex-about-lightbox p{
+	margin: 2.5%;
+}
+#close-sex-about{
+	position: absolute;
+	top: 1.25%;
+	right: 1.25%;
+}
+#close-sex-about:hover{
+	cursor: pointer;
+	color: red;
+}
+input:checked+label{
+	box-shadow: 0px 0px 2px 2px rgb(87,187,240) !important;
+}
+#height-title{
+	text-align: left;
+	flex-basis: 70%;
+}
+#height span#height-buttons{
+	flex-basis: 30%;
+	width: 30%;
+	justify-content: space-between;
+	display: flex;
+	height: 2rem;
+}
+#height input{
+	box-shadow: 0 1px 2px 1px rgba(0,0,0,0.3);
+	border: none;
+	outline: none;
+	width: 45%;
+}
+#height input#metric{
+	width: 100%;
+}
+#weight-area{
+	margin: 2.5% 0;
+}
+
+/*** Initial Weight Page ***/
+#initial-weight-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+#initial-weight-wrap .page-title{
+	text-align: justify;
+	width: 60%;
+}
+#initial-weight{
+	display: flex;
+	justify-content: space-between;
+}
+#initial-weight-title{
+	text-align: left;
+	height: 2rem;
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+#initial-weight-buttons{
+	flex-basis: 50%;
+	justify-content: space-between;
+	display: flex;
+	height: 2rem;
+}
+#initial-weight input{
+	box-shadow: 0 1px 2px 1px rgba(0,0,0,0.3);
+	border: none;
+	outline: none;
+	height: 2rem;
+  	flex: 1 1 auto;
+  	margin: 0 5px 5px 5px;
+}
+#initial-weight input#metric{
+	width: 100%;
+}
+.stage{
+	margin: 1.25% 0;
+	padding: 1.25%;
+	text-align: justify;
+	box-shadow: 0 0 1px rgba(0,0,0,0.6);
+}
+.stage-title{
+	font-weight: bold;
+	font-size: 1.125em;
+}
+.stage-description{
+	display: flex;
+	flex-direction: row;
+}
+.section{
+	flex: 1;
+	padding: 2.5% 2.5% 1.25% 2.5%;
+	display: flex;
+	flex-direction: column;
+}
+.section-header{
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 2.5%;
+}
+
+/*** Signup Options ***/
+#option-page{
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	width: 60%;
+	margin: auto;
+	padding: 2.5%;
+}
+#payment-stem input{
+	width: 5rem;
+	border: none;
+	outline: none;
+	height: 1.25rem;
+	box-shadow: 0 0px 1px 1px rgba(0,0,0,0.3);
+}
+#payment-system-info{
+	padding: 0 2.5% 0% 2.5%;
+	font-size: 0.85em;
+}
+#payment-info-area{
+	width: 50%;
+	margin: auto;
+}
+.payment-amount{
+	font-size: 0.85em;
+	margin-bottom: 2.5%;
+}
+#no-payment{
+	box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+	background-color: rgb(57, 198, 78);
+	color: white;
+	height: 2rem;
+	line-height: 2rem;
+	margin: 2.5% auto;
+	font-size: 0.8em;
+	width: 75%;
+}
+#no-payment:hover{
+	cursor: pointer;
+	background-color: rgb(27, 158, 48);
+}

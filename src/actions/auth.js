@@ -4,7 +4,7 @@ export const confirmRegistration = (email, activation_key) => {
 			"Content-Type": "application/json"
     	};
     	let body = JSON.stringify({email, activation_key});
-    	return fetch ("/api/auth/confirm/", {headers, body, method: "POST"})
+    	return fetch ("/api/auth/confirm-registration/", {headers, body, method: "POST"})
     	.then(res => {
     		if (res.status < 500){
     			return res.json().then(data => {
@@ -39,7 +39,7 @@ export const loadUser = () => {
 		if (token) {
 			headers["Authorization"] = "Token " + token; 
 		}
-		return fetch("/api/auth/user/", {headers, })
+		return fetch("/api/auth/get-user/", {headers, })
 		.then(res => {
 			if (res.status < 500){
 				return res.json().then(data => {
@@ -55,7 +55,6 @@ export const loadUser = () => {
 				return res.data;
 			} else if (res.status >= 400 && res.status < 500){
 				dispatch({type:'AUTHENTICATION_ERROR', data:res.data});
-				//throw res.data;
 			}
 		})
 	}
@@ -97,8 +96,11 @@ export const register = (email, password, alcohol, carb_ranks, weight_units, hei
 		let headers = {
 			"Content-Type": "application/json"
 		};
+		//return fetch("/api/auth/admin-delete/", {headers, method: "POST"})
 		monetary_value = Math.round(parseInt(monetary_value*100,10));
-		let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
+		//let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
+		let body = JSON.stringify({"email":"test@test.com","weight_kg":90.7184,"password":"test","alcohol":"true","carb_ranks":[3,8,7,4,1,6,5,0,2],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":0,"sex":"male"})
+
 		return fetch("/api/auth/register/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
@@ -178,7 +180,7 @@ export const updateUserSettings = (key, value) => {
 		}
 		let settings = {[key] : value};
 		let body = JSON.stringify(settings);
-		return fetch ("/api/auth/update_user/", {headers, body, method: "PUT"})
+		return fetch ("/api/auth/update-user/", {headers, body, method: "PATCH"})
 		 .then(res => {
 			if (res.status < 500) {
 				return res.json().then(data => {
@@ -203,7 +205,7 @@ export const resetPassword = (email) => {
 	return dispatch => {
 		let headers = {"Content-Type": "application/json"};
 		let body = JSON.stringify(email);
-		return fetch ("/api/auth/reset_password/", {headers, body, method: "POST"})
+		return fetch ("/api/auth/forgot-password/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
 				return res.json().then(data => {
@@ -228,7 +230,7 @@ export const confirmReset = (email, key) => {
 	return dispatch => {
 		let headers = {"Content-Type": "application/json"};
 		let body = JSON.stringify({email, key});
-		return fetch ("/api/auth/confirm_reset/", {headers, body, method: "POST"})
+		return fetch ("/api/auth/confirm-password-reset/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
 				return res.json().then(data => {
@@ -253,7 +255,7 @@ export const updatePassword = (email, key, password) => {
 	return dispatch => {
 		let headers = {"Content-Type": "application/json"};
 		let body = JSON.stringify({"email":email, "key":key, "password":password });
-		return fetch ("/api/auth/update_password/", {headers, body, method: "POST"})
+		return fetch ("/api/auth/update-password/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
 				return res.json().then(data => {

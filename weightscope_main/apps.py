@@ -4,5 +4,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class WeightscopeMainConfig(AppConfig):
+class weightscopeMainConfig(AppConfig):
     name = 'weightscope_main'

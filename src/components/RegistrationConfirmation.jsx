@@ -16,7 +16,7 @@ class RegistrationConfirmation extends Component {
 			{this.props.auth.userConfirmed? 
 				<div id='registration-confirmed'>
 					<div id='confirmation-title'>You're all set!</div>
-					<Link to='/Home/UserDashboard' className='intro-nav'>Go To Your Dashboard</Link>
+					<Link to='/UserDashboard' className='intro-nav'>Go To Your Dashboard</Link>
 				</div>
 				: this.props.auth.errors && this.props.auth.errors.length > 0 ? 
 					<div className='feedback'>

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Navbar from './Navbar';
-import { logo } from '../css/images/logo.svg'
 import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { auth } from "../actions";
@@ -22,21 +20,14 @@ class Login extends Component {
 		}
 		let showErrors = false;
 		if (this.props.errors['non_field_errors'] || this.props.errors['email'] || this.props.errors['password']){
-			console.log(this.props.errors['non_field_errors'], this.props.errors['email'], this.props.errors['password'])
 			showErrors = true;
 		}
 		return (
-			<div className='content'>
+			<div>
 				<style>
 					@import url('https://fonts.googleapis.com/css?family=Raleway');
 				</style>
-				<div className="top-wrap">
-					<Navbar></Navbar>
-					<header className="app-header">
-			          <img src={logo} className="app-logo" alt="logo" />
-			          <h1 className="app-title">Your Love of Food Can Make You Thin</h1>
-			        </header>
-			    </div>
+				
 				<div id='main-area'>
 					<div id='login-wrap'>
 						<form id='login-form' onSubmit={this.onSubmit}>
