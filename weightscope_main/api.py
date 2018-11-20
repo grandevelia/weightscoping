@@ -18,21 +18,18 @@ import hashlib, random, datetime, unicodedata
 class UserAPI(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
 	action_serializers = {
-		'get-user': UserSerializer,
 		'register' : CreateUserSerializer,
 		'login' : LoginUserSerializer
 	}
 	def get_serializer_class(self):
-		print(self.action)
 		if hasattr(self, 'action_serializers'):
 			if self.action in self.action_serializers:
 				return self.action_serializers[self.action]
 				
 		return super(UserAPI, self).get_serializer_class()
-		
+
 	@action(detail=False, methods=['post'], url_path='delete-all', url_name='delete_all')
 	def delete_all(self, request, *args, **kwargs):
-		print("It's happening")
 		Profile.objects.all().delete()
 		return Response({
 			"status": True
@@ -78,8 +75,6 @@ class UserAPI(viewsets.ModelViewSet):
 
 	@action(detail=True, methods=['post'], url_path='login', url_name='login')
 	def login(self, request, *args, **kwargs):
-		print(self.action)
-		print("API logging in")
 		serializer = self.get_serializer(data=request.data)
 		test = serializer.is_valid(raise_exception=True)
 		user = serializer.validated_data
@@ -129,10 +124,15 @@ class UserAPI(viewsets.ModelViewSet):
 			"user": UserSerializer(user, context=self.get_serializer_context()).data
 		})
 
-	@action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='get-user', url_name='get_object')
 	def get_object(self):
-		print("API getting user")
 		return self.request.user
+
+class RetrieveUserAPI(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 class WeightViewSet(viewsets.ModelViewSet):
 	permission_classes = [permissions.IsAuthenticated, ]
@@ -143,9 +143,6 @@ class WeightViewSet(viewsets.ModelViewSet):
 
 	def create(self, request):
 		data = request.data
-		#date = unicodedata.normalize('NFKD', data['date_added']).encode('ascii','ignore')
-		
-		#data['date_added'] = date
 		data['user'] = request.user.id
 		serializer = self.get_serializer(data=data)
 		serializer.is_valid()

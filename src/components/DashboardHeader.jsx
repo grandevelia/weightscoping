@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { auth, notifications } from "../actions";
 import { Link } from 'react-router-dom';
 import NotificationLightbox from './NotificationLightbox';
-import '../css/DashboardHeader.css';
 
 let planTitles = ["Classic","Slow Burn", "I Need More Proof"];
 class DashboardHeader extends Component {
@@ -109,6 +108,8 @@ class DashboardHeader extends Component {
                         <NotificationLightbox closeNotification={() => this.closeNotification()} content={this.state.notificationLightbox} />
                     : null
                 }
+
+                <div className='nav-wrapper'></div>
             </div>
         )
     }

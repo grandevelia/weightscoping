@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-let icons={"alcohol":"beer","carbs":"birthday-cake","info":"clipboard","initialWeight":"balance-scale","initialValue":"envelope","plan":"check"};
+let icons={"alcohol":"beer","carbs":"birthday-cake","info":"clipboard","initialWeight":"balance-scale","signup":"envelope","initialValue":"check","plans":"bars"};
 export default class NavItem extends Component {
 	render(){
 		return (

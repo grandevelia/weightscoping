@@ -4,8 +4,7 @@ import CarbsPage from './CarbsPage';
 import UserInfoPage from './UserInfoPage.jsx';
 import InitialWeightPage from './InitialWeightPage';
 import InitialValuePage from './InitialValuePage';
-import PlansPage from './PlansPage';
-import InitialCommitPage from './InitialCommitPage';
+import IntroPlansPage from './IntroPlansPage';
 import SignupPage from './SignupPage';
 import NavItem from './SideNav';
 import '../css/Intro.css';
@@ -21,8 +20,7 @@ export default class Intro extends Component{
 		idealWeightKg: null,
 		initialWeight: null,
 		initialValue: null,
-		plan: null,
-		confirmPayment: false
+		plan: null
 	}
 	updateIntroState(newState){
 		if ('alcohol' in newState && newState.alcohol !== null){
@@ -54,14 +52,13 @@ export default class Intro extends Component{
 		return(
 			<div id='main-area'>
 				<div id='navigation-area'>
-					<NavItem fillWith="alcohol" onClick={() => this.updateIntroState({alcohol: null})}  icon={0} active={this.state.alcohol !== null}/>
-					<NavItem fillWith="carbs" onClick={() => this.updateIntroState({carbRanks: [null, null, null, null, null, null, null, null, null]})}  icon={1} active={this.state.carbRanks.indexOf(null) < 0}/>
-					<NavItem fillWith="info" onClick={() => this.updateIntroState({sex: null})}  icon={2} active={this.state.sex !== null && this.state.height !== null && this.state.weightUnits !== '' && this.state.heightUnits !== ''}/>
-					<NavItem fillWith="initialWeight" onClick={() => this.updateIntroState({initialWeight: null})} icon={3} active={this.state.initialWeight !== null}/>
-					<NavItem fillWith="initialValue" onClick={() => this.updateIntroState({initialValue: null})}  icon={4} active={this.state.initialValue !== null}/>
-					<NavItem fillWith="plan" onClick={() => this.updateIntroState({plan: null})} icon={5} active={this.state.plan !== null}/>
-					<NavItem fillWith="commit" onClick={() => this.updateIntroState({commit: null})} icon={6} active={this.state.confirmPayment !== false}/>
-					<NavItem fillWith="signup" icon={7} active={false}/>
+					<NavItem fillWith="alcohol" onClick={() => this.updateIntroState({alcohol: null})} active={this.state.alcohol !== null}/>
+					<NavItem fillWith="carbs" onClick={() => this.updateIntroState({carbRanks: [null, null, null, null, null, null, null, null, null]})} active={this.state.carbRanks.indexOf(null) < 0}/>
+					<NavItem fillWith="info" onClick={() => this.updateIntroState({sex: null})} active={this.state.sex !== null && this.state.height !== null && this.state.weightUnits !== '' && this.state.heightUnits !== ''}/>
+					<NavItem fillWith="initialWeight" onClick={() => this.updateIntroState({initialWeight: null})} active={this.state.initialWeight !== null}/>
+					<NavItem fillWith="initialValue" onClick={() => this.updateIntroState({initialValue: null})} active={this.state.initialValue !== null}/>
+					<NavItem fillWith="plans" onClick={() => this.updateIntroState({plan: null})} active={this.state.plan !== null}/>
+					<NavItem fillWith="signup" active={false}/>
 				</div>
 				<div id='intro-wrap'>
 					{
@@ -76,9 +73,7 @@ export default class Intro extends Component{
 						: this.state.initialValue === null ?
 							<InitialValuePage {...this.state} updateIntroState={(newState) => this.updateIntroState(newState)}/>
 						: this.state.plan === null ?
-							<PlansPage {...this.state} updateIntroState={(newState) => this.updateIntroState(newState)}/>
-						: this.state.confirmPayment === false ?
-							<InitialCommitPage {...this.state} updateIntroState={(newState) => this.updateIntroState(newState)}/>
+							<IntroPlansPage {...this.state} updateIntroState={(newState) => this.updateIntroState(newState)}/>
 						:
 							<SignupPage {...this.state} updateIntroState={(newState) => this.updateIntroState(newState)}/>
 					}

@@ -23,7 +23,7 @@ class PlansPage extends Component {
                 <div id='other-plans'>
                     Other Options
                     {planTitles.map((title, i) => {
-                        if (i + 1 !== parseInt(user.payment_option,10) ){
+                        if (i + 1 !== parseInt(user.payment_option, 10) ){
                             return (
                                 <div key={i} className='payment-option'>
 									<div className='option-header'>"{planTitles[i]}"</div>    

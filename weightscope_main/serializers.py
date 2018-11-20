@@ -72,7 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
 		)
 
 	def check_activation(self, data):
-		print("Serializer Checking account activation")
 		time = timezone.now()
 		email = data['email']
 		activation_key = data['activation_key']
@@ -159,7 +158,6 @@ class LoginUserSerializer(serializers.Serializer):
 		model = Profile
 
 	def validate(self, data):
-		print("Serializer validating login credentials")
 		user = authenticate(**data)
 
 		if user:

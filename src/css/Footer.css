@@ -12,6 +12,7 @@
     align-items: center;
     text-align: center;
     transition: ease-in-out 0.125s;
+    text-decoration: none;
 }
 .footer-link:hover{
     cursor: pointer;

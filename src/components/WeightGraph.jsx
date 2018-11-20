@@ -370,11 +370,11 @@ export default class WeightGraph extends Component {
         let innerIndex = carbRanks[ carbOrder[ index ] ];
         if (allowed){
             return (
-                <div className='allowed-icon-wrap'>
+                <div className='icon-wrap'>
                     {
                         index !== 6 ? 
                             <div className='icon icon-allowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "15%", height: "75%"}} src={iconPaths[innerIndex]} alt=''/>
+                                <img src={iconPaths[innerIndex]} alt=''/>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
                         :
@@ -382,7 +382,7 @@ export default class WeightGraph extends Component {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
                                     <div key={j} className='icon icon-allowed'>
-                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "15%", height: "75%"}} src={iconPaths[innerIndex]} alt=''/>
+                                        <img src={iconPaths[innerIndex]} alt=''/>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
                                 )
@@ -392,11 +392,11 @@ export default class WeightGraph extends Component {
             );
         } else {
             return (
-                <div className='disallowed-icon-wrap'>
+                <div className='icon-wrap disallowed'>
                     {
                         index !== 6 ? 
-                            <div className='icon icon-disallowed'>
-                                <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
+                            <div className='icon'>
+                                <img src={iconPaths[innerIndex]} alt=''/>
                                 <div className='icon-cross'></div>
                                 <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                             </div>
@@ -404,8 +404,8 @@ export default class WeightGraph extends Component {
                             Array( carbRanks.length - index).fill().map( (x, j) => j + index).map(j => {
                                 innerIndex = carbRanks[ carbOrder[ j ] ];
                                 return (
-                                    <div key={j} className='icon icon-disallowed'>
-                                        <img style={{position: "absolute", left: "10%", color: "black", width: "80%", top: "10%", height: "80%"}} src={iconIndex[innerIndex]} alt=''/>
+                                    <div key={j} className='icon'>
+                                        <img src={iconPaths[innerIndex]} alt=''/>
 								        <div className='icon-cross'></div>
                                         <div className='icon-description'>{carbOptions[ innerIndex ]}</div>
                                     </div>
@@ -556,13 +556,6 @@ export default class WeightGraph extends Component {
 
         let daysInFrame = this.state.daysInFrame;
 
-        /*let canvasWidth = window.innerWidth * 0.975 * 0.975;
-        let canvasHeight = window.innerHeight * 0.9 * 0.3;
-
-        let pxPerDay = canvasWidth/daysInFrame;
-        if (weights.length > daysInFrame){
-            canvasWidth = pxPerDay * (weights.length + 1); //+1 to account for double width today
-        }*/
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
@@ -641,7 +634,7 @@ export default class WeightGraph extends Component {
                                 dates.map((date, i) => {
                                     let dateInfo = this.dateString(date, pxPerDay, i);
                                     return (
-                                        <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
+                                        <div key={i} style={dates[i] === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} } className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
                                             <div className='date-number-area'>{ dateInfo.dateString }</div>
                                             {
                                                 pxPerDay > 15 ?
@@ -749,22 +742,26 @@ export default class WeightGraph extends Component {
                                         } else if (user.weight_units === "Kilograms"){
                                             weightString = weightString.substring(0, weightString.length - 10);
                                         }
-                                        if (i < this.state.pastProjecting){
+                                        let currDate = moment(dates[i]);
+                                        
+                                        if (moment(this.props.dates[0]).isAfter(currDate)){
                                             return (
                                                 <form 
                                                     key={i} 
-                                                    className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} 
+                                                    className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'}
+                                                    style={{width: pxPerDay} }
                                                     onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}
                                                 >
                                                     <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
                                                     <input type='submit' className='weight-submit' />
                                                 </form>
                                             )
-                                        } else if (i < this.state.pastProjecting + this.props.weights.length){
+                                        } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
                                             return (
                                                 <form 
                                                     key={i} 
                                                     className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} 
+                                                    style={dates[i] === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
                                                     onSubmit={
                                                         ids[i] === null ? 
                                                             (e) => this.submitWeight(e, i, dates[i]) 
@@ -784,13 +781,17 @@ export default class WeightGraph extends Component {
                                             )
                                         } else {
                                             return (
-                                                <div key={i} className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}>
+                                                <div 
+                                                    key={i} 
+                                                    className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}
+                                                    style={{width: pxPerDay} }
+                                                >
                                                     <input 
                                                         onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} 
                                                         className='graph-weight-number' 
                                                         type='number' 
                                                         step="0.01" 
-                                                        value={parseFloat(weightStringFromKg(this.state.futureWeights[i - this.props.weights.length - this.state.pastProjecting], user.weight_units))}
+                                                        value={parseFloat(weightStringFromKg(weights[i], user.weight_units))}
                                                     />
                                                 </div>
                                             )

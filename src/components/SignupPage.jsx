@@ -14,7 +14,7 @@ class SignupPage extends Component {
 		e.preventDefault();
 		if (this.state.password.length){
 			if (this.state.password === this.state.passwordConfirm){
-				this.props.register(this.state.email, this.state.password, this.props.intro.alcohol, this.props.intro.carbRanks, this.props.intro.weightUnits, this.props.intro.heightUnits, this.props.intro.heightInches, this.props.intro.weightKg, this.props.intro.idealWeightKg, this.props.intro.idealWeightValue, this.props.intro.sex);
+				this.props.register(this.state.email, this.state.password, this.props.alcohol, this.props.carbRanks, this.props.weightUnits, this.props.heightUnits, this.props.height, this.props.initialWeight, this.props.idealWeightKg, this.props.initialValue, this.props.sex);
 			} else {
 				alert("Password fields don't match");
 			}

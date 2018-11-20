@@ -18,14 +18,13 @@ export default function auth(state=initialState, action){
 			return {...state, isLoading: true};
 
 		case 'USER_LOADED':
-			return {...state, isAuthenticated:true, userConfirmed:action.user.is_active, isLoading: false, user:action.user};
+			return {...state, isAuthenticated: true, userConfirmed: action.user.is_active, isLoading: false, user: action.user};
 
 		case 'LOGIN_SUCCESSFUL':
 			localStorage.setItem("token", action.data.token);
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 
 		case 'CONFIRMATION_SUCCESSFUL':
-			console.log(action.data)
 			localStorage.setItem("token", action.data.token);
 			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
 

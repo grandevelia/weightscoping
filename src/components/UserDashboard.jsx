@@ -74,14 +74,12 @@ class UserDashboard extends Component {
 
 		} else {
 			level = 7;
-			
 			let mData = setupAverages(weights, dates, newStartingIndex);
 			mWeights = mData.weights;
 			modStart = mData.startIndex;
 			weightAvgs = calcAverages(modStart, mWeights);
 			weightAvgs = weightAvgs[weightAvgs.length-1];
 		}
-		console.log(user)
 		return (
 			<div id='dashboard-wrap'>
 				{user.amount_paid < totalOwed ? 
@@ -141,16 +139,17 @@ class UserDashboard extends Component {
 									level < 7 || user.mode === "0" ? 
 										allowedCarbs(level, user.carb_ranks) 
 									:
-										['All non-incentive foods'].concat(Object.keys(weightAvgs).map( (k,i) => {
-											let curr = weightAvgs[k];
-											if (curr <= user.ideal_weight_kg){
-												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+										['All non-incentive foods'].concat(Object.keys(weightAvgs).reduce( (res, curr, i) => {
+											if (weightAvgs[curr] <= user.ideal_weight_kg){
+												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ])
 											}
-										}).filter(e => e)).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+											return res;
+										}, [])).concat( Array(user.carb_ranks.length - 6).fill().map( (x, i) => i + 6 ).reduce( (res, curr, i) => {
 											if (weightAvgs[19] <= user.ideal_weight_kg){
-												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
-										})).join(', ')
+											return res;
+										}, []) ).join(', ')
 								}
 							</div>
 						</div>
@@ -161,17 +160,18 @@ class UserDashboard extends Component {
 									level < 7 || user.mode === "0" ? 
 										disallowedCarbs(level, user.carb_ranks) 
 									:
-										Object.keys(weightAvgs).map((k, i) => {
-											let curr = weightAvgs[k];
-											if (curr > user.ideal_weight_kg){
-												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]
+										Object.keys(weightAvgs).reduce((res, k, i) => {
+											if (weightAvgs[k] > user.ideal_weight_kg){
+												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
-										}).filter(e => e).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).map(i => {
+											return res
+										}, []).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).filter( (res, i) => {
 											if (weightAvgs[19] > user.ideal_weight_kg){
-												return carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ];
+												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
-										})).join(', ')
-									}
+											return res;
+										}, [])).join(', ')
+								}
 							</div>
 						</div>
 					</div>

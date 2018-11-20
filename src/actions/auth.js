@@ -39,7 +39,7 @@ export const loadUser = () => {
 		if (token) {
 			headers["Authorization"] = "Token " + token; 
 		}
-		return fetch("/api/auth/get-user/", {headers, })
+		return fetch("/api/auth/user-info/", {headers, })
 		.then(res => {
 			if (res.status < 500){
 				return res.json().then(data => {
@@ -65,6 +65,7 @@ export const login = (email, password) => {
 		let headers = {
 			"Content-Type": "application/json"
 		};
+		//return fetch("/api/auth/all-users/", {headers, method: "POST"})
 		let body = JSON.stringify({email, password});
 		return fetch("/api/auth/login/", {headers, body, method: "POST"})
 		.then(res => {
@@ -98,9 +99,8 @@ export const register = (email, password, alcohol, carb_ranks, weight_units, hei
 		};
 		//return fetch("/api/auth/admin-delete/", {headers, method: "POST"})
 		monetary_value = Math.round(parseInt(monetary_value*100,10));
-		//let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
-		let body = JSON.stringify({"email":"test@test.com","weight_kg":90.7184,"password":"test","alcohol":"true","carb_ranks":[3,8,7,4,1,6,5,0,2],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":0,"sex":"male"})
-
+		let body = JSON.stringify({email, weight_kg, password, alcohol, carb_ranks, weight_units, height_units, height_inches, ideal_weight_kg, monetary_value, sex});
+		//let body = JSON.stringify({"email":"test@test.com","weight_kg":90.7184,"password":"test","alcohol":"true","carb_ranks":[3,8,7,4,1,6,5,0,2],"weight_units":"Pounds","height_units":"Feet / Inches","height_inches":70,"ideal_weight_kg":72.399068,"monetary_value":0,"sex":"male"})
 		return fetch("/api/auth/register/", {headers, body, method: "POST"})
 		.then(res => {
 			if (res.status < 500){
