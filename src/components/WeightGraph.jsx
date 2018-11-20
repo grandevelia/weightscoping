@@ -91,6 +91,7 @@ export default class WeightGraph extends Component {
 
         canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[startingWeightIndex] )/( frameMax - frameMin ));
         canvas.lineTo(pxPerDay, graphPixelsHeight * ( frameMax - weightsInFrame[0] )/( frameMax - frameMin ) );
+
         weightsInFrame.map((weight, i) => {
             let currDate = moment(dates[i]);
             let dayMod = 1;
@@ -134,12 +135,25 @@ export default class WeightGraph extends Component {
     handleResize = () => {
         let numWeights = this.props.weights.length + this.state.pastProjecting + this.state.futureProjecting;
         let todayIndex = numWeights - this.state.futureProjecting;
+        //Put today in the middle of the screen, or scroll as for right as possible
+        let endWithTodayCenter = todayIndex + Math.floor(this.state.daysInFrame/2);
+        let endIndex = endWithTodayCenter;
+
+        if (endWithTodayCenter > numWeights){
+            endIndex = numWeights;
+        } else if (endWithTodayCenter < this.state.daysInFrame){
+            //ensure startIndex in renderGraph > 0 with small number of days
+            endIndex = this.state.daysInFrame;
+        }
+
+        //Update slider bar position accordingly
         let barWidth = this.sliderBar.current.getBoundingClientRect().width
         let sliderLeft = todayIndex/numWeights * barWidth;
+        
         this.setState({
             windowHeight: window.innerHeight,
             windowWidth: window.innerWidth,
-            frameEndIndex: Math.min(todayIndex + Math.floor(this.state.daysInFrame/2), numWeights),
+            frameEndIndex: endIndex,
             sliderLeft: sliderLeft,
             lineX: 0
         }, () => {
@@ -186,9 +200,26 @@ export default class WeightGraph extends Component {
     showDatePicker(status){
         this.setState({showDatePicker: status});
     }
-    scaleGraph(n){
-        let end = moment(this.state.futureDates[this.state.futureDates.length - 1]);
-        let start = end.clone().subtract(n, "days");
+    scaleGraph(n, future=false){
+        let start;
+        let end;
+        if (!future){
+            //Scaling graph without changing future projection
+            //Use last day of current future projecting as end
+            end = moment(this.state.futureDates[this.state.futureDates.length - 1]);
+            start = end.clone().subtract(n, "days");
+        } else {
+            //Scaling graph with new future projection
+            end = moment().add(n, "days");
+
+            if (n > this.state.daysInFrame){
+                //If projecting more days in future than currently displayed days, change days in frame
+                start = moment();
+            } else {
+                //If projecting less than current days in frame, shrink the projection without changing days in frame
+                start = end.clone().subtract(this.state.daysInFrame, "days");
+            }
+        }
         this.setDateRange(start, end);
     }
     setDateRange(start, end){
@@ -257,7 +288,7 @@ export default class WeightGraph extends Component {
             hoverIndex: 0,
         }, () => this.handleResize());
     }
-    futureProject(daysToProject, setState=false){
+    futureProject(daysToProject){
         let weights = this.props.weights;
         let dates = this.props.dates;
         if (isNaN(daysToProject)){
@@ -285,21 +316,11 @@ export default class WeightGraph extends Component {
 
         futureWeights = futureWeights.slice(weights.length);
         futureDates = futureDates.slice(dates.length);
-        if (!setState){
-            return {
-                futureProjecting : daysToProject,
-                futureWeights: futureWeights,
-                futureDates: futureDates
-            };
-        } else {
-            this.setState({
-                futureProjecting : daysToProject,
-                daysInFrame: Math.max(daysToProject, this.state.daysInFrame),
-                futureWeights: futureWeights,
-                futureDates: futureDates,
-                hoverIndex: 0
-            }, () => this.renderGraph());
-        }
+        return {
+            futureProjecting : daysToProject,
+            futureWeights: futureWeights,
+            futureDates: futureDates
+        };
     }
     changeWeight(e, i, weightClass="STANDARD"){
         e.preventDefault();
@@ -350,13 +371,11 @@ export default class WeightGraph extends Component {
         if (id === null){
             this.props.addWeight(this.convertWeight(newWeight), date)
             .then(() => {
-                this.futureProject(this.state.futureProjecting, true);
                 this.renderGraph();
             })
         } else {
             this.props.updateWeight(this.convertWeight(newWeight), id)
             .then(() => {
-                this.futureProject(this.state.futureProjecting, true);
                 this.renderGraph();
             })
         }
@@ -555,7 +574,6 @@ export default class WeightGraph extends Component {
         }
 
         let daysInFrame = this.state.daysInFrame;
-
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
@@ -608,8 +626,8 @@ export default class WeightGraph extends Component {
                         </div>
                         <div className='view-section' id='future-view-section'>
                             <div className='view-section-title'>Future</div>
-                            <div className='view-section-option' onClick={() => this.futureProject(7, true)}>7D</div>
-                            <div className='view-section-option' onClick={() => this.futureProject(30, true)}>1M</div>
+                            <div className='view-section-option' onClick={() => this.scaleGraph(7, true)}>7D</div>
+                            <div className='view-section-option' onClick={() => this.scaleGraph(30, true)}>1M</div>
                         </div>
                     </div>
                 </div>
