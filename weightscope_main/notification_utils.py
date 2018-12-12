@@ -7,7 +7,7 @@ EMAIL_BASE = getattr(settings, "EMAIL_BASE", None)
 
 def send_email(data):
     link = data['activation_key']
-    c = {'key':link, 'basename':EMAIL_BASE}
+    c = {'key': link, 'basename': EMAIL_BASE}
     c = merge_two_dicts(c, data)
 
     subject = data['email_subject']
@@ -20,6 +20,6 @@ def send_email(data):
     send_mail(subject, msg_txt, from_email, [to_email], html_message=msg_html, fail_silently=False)
 
 def merge_two_dicts(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
+    z = x.copy()
+    z.update(y)
     return z

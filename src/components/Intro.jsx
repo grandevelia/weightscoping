@@ -10,6 +10,18 @@ import NavItem from './SideNav';
 import '../css/Intro.css';
 
 export default class Intro extends Component{
+	/*state = {
+		alcohol: true,
+		carbRanks: [8, 7, 6, 5, 4, 3, 2, 1, 0],
+		height: 70,
+		heightUnits: "Feet / Inches",
+		idealWeightKg: 72.399068,
+		initialValue: 0,
+		initialWeight: 92,
+		plan: 2,
+		sex: "male",
+		weightUnits: "Pounds",
+	}*/
 	state = {
 		alcohol: null,
 		carbRanks: [null, null, null, null, null, null, null, null, null],

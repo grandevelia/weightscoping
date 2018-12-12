@@ -41,7 +41,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		confirmRegistration: (email, key) => {
-			return dispatch(auth.confirmRegistration(email, key))
+			return dispatch(auth.confirmRegistration(email, key)).then((() => {
+				return dispatch(auth.loadUser())
+			}))
 		}
 	}
 }

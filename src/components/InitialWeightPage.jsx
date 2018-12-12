@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import { poundsToKg, idealWeightString, weightStringFromKg, allowedCarbs, disallowedCarbs } from './utils';
+import InfoLink from './InfoLink';
+import { poundsToKg, weightStringFromKg, allowedCarbs, disallowedCarbs } from './utils';
 export default class InitialWeightPage extends Component {
 	state={
 		primary: "",
@@ -56,7 +57,7 @@ export default class InitialWeightPage extends Component {
 		        <div>
 		        {(this.state.primary !== "" && this.props.weightUnits !== "Stones") || (this.state.primary !== "" && this.state.secondary !== "" && this.props.weightUnits === "Stones") ?
 			        <div>
-			        	<div id='layers'>{"Your ideal weight is " + idealWeightString(currentWeight, this.props.heightUnits, this.props.sex, 0, this.props.height)}</div>
+			        	<div id='layers'>{"Your ideal weight is " + weightStringFromKg(this.props.idealWeightKg, this.props.weightUnits)}</div>
 			        	<h2>You have to lose {weightStringFromKg(currentWeight - this.props.idealWeightKg, this.props.weightUnits)} to reach your ideal weight. Here's how we'll get you there:</h2>
 			        	<div id='incentive-layers'>
 			        		<div id='incentive-layers'>
@@ -64,14 +65,14 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 1</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-2*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-2*incrementKg, this.props.weightUnits)}, you may have</div>
 											<div className='section-description'>
 												Anything other than any incentive food. Eat as much as you want, but if you do you’ll never eat any incentive foods again.
 											</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(0, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(0, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -79,12 +80,12 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 2</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-3*incrementKg, this.props.weightUnits)}, you may have</div>
-											<div className='section-description'>{ allowedCarbs(1, carbRanks) }</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-3*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>{ allowedCarbs(1, carbRanks).map(x => x) }</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(1, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(1, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -92,12 +93,12 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 3</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-4*incrementKg, this.props.weightUnits)}, you may have</div>
-											<div className='section-description'>{ allowedCarbs(2, carbRanks) }</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-4*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>{ allowedCarbs(2, carbRanks).map(x => x) }</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(2, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(2, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -105,12 +106,12 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 4</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-5*incrementKg, this.props.weightUnits)}, you may have</div>
-											<div className='section-description'>{ allowedCarbs(3, carbRanks) }</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-5*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>{ allowedCarbs(3, carbRanks).map(x => x) }</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(3, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(3, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -118,12 +119,12 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 5</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-6*incrementKg, this.props.weightUnits)}, you may have</div>
-											<div className='section-description'>{ allowedCarbs(4, carbRanks) }</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-6*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>{ allowedCarbs(4, carbRanks).map(x => x) }</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(4, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(4, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -131,12 +132,12 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-title'>Level 6</div>
 									<div className='stage-description'>
 										<div className='section'>
-											<div className='section-header'>If you are over {weightStringFromKg(currentWeight-7*incrementKg, this.props.weightUnits)}, you may have</div>
-											<div className='section-description'>{ allowedCarbs(5, carbRanks) }</div>
+											<div className='section-header'>Until you have reduced your weight to {weightStringFromKg(currentWeight-7*incrementKg, this.props.weightUnits)}, you may have</div>
+											<div className='section-description'>{ allowedCarbs(5, carbRanks).map(x => x) }</div>
 										</div>
 										<div className='section'>
 											<div className='section-header'>You may not have</div>
-											<div className='section-description'>{ disallowedCarbs(5, carbRanks) }</div>
+											<div className='section-description'>{ disallowedCarbs(5, carbRanks).map(x => x) }</div>
 										</div>
 									</div>
 								</div>
@@ -145,7 +146,7 @@ export default class InitialWeightPage extends Component {
 									<div className='stage-description'>
 										<div className='section'>
 											<div className='section-header'>You may have</div>
-											<div className='section-description'>Whatever you want</div>
+											<div className='section-description'>Whatever you want<InfoLink title='as long as you maintain your weight' list='Once you reach your ideal weight you will enter Maintenance mode, where your average weight over various periods of time will determine what incentive foods you may have'/></div>
 										</div>
 									</div>
 								</div>

@@ -1,0 +1,35 @@
+
+.infolink{
+    display: inline-block;
+    color: rgb(4, 100, 163);
+    text-decoration: underline;
+    padding: 0 1.25%;
+}
+.infolink:hover{
+	cursor: pointer;
+    color: rgb(4, 50, 123);
+	transition: ease-in-out 0.125s;
+}
+.infolink:hover .link-hover{
+    display: inline-block;
+}
+.link-hover{
+    display: none;
+    position: absolute;
+    background-color: black;
+    box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.4);
+    color: rgba(255,255,255,0.9);
+    padding: 1.25%;
+    border-radius: 5px;
+}
+.link-hover-title{
+    color: white;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+.link-hover-list{
+    font-size: 0.85em;
+    padding: 0.125% 0;
+    display: flex;
+    flex-direction: column;
+}

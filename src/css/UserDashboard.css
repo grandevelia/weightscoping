@@ -198,6 +198,7 @@ body {
 .view-section-option:hover{
 	cursor: pointer;
 	color: rgb(1, 138, 243);
+	transition: ease-in-out 0.125s;
 }
 #datepicker-popup{
 	position: absolute;
@@ -244,6 +245,7 @@ body {
 #popup-submit:hover{
 	cursor: pointer;
 	background: rgb(1, 76, 133);
+	transition: ease-in-out 0.125s;
 }
 #popup-cancel{
 	border-radius: 2px;
@@ -257,6 +259,7 @@ body {
 	cursor: pointer;
 	border: 1px solid rgb(1, 76, 133);
 	color: rgb(1, 76, 133);
+	transition: ease-in-out 0.125s;
 }
 .graph-middle{
 	flex-basis: 85%;
@@ -275,9 +278,8 @@ body {
 }
 #dates-container{
 	position: relative;
-	top: 0;
-	height: 5%;
 	flex-direction: row;
+	flex: 5;
 	position: relative;
 	white-space: nowrap;
 	overflow: hidden;
@@ -294,8 +296,9 @@ body {
 	flex: 2;
 }
 #level-graph-display{
-	height: 60%;
+	flex: 60;
 	overflow: hidden;
+	position: relative;
 }
 .level-graph-date{
 	flex-direction: column;
@@ -338,6 +341,7 @@ body {
 	background: rgba(255,255,255,0.9);
 }
 #line-graph-display {
+	flex: 30;
 	position: relative;
 }
 #m-graph-display{
@@ -350,30 +354,30 @@ body {
 }
 #weight-input-container{
 	position: relative;
-	height: 5%;
-	flex-direction: row;
 	position: relative;
 	white-space: nowrap;
 	overflow: hidden;
+	flex: 5;
 }
 .graph-weight{
 	padding: 0 2.5px;
 	display: inline-flex;
 	flex-direction: row;
 	position: relative;
+	height: 100%;
 }
 .graph-weight.level-graph-today{
 	flex: 2;
 }
 .graph-weight-number{
-	width: 75%;
+	width: 100%;
 	border-left: 1px solid rgba(0,0,0,0.1);
 }
 #graph-sidebar{
 	position: absolute;
-	top: 5%;
+	top: 0;
 	left: 0;
-	height: 60%;
+	height: 100%;
 	background: rgba(255,255,255,0.85);
 	color: rgba(0,0,0,0.7);
 	width: 7.1%;
@@ -409,6 +413,7 @@ body {
 .weight-submit:hover{
 	background-color: rgb(1, 24, 71);
 	cursor: pointer;
+	transition: ease-in-out 0.125s;
 }
 #graph-hover{
 	display: flex;
@@ -475,13 +480,14 @@ body {
 .icon{
 	border: 1px solid rgba(0,0,0,0.1);
 	border-radius: 50%;
-	width: 25%;
+	flex: 1;
 	max-width: 2em;
 	max-height: 2em;
 	box-shadow: 0px 0px 1px rgba(0,0,0,1);
 	position: relative;
 	background: rgba(215,215,215,0.9);
 }
+
 .icon img{
 	position: absolute; 
 	left: 15%;
@@ -586,6 +592,7 @@ body {
 .settings-option button:hover{
 	background-color: rgb(27, 152, 188);
 	cursor: pointer;
+	transition: ease-in-out 0.125s;
 }
 #level-reset-button{
 	width: 50%;
@@ -600,6 +607,7 @@ body {
 #level-reset-button:hover{
 	background-color: rgb(27, 152, 188);
 	cursor: pointer;
+	transition: ease-in-out 0.125s;
 }
 #graph-container{
 	display: flex;
@@ -673,11 +681,13 @@ body {
 .horizontal-scroll-bar{
 	width: 5%;
 	top: 0;
+	left: 0;
 	height: 100%;
 	border-radius: 10px;
 	position: absolute;
 	background-color: rgba(0,0,0,0.6);
 	border: 1px solid rgba(255,255,255,0.1);
+	transition: left ease-in-out 0.05s;
 }
 .horizontal-scroll-bar:hover{
 	cursor: pointer;

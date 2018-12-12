@@ -13,15 +13,20 @@
 .intro-nav{
 	margin-top: 2.5%;
 	display: block;
-	color: black;
+	color: rgba(69, 171, 238, 0.999);
+	font-weight: bold;
+	text-decoration: underline;
   }
   .back{
 	margin-top: 0.75%;
 	font-size: 0.8em;
+	text-decoration: none;
+	color: black;
   }
   .intro-nav:hover{
 	cursor: pointer;
-	color: rgb(178, 27, 198);
+	color: rgba(178, 27, 198, 0.9);
+	transition: ease-in-out 0.125s;
   }
 /*** Side Navigator ***/
 #navigation-area{
@@ -544,7 +549,6 @@ input:checked+label{
 	text-align: center;
 	margin-bottom: 2.5%;
 }
-
 /*** Signup Options ***/
 #option-page{
 	display: flex;

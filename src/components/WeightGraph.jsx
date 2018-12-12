@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { iconPaths, iconIndex, carbOrder, carbOptions, weightStringFromKg,interpolateDates, poundsToKg, maintenanceAvgs, calcAverages } from './utils';
+import { iconPaths, carbOrder, carbOptions, weightStringFromKg,interpolateDates, poundsToKg, maintenanceAvgs, calcAverages } from './utils';
 import DatepickerArea from './DatepickerArea';
 import moment from 'moment';
 
@@ -148,8 +148,8 @@ export default class WeightGraph extends Component {
 
         //Update slider bar position accordingly
         let barWidth = this.sliderBar.current.getBoundingClientRect().width
-        let sliderLeft = todayIndex/numWeights * barWidth;
-        
+        let sliderLeft = Math.min(todayIndex/numWeights * barWidth, 0.95 * barWidth);
+
         this.setState({
             windowHeight: window.innerHeight,
             windowWidth: window.innerWidth,
@@ -481,7 +481,7 @@ export default class WeightGraph extends Component {
         }
 
         if (weightIndex !== this.state.hoverIndex){
-            this.setState({lineX: lineX, lineY: lineY, hoverIndex: weightIndex});
+            this.setState({lineX: lineX-1, lineY: lineY, hoverIndex: weightIndex});
         }
     }
     dateString(date, pxPerDay, i){
@@ -556,7 +556,7 @@ export default class WeightGraph extends Component {
         } else {
             weightsInFrame = weights.slice(this.state.pastProjecting);
         }
-
+        console.log(weightsInFrame)
         let initialWeight = this.props.weights[this.props.startingIndex];
 
         let weightAvgs, numLevels, levelMap;
@@ -749,6 +749,15 @@ export default class WeightGraph extends Component {
                                         )
                                     })
                             }
+                            <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
+                                {
+                                    levelMap.map((levelWeight, j) => {
+                                        return (
+                                            <div key={j} className="sidebar-section">{ this.levelIcon(j, user.carb_ranks, true) }</div>
+                                        )
+                                    })
+                                }
+                            </div>
                         </div>
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
@@ -763,6 +772,8 @@ export default class WeightGraph extends Component {
                                         let currDate = moment(dates[i]);
                                         
                                         if (moment(this.props.dates[0]).isAfter(currDate)){
+                                            console.log("pastweight", weights[i], weightString)
+                                            //currDate is before first user added weight (i.e. it is in pastWeights)
                                             return (
                                                 <form 
                                                     key={i} 
@@ -771,10 +782,15 @@ export default class WeightGraph extends Component {
                                                     onSubmit={(e) => this.props.addWeight(this.convertWeight(e.target.value), dates[i])}
                                                 >
                                                     <input  className='graph-weight-number' type='number' step="0.01" defaultValue=""/>
-                                                    <input type='submit' className='weight-submit' />
+                                                    {
+                                                        dates[i] === moment().format("YYYY-MM-DD") || parseFloat(this.state.inputs[i]) !== parseFloat(weightStringFromKg(this.props.weights[i], this.props.user.weight_units)) ? 
+                                                            <input type='submit' className='weight-submit'/>
+                                                        : null
+                                                    }
                                                 </form>
                                             )
                                         } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
+                                            //currDate is between now and first date
                                             return (
                                                 <form 
                                                     key={i} 
@@ -794,22 +810,28 @@ export default class WeightGraph extends Component {
                                                         step="0.01" 
                                                         defaultValue={weightString} 
                                                     />
-                                                    <input type='submit' className='weight-submit'/>
+                                                    {
+                                                        dates[i] === moment().format("YYYY-MM-DD") || parseFloat(this.state.inputs[i]) !== parseFloat(weightStringFromKg(this.props.weights[i], this.props.user.weight_units)) ? 
+                                                            <input type='submit' className='weight-submit'/>
+                                                        : null
+                                                    }
                                                 </form>
                                             )
                                         } else {
+                                            let keyI = i;
+                                            i = i - this.props.weights.length - this.state.pastProjecting + frameStartIndex;
                                             return (
                                                 <div 
-                                                    key={i} 
+                                                    key={keyI} 
                                                     className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight future-graph-weight level-graph-today' : 'graph-weight future-graph-weight'}
                                                     style={{width: pxPerDay} }
                                                 >
                                                     <input 
-                                                        onChange={(e) => this.changeWeight(e, i - this.props.weights.length - this.state.pastProjecting, "FUTURE")} 
+                                                        onChange={(e) => this.changeWeight(e, i, "FUTURE")} 
                                                         className='graph-weight-number' 
                                                         type='number' 
                                                         step="0.01" 
-                                                        value={parseFloat(weightStringFromKg(weights[i], user.weight_units))}
+                                                        value={parseFloat(weightStringFromKg(this.state.futureWeights[i], user.weight_units))}
                                                     />
                                                 </div>
                                             )
@@ -819,18 +841,9 @@ export default class WeightGraph extends Component {
                                     null
                             }
                         </div>
-                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth + 'px', height: canvasHeight + 'px'}} width={canvasWidth} height={canvasHeight}></canvas>
+                        <canvas id='line-graph-display' ref={this.canvas} style={{width: canvasWidth + 'px'}} width={canvasWidth} height={canvasHeight}></canvas>
                         <div id='mouse-coordinate-x' style={{left: this.state.lineX, height: this.state.lineY}} ref={this.coordX}></div>
                         <div id='mouse-coordinate-y' style={{width: this.state.lineX, bottom: this.state.lineY}} ref={this.coordY}></div>
-                        <div id='graph-sidebar' style={{width: Math.ceil(0.075 * window.innerWidth * 0.975 * 0.975/pxPerDay)*pxPerDay}}>
-                            {
-                                levelMap.map((levelWeight, j) => {
-                                    return (
-                                        <div key={j} className="sidebar-section">{ this.levelIcon(j, user.carb_ranks, true) }</div>
-                                    )
-                                })
-                            }
-                        </div>
                     </div>
                 </div>
             </div>

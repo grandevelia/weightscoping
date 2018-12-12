@@ -32,7 +32,7 @@ export default class InitialValuePage extends Component {
 							<div className='slider-section-body'>$113</div>
 						</div>
 					</div>
-					<p id='payment-prompt-info'>This isn't a commitment to pay anything. It is a way of helping you understand how much you value achieving your ideal weight. Later, if you are really happy with our approach, you can thank us -- with this amount, some other amount, or by just saying “Thanks!”. You don’t have to pay to use the Reductiscope if you don’t want to.</p>
+					<p id='payment-prompt-info'>This isn't a commitment to pay anything. It is a way of helping you understand how much you value achieving your ideal weight. Later, if you are really happy with our approach, you can thank us -- with this amount, some other amount, or by just saying “Thanks!”. During the 6 month free trial period, you don’t have to pay to use the Reductiscope if you don’t want to.</p>
 					<div onClick={() => this.props.updateIntroState({initialValue: this.state.initialValue})} className='intro-nav'>NEXT: Pick your plan</div>
 					<div onClick={() => this.props.updateIntroState({initialWeight: null})} className='intro-nav back'>Back</div>
 				</div>

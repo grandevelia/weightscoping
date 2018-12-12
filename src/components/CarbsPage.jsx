@@ -2,6 +2,20 @@ import React, { Component } from 'react';
 import InteractionArea from './InteractionArea';
 
 export default  class CarbsPage extends Component {
+	constructor(props){
+		super(props);
+		let carbLength = 7;
+		if (this.props.alcohol){
+			carbLength = 9;
+		}
+		let carbRanks = [];
+		for (let i = 0; i < carbLength; i ++){
+			carbRanks.push(null);
+		}
+		this.state = {
+			carbRanks: carbRanks
+		}
+	}
 	moveOption(optionId, toId){
 		let positions = this.props.carbRanks;
 
@@ -54,7 +68,7 @@ export default  class CarbsPage extends Component {
 				positions[toId] = optionId;
 			}
 		}
-		this.props.updateIntroState({carbRanks: positions});
+		this.setState({carbRanks: positions});
 	}
 	render(){
 		let carbOptions;
@@ -64,7 +78,7 @@ export default  class CarbsPage extends Component {
 			carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals"];
 		}
 		
-		let positions = this.props.carbRanks;
+		let positions = this.state.carbRanks;
 		return (
 			<div>
 				<h3 className="page-intro">Rate the following in order of how much you enjoy them</h3>
@@ -72,7 +86,7 @@ export default  class CarbsPage extends Component {
 				<InteractionArea options={carbOptions} positions={positions} moveOption={(optionId, toId) => this.moveOption(optionId, toId)}/>
 				{
 					positions.indexOf(null) < 0 ?
-						<p className='intro-nav'>NEXT: Find Your Ideal Weight</p>
+					<p onClick={() => this.props.updateIntroState({carbRanks: positions})} className='intro-nav'>NEXT: Find Your Ideal Weight</p>
 					: null
 				}
 				<p onClick={() => this.props.updateIntroState({alcohol: null})} className='intro-nav back'>Back</p>

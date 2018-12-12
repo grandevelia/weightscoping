@@ -1,8 +1,10 @@
+import React from 'react';
+import InfoLink from './InfoLink.jsx';
 import moment from "moment";
 
-export const iconPaths = ["BreadIcon", require('../images/pasta.png'), "PotatoIcon", "DessertIcon", require('../images/soft_drink.png'), require('../images/snack_carb.png'), "CerealIcon", require('../images/hard_alcohol.png'), require('../images/soft_alcohol.png')];
+export const iconPaths = [require('../images/bread.png'), require('../images/pasta.png'), "PotatoIcon", "DessertIcon", require('../images/soft_drink.png'), require('../images/snack_carb.png'), "CerealIcon", require('../images/hard_alcohol.png'), require('../images/soft_alcohol.png')];
 export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
-export const iconIndex = ["breads","pasta","potatoes","dessert","soft-drinks","snack-carbs","cereals","hard-alcohol","soft-alcohol"];
+const carbList =[["Raised", "Flat", "Croissants", "Muffins", "Scones", "Tortillas", "Naan", "Pizza Crust",  "Crackers",  "etc."], ["Rice", "Wheat", "Corn", "Oats", "Separate or part of a dish", "Cold Breakfast Cereals", "Granola", "Oatmeal", "Cous-cous", "etc"], ["Potatoes", "Yams",  "Sweet Potatoes", "Casava", "Separate or part of a dish"], ["Any sugar/sweet treat (no exceptions)"], ["Soda/pop (diet, too)", "Fruit Juice (even if 100% fruit)"], ["Chips/Crisps", "Crackers", "Pretzels", "Popcorn", "etc."], [""], [""], [""]];
 export const carbOrder = [5,0,4,1,6,2,3,7,8];
 export const maintenanceCarbOrder = [3,2,4,1,0,5,6,7,8];
 export const maintenanceAvgs = [3,5,7,10,14,19];
@@ -120,21 +122,21 @@ export function	calcHeightInches(units, primary, secondary){
 export const disallowedCarbs = (start, carbRanks) => {
 	let disallowed = [];
 	for (let i = start; i < carbRanks.length; i ++){
-		disallowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
+		disallowed.push(<InfoLink key={i} title={carbOptions[ carbRanks[ carbOrder[ i ] ] ]} list={carbList[carbRanks[ carbOrder[ i ] ]]}/>);
 	}
-	return disallowed.join(', ');
+	return disallowed;
 }
 export const allowedCarbs = (end, carbRanks) => {
-	let allowed = ["All non-incentive food"];
+	let allowed = [<InfoLink key={-1} title={"All non-incentive food"} list={[""]}/>];
 	for (let i = end-1; i >= 0; i --){
-		allowed.push(carbOptions[ carbRanks[ carbOrder[ i ] ] ]);
+		allowed.push(<InfoLink key={i} title={carbOptions[ carbRanks[ carbOrder[ i ] ] ]} list={carbList[carbRanks[ carbOrder[ i ] ]]}/>);
 	}
-	return allowed.join(", ");
+	return allowed;
 }
 export const interpolateDates = (weightArr, dateArr, originalIds=false) => {
 	/*
 	* If originalIds is false, the indexes of interpolated dates will be returned
-	* if it is passed an array of ids, null will be interpolated in between the original ids
+	* if it is an array of ids, null will be interpolated in between the original ids
 	*/
 
 	let indexes;

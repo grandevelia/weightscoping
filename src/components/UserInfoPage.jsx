@@ -22,9 +22,13 @@ export default class UserInfoPage extends Component {
 				primary: e.target.value
 			})
 		} else if (unit === "SECONDARY"){
-			this.setState({
-				secondary: e.target.value
-			})
+			if (e.target.value > 11){
+				alert("Inches must be less than 12");
+			} else {
+				this.setState({
+					secondary: e.target.value
+				})
+			}
 		}
 	}
 	enterSex(e){
@@ -117,7 +121,13 @@ export default class UserInfoPage extends Component {
 					</div> : null
 				}
 				</div>
-				<div onClick={() => this.props.updateIntroState({carbRanks: [null].concat(this.props.carbRanks.slice(1))})} className='intro-nav back'>Back</div>
+				<div onClick={() => {
+					let resetRanks = [];
+					for (let i = 0; i < this.props.carbRanks.length; i ++){
+						resetRanks.push(null);
+					}
+					this.props.updateIntroState({carbRanks: resetRanks});
+				}} className='intro-nav back'>Back</div>
 			</div>
 		)
 	}
