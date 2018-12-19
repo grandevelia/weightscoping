@@ -165,7 +165,7 @@ class UserDashboard extends Component {
 												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
 											return res
-										}, []).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).filter( (res, i) => {
+										}, []).concat(Array(user.carb_ranks.length - 6).fill().map((x, i) => i + 6).filter( (res=[], i) => {
 											if (weightAvgs[19] > user.ideal_weight_kg){
 												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
