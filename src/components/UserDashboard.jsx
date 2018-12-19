@@ -157,7 +157,7 @@ class UserDashboard extends Component {
 							<div className='primary-status-header'>You may not have</div>
 							<div className='primary-status-content'>
 								{ 
-									level < 7 || user.mode === "0" ? 
+									/*level < 7 || user.mode === "0" ? 
 										disallowedCarbs(level, user.carb_ranks) 
 									:
 										Object.keys(weightAvgs).reduce((res, k, i) => {
@@ -170,7 +170,7 @@ class UserDashboard extends Component {
 												res.push(carbOptions[user.carb_ranks[ maintenanceCarbOrder[i] ] ]);
 											}
 											return res;
-										}, [])).join(', ')
+										}, [])).join(', ')*/
 								}
 							</div>
 						</div>
