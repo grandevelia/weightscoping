@@ -72,7 +72,6 @@ export default class WeightGraph extends Component {
         
         let weightsInFrame;
         let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
-        
         if (this.state.daysInFrame < weights.length){
             weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
             dates =  dates.slice(frameStartIndex, this.state.frameEndIndex);
@@ -165,9 +164,14 @@ export default class WeightGraph extends Component {
         }
 
         //Update slider bar position accordingly
-        let barWidth = this.sliderBar.current.getBoundingClientRect().width
-        let sliderLeft = Math.min(todayNum/numWeights * barWidth, 0.95 * barWidth);
+//needs to be todayNum - 1 but accurate to pillwidth/barwidth/2
+        let todayPercent = todayNum/numWeights;
+        let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
+        let pillWidth = 0.05 * barWidth;
+        let sliderLeft = Math.round((barWidth - pillWidth) * todayPercent);
 
+        //let percentFromLeft = sliderLeft/(barWidth - 2 * halfSliderPill);
+        //let mouseIndex = Math.round( ( numWeights - this.state.daysInFrame ) * percentFromLeft );
         this.setState({
             windowHeight: window.innerHeight,
             windowWidth: window.innerWidth,
@@ -194,19 +198,36 @@ export default class WeightGraph extends Component {
     handleScroll(e){
         let sliderBox = this.sliderBar.current.getBoundingClientRect();
         let numWeights = this.state.pastProjecting + this.props.weights.length + this.state.futureProjecting;
-        let daysInFrame = this.state.daysInFrame;
-
+        let halfSliderPill = 0.025 * sliderBox.width;
         let mouseX = e.clientX - sliderBox.left; //relative to slider bar
-        if (mouseX < 0.025 * sliderBox.width){
-            mouseX = 0.025 * sliderBox.width
-        } else if (mouseX > 0.975 * sliderBox.width){
-            mouseX = 0.975 * sliderBox.width
+
+        if (mouseX < halfSliderPill){
+            mouseX = halfSliderPill;
+        } else if (mouseX > sliderBox.width - halfSliderPill){
+            mouseX = sliderBox.width - halfSliderPill;
         }
-        let mouseIndex = Math.floor((numWeights - daysInFrame) * (mouseX - 0.025 * sliderBox.width)/(0.95 * sliderBox.width)) + daysInFrame;
-        let sliderLeft = mouseX - 0.025 * sliderBox.width;
+
+        let sliderLeft = mouseX - halfSliderPill;
+        /* Set index based on left of slider, update slider so center is at mouse
+
+            Effective range is actually the full width of the slider bar minus
+            the width of the slider pill since index is taken
+            from the left side of the slider.
+
+            E.g. if the pill is 5% of the bar width, the effective width 
+            will be 95% of the full bar
+
+            Also, the frame end index ranges from daysInFrame to numWeights,
+            so a mapping from [0, 1] to [daysInFrame, numWeights] is required
+        */
         
+        //Account for days in frame when calculating percentfromleft
+        let percentFromLeft = sliderLeft/(sliderBox.width - 2 * halfSliderPill);
+        let mouseIndex = Math.round( ( numWeights - this.state.daysInFrame ) * percentFromLeft );
+        let frameEndIndex = mouseIndex + this.state.daysInFrame;
+
         this.setState({
-            frameEndIndex: mouseIndex,
+            frameEndIndex: frameEndIndex,
             sliderLeft: sliderLeft
         }, () => {
             this.renderGraph();

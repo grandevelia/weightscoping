@@ -1,9 +1,11 @@
 {
   "main.css": "css/main.56d9c252.css",
   "main.css.map": "css/main.56d9c252.css.map",
-  "main.js": "js/main.d70a44f5.js",
-  "main.js.map": "js/main.d70a44f5.js.map",
+  "main.js": "js/main.cf8a49e2.js",
+  "main.js.map": "js/main.cf8a49e2.js.map",
+  "media/alcohol_beer.png": "media/alcohol_beer.8f9f891b.png",
   "media/bread.png": "media/bread.4aa89fb1.png",
+  "media/dessert_cake.png": "media/dessert_cake.5905ec88.png",
   "media/fontawesome-webfont.eot": "media/fontawesome-webfont.674f50d2.eot",
   "media/fontawesome-webfont.svg?v=4.7.0": "media/fontawesome-webfont.912ec66d.svg",
   "media/fontawesome-webfont.ttf?v=4.7.0": "media/fontawesome-webfont.b06871f2.ttf",
@@ -11,7 +13,8 @@
   "media/fontawesome-webfont.woff?v=4.7.0": "media/fontawesome-webfont.fee66e71.woff",
   "media/hard_alcohol.png": "media/hard_alcohol.fe18b866.png",
   "media/pasta.png": "media/pasta.59c3134b.png",
+  "media/potatoes_fries.png": "media/potatoes_fries.1e683dc3.png",
+  "media/rice_bowl.png": "media/rice_bowl.a1bd0037.png",
   "media/snack_carb.png": "media/snack_carb.9f39415e.png",
-  "media/soft_alcohol.png": "media/soft_alcohol.962c5c0f.png",
   "media/soft_drink.png": "media/soft_drink.f91b5a9a.png"
 }

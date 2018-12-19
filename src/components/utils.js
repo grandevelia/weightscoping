@@ -2,9 +2,32 @@ import React from 'react';
 import InfoLink from './InfoLink.jsx';
 import moment from "moment";
 
-export const iconPaths = [require('../images/bread.png'), require('../images/pasta.png'), "PotatoIcon", "DessertIcon", require('../images/soft_drink.png'), require('../images/snack_carb.png'), "CerealIcon", require('../images/hard_alcohol.png'), require('../images/soft_alcohol.png')];
-export const carbOptions = ["Breads","Pasta/Rice","Potatoes","Dessert","Soft Drinks","Snack Carbs","Cereals","Hard Alcohol","Beer/Wine"];
+export const iconPaths = [
+	require('../images/bread.png'), 
+	require('../images/pasta.png'), 
+	require('../images/potatoes_fries.png'), 
+	require('../images/dessert_cake.png'), 
+	require('../images/soft_drink.png'), 
+	require('../images/snack_carb.png'), 
+	require('../images/rice_bowl.png'),
+	require('../images/hard_alcohol.png'), 
+	require('../images/alcohol_beer.png')
+];
+
+export const carbOptions = [
+	"Breads",
+	"Pasta",
+	"Potatoes",
+	"Dessert",
+	"Soft Drinks",
+	"Snack Carbs",
+	"Grains",
+	"Hard Alcohol",
+	"Beer/Wine"
+];
+
 const carbList =[["Raised", "Flat", "Croissants", "Muffins", "Scones", "Tortillas", "Naan", "Pizza Crust",  "Crackers",  "etc."], ["Rice", "Wheat", "Corn", "Oats", "Separate or part of a dish", "Cold Breakfast Cereals", "Granola", "Oatmeal", "Cous-cous", "etc"], ["Potatoes", "Yams",  "Sweet Potatoes", "Casava", "Separate or part of a dish"], ["Any sugar/sweet treat (no exceptions)"], ["Soda/pop (diet, too)", "Fruit Juice (even if 100% fruit)"], ["Chips/Crisps", "Crackers", "Pretzels", "Popcorn", "etc."], [""], [""], [""]];
+
 export const carbOrder = [5,0,4,1,6,2,3,7,8];
 export const maintenanceCarbOrder = [3,2,4,1,0,5,6,7,8];
 export const maintenanceAvgs = [3,5,7,10,14,19];
