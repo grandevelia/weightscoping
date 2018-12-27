@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { iconPaths, carbOrder, carbOptions, weightStringFromKg,interpolateDates, poundsToKg, maintenanceAvgs, calcAverages } from './utils';
+import { iconPaths, carbOrder, carbOptions, weightStringFromKg, weightFromKg, interpolateDates, poundsToKg, maintenanceAvgs, calcAverages } from './utils';
 import DatepickerArea from './DatepickerArea';
 import moment from 'moment';
 
@@ -13,41 +13,41 @@ export default class WeightGraph extends Component {
         this.coordY = React.createRef();
         this.hover = React.createRef();
         this.sliderBar = React.createRef();
-
-        let inputs = [];
-        for (let i = 0; i < props.weights.length; i ++){
-            inputs.push(parseFloat(weightStringFromKg(props.weights[i], props.user.weight_units)))
-        }
         this.showDatePicker = this.showDatePicker.bind(this);
         this.setDateRange = this.setDateRange.bind(this);
         let projectionData = this.futureProject(7);
 
-        let currStart = moment(this.props.dates[0]);
-        let pastDates = [];
-        let pastWeights = [];
         let daysInFrame = 14;
 
+        let inputs = [];
         let pastProjecting = Math.ceil(0.075 * daysInFrame); //Have at least this many filler weights in the past to fill the transparent sidebar
         if (props.weights.length <= daysInFrame/2){
+            //Backfill if there isn't enough data to fill the ui
             pastProjecting += daysInFrame/2 - props.weights.length;
-            for (let i = 1; i <= pastProjecting; i ++){
-                let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
-                pastDates.unshift(newDate);
-                pastWeights.unshift(0);
-            }
         }
-        let frameEndIndex = props.weights.length + pastProjecting + daysInFrame/2;
+
+        //Filler weights before start
+        for (let i = 0; i < pastProjecting; i ++){
+            inputs.push(0);
+        }
+
+        //All added or interpolated weights
+        for (let i = 0; i < props.weights.length; i ++){
+            inputs.push(weightFromKg(props.weights[i], props.user.weight_units));
+        }
+
+        //future weights initialized to today's weight
+        for (let i = 0; i < projectionData.futureProjecting; i ++){
+            inputs.push(weightFromKg(props.weights[props.weights.length-1], props.user.weight_units));
+        }
+        let frameEndIndex = inputs.length;
         this.state = {
             inputs: inputs,
             showDatePicker: false,
             daysInFrame: daysInFrame,
             frameEndIndex: frameEndIndex,
             futureProjecting : projectionData.futureProjecting,
-            futureWeights: projectionData.futureWeights,
-            futureDates: projectionData.futureDates,
             pastProjecting : pastProjecting,
-            pastWeights: pastWeights,
-            pastDates: pastDates,
             sliderLeft: 0,
             lineX: 0,
             lineY: 0,
@@ -67,21 +67,13 @@ export default class WeightGraph extends Component {
         canvas.clearRect(0, 0, this.canvas.current.width, graphPixelsHeight);
         canvas.beginPath();
 
-        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
-        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
+        let weights = this.state.inputs;
         
-        let weightsInFrame;
+        let weightsInFrame = weights;
         let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
+
         if (this.state.daysInFrame < weights.length){
             weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
-            dates =  dates.slice(frameStartIndex, this.state.frameEndIndex);
-        } else {
-            //This will either happen if # days from first date to now + future projection exactly equals daysInFrame,
-            //Or because past weights have been projected to fill up the gap
-
-            //Days in frame should should at least equal the number of weights (projected before first entered weight, up to now, and future)
-
-            weightsInFrame = weights;
         }
     
         let frameMax = 1.02 * Math.max(...weightsInFrame);
@@ -91,18 +83,20 @@ export default class WeightGraph extends Component {
         let pxPerDay = graphPixelsWidth/this.state.daysInFrame;
         canvas.strokeStyle = "rgb(0, 0, 0)";
         let monthOpacity = ["0.6", "0.9"];
-        let compDate = moment(this.props.dates[0]).subtract(1, "days");
+
+        let startDate = moment().subtract(this.props.weights.length, "days");
 
         //Line graph
         //startingWeightIndex will be one less than the first weight "In the frame" to account for partial scrolls,
         //Or 0 if the index of the first weight in the frame is 0
         let startingWeightIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame - 1, 0);
+        let frameStartDate = startDate.add(startingWeightIndex, "days");
 
         canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[startingWeightIndex] )/( frameMax - frameMin ));
         canvas.lineTo(pxPerDay, graphPixelsHeight * ( frameMax - weightsInFrame[0] )/( frameMax - frameMin ) );
 
         weightsInFrame.map((weight, i) => {
-            let currDate = moment(dates[i]);
+            let currDate = frameStartDate.clone().add(i, "days");
             let dayMod = 1;
             let monthIndex = currDate.month() % 2;
             canvas.fillStyle = 'rgba(170,170,170, ' + monthOpacity[monthIndex] + ')'; //alternate background color by month
@@ -126,7 +120,7 @@ export default class WeightGraph extends Component {
 
             let realWeightIndex = i + (this.state.frameEndIndex - this.state.daysInFrame);
             //Only draw lines for weights added by user or projected into future
-            if (currDate.isAfter(compDate)){
+            if (currDate.isAfter(startDate)){
                 canvas.moveTo(currLeft + dayMod * pxPerDay, graphPixelsHeight * ( frameMax - weight )/( frameMax - frameMin ));
                 
                 if (realWeightIndex !== this.state.pastProjecting ){
@@ -138,7 +132,6 @@ export default class WeightGraph extends Component {
             return "";
         })
         canvas.stroke();
-
         //If canvas width has changed, mouse coordinates may be too large and extend the size until next mouseover event
         this.coordX.current.style.left = 0;
         this.coordY.current.style.width = 0;
@@ -148,23 +141,11 @@ export default class WeightGraph extends Component {
         window.addEventListener('resize', this.handleResize);
     }
     handleResize = () => {
-        let numWeights = this.props.weights.length + this.state.pastProjecting + this.state.futureProjecting;
-        let todayNum = numWeights - this.state.futureProjecting;
-
-        //Put today in the middle of the screen, or scroll as for right as possible
-        let endWithTodayCenter = todayNum + Math.floor(this.state.daysInFrame/2);
-        let endIndex = endWithTodayCenter; //Note this is more a bound than an index
-
-        if (endWithTodayCenter > numWeights){
-            //This will happen if daysInFrame/2 is larger than futureProjecting 
-            //e.g. if the user has a viewframe larger than 30 (the max number of future days)
-
-            //In this case "bring it back down"
-            endIndex = numWeights;
-        }
+        let numWeights = this.state.inputs.length;
+        let todayNum = numWeights - this.state.futureProjecting - 1;
+        let endIndex = numWeights;
 
         //Update slider bar position accordingly
-//needs to be todayNum - 1 but accurate to pillwidth/barwidth/2
         let todayPercent = todayNum/numWeights;
         let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
         let pillWidth = 0.05 * barWidth;
@@ -197,7 +178,7 @@ export default class WeightGraph extends Component {
     }
     handleScroll(e){
         let sliderBox = this.sliderBar.current.getBoundingClientRect();
-        let numWeights = this.state.pastProjecting + this.props.weights.length + this.state.futureProjecting;
+        let numWeights = this.state.inputs.length;
         let halfSliderPill = 0.025 * sliderBox.width;
         let mouseX = e.clientX - sliderBox.left; //relative to slider bar
 
@@ -245,7 +226,7 @@ export default class WeightGraph extends Component {
         if (!future){
             //Scaling graph without changing future projection
             //Use last day of current future projecting as end
-            end = moment(this.state.futureDates[this.state.futureDates.length - 1]);
+            end = moment().add(this.state.futureProjecting - 1, "days");
             start = end.clone().subtract(n, "days");
         } else {
             //Scaling graph with new future projection
@@ -262,17 +243,16 @@ export default class WeightGraph extends Component {
         this.setDateRange(start, end);
     }
     setDateRange(start, end){
-        if (moment(this.props.dates[0]).isAfter(end)){
-            end = moment(this.props.dates[0]);
+        let startDate = moment().subtract(this.props.weights.length, "days");
+        if (startDate.isAfter(end)){
+            end = startDate;
             alert("You must keep at least 1 added weight in the window");
         }
         let futureProjecting = this.state.futureProjecting;
         let futureWeights = this.state.futureWeights;
-        let futuresDates = this.state.futureDates;
 
         let pastProjecting = this.state.pastProjecting;
         let pastWeights = this.state.pastWeights;
-        let pastDates = this.state.pastDates;
 
         let daysInFrame = Math.ceil(end.diff(start, "days", true));
         if (end.isAfter(moment())){
@@ -284,52 +264,37 @@ export default class WeightGraph extends Component {
             }
             futureProjecting = data.futureProjecting;
             futureWeights = data.futureWeights;
-            futuresDates = data.futureDates;
         }
 
-        let currStart = moment(this.props.dates[0]);
-        if (currStart.isAfter(start)){
-            pastProjecting = Math.floor(currStart.diff(start, "days", true));
+        if (startDate.isAfter(start)){
+            pastProjecting = Math.floor(startDate.diff(start, "days", true));
             pastWeights = Array(pastProjecting).fill().map(x => {return 0});
-            pastDates = [];
-            for (let i = 1; i <= pastProjecting; i ++){
-                let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
-                pastDates.unshift(newDate);
-            }
         } else {
             pastProjecting = 0;
             pastWeights = [];
-            pastDates = [];
         }
         
         let pastAddition = Math.ceil(0.075 * daysInFrame);
         pastProjecting += pastAddition;
-        if (pastDates.length){
-            currStart = moment(pastDates[0]);
-        } else {
-            currStart = moment(this.props.dates[0]);
-        }
         for (let i = 1; i <= pastAddition; i ++){
-            let newDate = currStart.clone().subtract(i, "days").format("YYYY-MM-DD");
-            pastDates.unshift(newDate);
             pastWeights.unshift(0);
         }
 
+        let inputs = this.state.inputs;
+        inputs.splice(inputs.length - this.state.futureProjecting, futureWeights.length, futureWeights);
+        inputs.splice(0, pastWeights.length, pastWeights);
+
         this.setState({
+            inputs: inputs,
             daysInFrame: daysInFrame,
             showDatePicker: false,
             futureProjecting : futureProjecting,
-            futureWeights: futureWeights,
-            futureDates: futuresDates,
             pastProjecting: pastProjecting,
-            pastWeights: pastWeights,
-            pastDates: pastDates,
             hoverIndex: 0,
         }, () => this.handleResize());
     }
     futureProject(daysToProject){
         let weights = this.props.weights;
-        let dates = this.props.dates;
         if (isNaN(daysToProject)){
             return null;
         }
@@ -342,45 +307,50 @@ export default class WeightGraph extends Component {
         let futureWeights, futureDates;
         //Get last day, add the same weight state.projecting days later, interpolate between
         futureDates = [];
-        futureDates.push(dates[dates.length-1]);
-        futureDates.push(moment(futureDates[0]).add(daysToProject, "days").format("YYYY-MM-DD"));
+        futureDates.push(moment());
+        futureDates.push(moment().add(daysToProject, "days").format("YYYY-MM-DD"));
 
         futureWeights = [];
         futureWeights.push(weights[weights.length-1]);
         futureWeights.push(weights[weights.length-1]);
         let tempData = interpolateDates(futureWeights, futureDates);
 
-        futureWeights = weights.concat(tempData.weights.slice(1,tempData.weights.length));
-        futureDates = dates.concat(tempData.dates.slice(1,tempData.dates.length));
+        futureWeights = weights.concat(tempData.weights.slice(1,tempData.weights.length)).slice(weights.length);
 
-        futureWeights = futureWeights.slice(weights.length);
-        futureDates = futureDates.slice(dates.length);
         return {
             futureProjecting : daysToProject,
-            futureWeights: futureWeights,
-            futureDates: futureDates
+            futureWeights: futureWeights
         };
     }
     changeWeight(e, i){
-        e.preventDefault(); 
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
-        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates).slice(frameStartIndex, this.state.frameEndIndex);
-        let currDate = moment(dates[i]);
-
+        e.preventDefault();
+        let val = e.target.value;
+        let currDate = moment().subtract(this.state.inputs.length - i, "days");
         if (moment().isAfter(currDate) || moment().isSame(currDate)){
             //currDate is between first date and now
+
             let newInputs = this.state.inputs;
-            newInputs[i] = e.target.value;
-            this.setState({inputs: newInputs}, () => this.renderGraph());
-        } else if (moment(currDate).isAfter(moment())){
+            newInputs[i] = val;
+            this.setState({
+                inputs: newInputs
+            }, () => this.renderGraph());
+
+        } else if (currDate.isAfter(moment())){
             //currDate is in the future
+
             let newProjection = this.state.futureWeights;
-            let targetWeight = this.convertWeight(e.target.value);
-            if(!targetWeight){
+            let targetWeight = this.convertWeight(val);
+            let newInputs = this.state.inputs;
+
+            if( !targetWeight ){
                 targetWeight = 0;
             }
-            if (i > this.state.frameEndIndex - this.state.futureProjecting){
-                //When a user changes a projected weights, all weights before that day are filled
+
+            let futureIndex = i - this.props.weights.length - this.state.pastProjecting;
+
+            if ( futureIndex > 0 ){
+                //Iinterpolate all days before current
+
                 let anchorWeight = this.props.weights[this.props.weights.length-1];
                 let interpWeights = [];
                 interpWeights.push(anchorWeight);
@@ -389,43 +359,44 @@ export default class WeightGraph extends Component {
                 let interpDates = [];
                 let now = moment();
                 interpDates.push(now);
-                interpDates.push(now.clone().add(i+1, "days").format("YYYY-MM-DD"));
+                interpDates.push(now.clone().add(futureIndex, "days").format("YYYY-MM-DD"));
 
                 let interpSection = interpolateDates(interpWeights, interpDates).weights.slice(1);
-                newProjection = interpSection.concat(newProjection.slice(i+1));
-            } else {
-                newProjection[i] = targetWeight;
-            }
-            this.setState({futureWeights: newProjection}, () => this.renderGraph());
-        } 
-    }
-	convertWeight(weight){
-		let weightUnits = this.props.user.weight_units;
-		if (weightUnits === "Pounds"){
-			return poundsToKg(weight);
-		}
-		return weight;
-    }
-    submitWeightForm(e, i){
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
-        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates).slice(frameStartIndex, this.state.frameEndIndex);
+                newProjection = interpSection.concat(newProjection.slice(futureIndex));
 
+                for (let j = 0; j < futureIndex + 1; j ++){
+                    newInputs[i + j] = newProjection[j];
+                }
+            } else {
+                newProjection[futureIndex] = targetWeight;
+                newInputs[i] = val;
+            }
+
+            this.setState({
+                futureWeights: newProjection,
+                inputs: newInputs
+            }, () => this.renderGraph());
+            
+        }
+    }
+    handleInputKey(e, i){
         if (e.key === 'Enter'){
             e.preventDefault();
-            let currDate = moment(dates[i]);
-            let id = Array(this.state.pastProjecting).fill().map(x => {return null}).concat(this.props.ids).concat(Array(this.state.futureProjecting).fill().map(x => {return null}))[i];
-
-            if (moment(this.props.dates[0]).isAfter(currDate)){
+            let daysFromNow = this.state.inputs.length - this.state.futureProjecting - i - this.state.pastProjecting;
+            let currDate = moment().subtract(daysFromNow, "days");
+            if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
                 //currDate is before first user added weight (i.e. it is in pastWeights)
-                this.props.addWeight(this.convertWeight(e.target.value), currDate);
+                this.props.addWeight(this.convertWeight(e.target.value), currDate.format("YYYY-MM-DD"));
 
             } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
                 //currDate is between now and first date (inc)
                 let newWeight = this.state.inputs[i];
-                
+                let index = i - this.state.pastProjecting;
+                let id = this.props.ids[index];
                 if (id === null){
                     //Weight was interpolated
-                    this.props.addWeight(this.convertWeight(newWeight), currDate)
+                    console.log(currDate.format("YYYY-MM-DD"))
+                    this.props.addWeight(this.convertWeight(newWeight), currDate.format("YYYY-MM-DD"))
                     .then(() => {
                         this.renderGraph();
                     })
@@ -440,9 +411,14 @@ export default class WeightGraph extends Component {
                 //date is in future
                 console.log("future")
             }
-        } else {
-            this.changeWeight(e, i)
         }
+    }
+	convertWeight(weight){
+		let weightUnits = this.props.user.weight_units;
+		if (weightUnits === "Pounds"){
+			return poundsToKg(weight);
+		}
+		return weight;
     }
     levelIcon(index, carbRanks, allowed){
 
@@ -503,8 +479,7 @@ export default class WeightGraph extends Component {
         //Mouse position relative to scrolled canvas left
         let mouseX = e.clientX - canvasBox.left;
         
-        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
-        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
+        let weights = this.state.inputs;
 
         let boundingWidth = this.state.daysInFrame;
         let weightIndex = Math.max(Math.min(Math.floor(boundingWidth * mouseX/canvasBox.width), weights.length-1), 0);
@@ -513,15 +488,13 @@ export default class WeightGraph extends Component {
         let lineX = canvasBox.width * (weightIndex + 1) / boundingWidth;
 
         let realWeightIndex = weightIndex + (this.state.frameEndIndex - this.state.daysInFrame);
-        let toComp = moment(dates[realWeightIndex]);
+        let toComp = moment().subtract(this.props.weights.length - realWeightIndex);
         let today = moment();
-        if (toComp.isAfter(today)){
+        if (toComp.isAfter(today) || toComp.isSame(today)){
             weightIndex -- ;
-            if (today.format("YYYY-MM-DD") === dates[realWeightIndex]){
+            if (today.format("YYYY-MM-DD") === toComp.format("YYYY-MM-DD")){
                 lineX = canvasBox.width * (weightIndex + 2) / boundingWidth
             }
-        } else if (today.format("YYYY-MM-DD") === dates[realWeightIndex]){
-            lineX = canvasBox.width * (weightIndex + 2) / boundingWidth
         }
 
         let weightsInFrame;
@@ -607,18 +580,12 @@ export default class WeightGraph extends Component {
     }
     render(){
         let user = this.props.user;
-        let weights = this.state.pastWeights.concat(this.props.weights).concat(this.state.futureWeights);
-        let dates = this.state.pastDates.concat(this.props.dates).concat(this.state.futureDates);
-        let ids = Array(this.state.pastProjecting).fill().map(x => {return null}).concat(this.props.ids).concat(Array(this.state.futureProjecting).fill().map(x => {return null}));
+        let weights = this.state.inputs;
 
         let weightsInFrame;
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
-        if (this.state.daysInFrame < weights.length){
-            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
-            dates = dates.slice(frameStartIndex, this.state.frameEndIndex);
-        } else {
-            weightsInFrame = weights.slice(this.state.pastProjecting);
-        }
+        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame - 1;
+        weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
+
         let initialWeight = this.props.weights[this.props.startingIndex];
 
         let weightAvgs, numLevels, levelMap;
@@ -711,10 +678,11 @@ export default class WeightGraph extends Component {
                     <div id='graph-scroller' onMouseMove={(e) => this.showGraphLines(e)}>
                         <div id='dates-container' style={{width: canvasWidth}}>
                             {
-                                dates.map((date, i) => {
-                                    let dateInfo = this.dateString(date, pxPerDay, i);
+                                weightsInFrame.map((weight, i) => {
+                                    let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days").format("YYYY-MM-DD");
+                                    let dateInfo = this.dateString(date, pxPerDay, i + frameStartIndex);
                                     return (
-                                        <div key={i} style={dates[i] === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} } className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
+                                        <div key={i} style={date === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} } className={date === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
                                             <div className='date-number-area'>{ dateInfo.dateString }</div>
                                             {
                                                 pxPerDay > 15 ?
@@ -731,8 +699,9 @@ export default class WeightGraph extends Component {
                             {
                                 user.mode === "0" ?
                                     weightsInFrame.map((weight, i) => {
+                                        let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days");
                                         let onMonth = " on-month";
-                                        if (moment(dates[i]).month() % 2 === 0){
+                                        if (date.month() % 2 === 0){
                                             onMonth = " off-month";
                                         }
                                         let paddingStyle;
@@ -745,7 +714,7 @@ export default class WeightGraph extends Component {
                                         }
                                         let currClassName = "level-graph-date";
                                         let currWidth = pxPerDay;
-                                        if (dates[i] === moment().format("YYYY-MM-DD")){
+                                        if (date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD")){
                                             currClassName = "level-graph-date level-graph-today";
                                             currWidth = 2 * pxPerDay;
                                         }
@@ -753,11 +722,13 @@ export default class WeightGraph extends Component {
                                             <div key={i} className={currClassName} style={{width: currWidth, padding: paddingStyle}}>
                                                 {
                                                     levelMap.map((levelWeight, j) => {
-                                                        let weightOk = weight < levelWeight;
+                                                        let weightOk = this.convertWeight(weight) < levelWeight;
                                                         return (
-                                                            <div key={j} className={weightOk ? "level-section weight-ok" + onMonth : "level-section weight-not-ok" + onMonth}>
+                                                            <div 
+                                                                key={j} 
+                                                                className={weightOk ? "level-section weight-ok" + onMonth : "level-section weight-not-ok" + onMonth}>
                                                                 {
-                                                                    pxPerDay > 30 && moment(dates[i]).isAfter(moment().subtract(1, "days"))? 
+                                                                    pxPerDay > 30 && date.isAfter(moment().subtract(1, "days"))? 
                                                                         this.levelIcon(j, user.carb_ranks, weightOk)
                                                                     :null
                                                                 }
@@ -771,12 +742,13 @@ export default class WeightGraph extends Component {
                                 :
                                     weightAvgs.map((weight, i) => {
                                         let onMonth = "on-month";
-                                        if (moment(dates[i]).month() % 2 === 0){
+                                        let date = moment().subtract(this.props.weights.length - frameStartIndex + i , "days");
+                                        if (date.month() % 2 === 0){
                                             onMonth = "off-month";
                                         }
                                         return (
                                             <div key={i} 
-                                                className={dates[i] === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'} 
+                                                className={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'} 
                                                 style={daysInFrame < 30 ? {padding: "0 2px"} : daysInFrame < 50 ? {padding: "0 1px"} : {padding: "0 0"}}>
                                                 {
                                                     levelMap.map(i => {
@@ -824,29 +796,19 @@ export default class WeightGraph extends Component {
                         <div id='weight-input-container' style={{width: canvasWidth}}>
                             {
                                 pxPerDay > 45 ?
-                                    weightsInFrame.map((weight,i) => {
-                                        let weightString = weightStringFromKg(weight, user.weight_units);
-                                        if (user.weight_units === "Pounds"){
-                                            weightString = weightString.substring(0, weightString.length - 7);
-                                        } else if (user.weight_units === "Kilograms"){
-                                            weightString = weightString.substring(0, weightString.length - 10);
-                                        }
-                                        
+                                    weightsInFrame.map((weight, i) => {
+                                        let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days");
                                         return (
-                                            <form 
-                                                key={i} 
-                                                className={dates[i] === moment().format("YYYY-MM-DD") ? 'graph-weight level-graph-today' : 'graph-weight'} 
-                                                style={dates[i] === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
-                                                onKeyPress={(e) => this.submitWeightForm(e, i, ids[i])}
-                                            >
-                                                <input 
-                                                    onChange={(e) => this.changeWeight(e, i)} 
-                                                    className='graph-weight-number' 
-                                                    type='number' 
-                                                    step="0.01" 
-                                                    defaultValue={weightString} 
-                                                />
-                                            </form>
+                                            <input
+                                                key={i}
+                                                onChange={(e) => this.changeWeight(e, i + frameStartIndex)}
+                                                onKeyPress={e => this.handleInputKey(e, i + frameStartIndex)}
+                                                className={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? 'graph-weight graph-weight-number level-graph-today' : 'graph-weight graph-weight-number'}
+                                                style={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
+                                                type='number' 
+                                                step="0.01"
+                                                defaultValue={weight}
+                                            />
                                         )
                                     })
                                 :

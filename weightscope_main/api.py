@@ -158,6 +158,7 @@ class WeightViewSet(viewsets.ModelViewSet):
 		serializer.save()
 	
 	def update(self, request, pk):
+		print("here")
 		weight = WeightInput.objects.get(id=pk)
 		weight.weight_kg = request.data['weight_kg']
 		weight.save()

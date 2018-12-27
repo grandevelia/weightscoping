@@ -26,7 +26,17 @@ export const carbOptions = [
 	"Beer/Wine"
 ];
 
-const carbList =[["Raised", "Flat", "Croissants", "Muffins", "Scones", "Tortillas", "Naan", "Pizza Crust",  "Crackers",  "etc."], ["Rice", "Wheat", "Corn", "Oats", "Separate or part of a dish", "Cold Breakfast Cereals", "Granola", "Oatmeal", "Cous-cous", "etc"], ["Potatoes", "Yams",  "Sweet Potatoes", "Casava", "Separate or part of a dish"], ["Any sugar/sweet treat (no exceptions)"], ["Soda/pop (diet, too)", "Fruit Juice (even if 100% fruit)"], ["Chips/Crisps", "Crackers", "Pretzels", "Popcorn", "etc."], [""], [""], [""]];
+const carbList =[
+	["Raised", "Flat", "Croissants", "Muffins", "Scones", "Tortillas", "Naan", "Pizza Crust",  "Crackers",  "etc."],
+	["Rice", "Wheat", "Corn", "Oats", "Separate or part of a dish", "Cold Breakfast Cereals", "Granola", "Oatmeal", "Cous-cous", "etc"],
+	["Potatoes", "Yams",  "Sweet Potatoes", "Casava", "Separate or part of a dish"],
+	["Any sugar/sweet treat (no exceptions)"],
+	["Soda/pop (diet, too)", "Fruit Juice (even if 100% fruit)"],
+	["Chips/Crisps", "Crackers", "Pretzels", "Popcorn", "etc."],
+	[""],
+	[""],
+	[""]
+];
 
 export const carbOrder = [5,0,4,1,6,2,3,7,8];
 export const maintenanceCarbOrder = [3,2,4,1,0,5,6,7,8];
@@ -117,6 +127,9 @@ export function	idealWeightString(weightUnits, heightUnits, sex, primary, second
 	let weightKg = averageAlgs(heightInches, sex);
 
  	return weightStringFromKg(weightKg, weightUnits);
+}
+export function weightFromKg(weightKg, targetUnit){
+	return parseFloat(weightStringFromKg(weightKg, targetUnit));
 }
 export function weightStringFromKg(weightKg, targetUnit){
 
