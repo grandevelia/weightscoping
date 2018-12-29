@@ -40,7 +40,7 @@ export default class WeightGraph extends Component {
         for (let i = 0; i < projectionData.futureProjecting; i ++){
             inputs.push(weightFromKg(props.weights[props.weights.length-1], props.user.weight_units));
         }
-        let frameEndIndex = inputs.length;
+        let frameEndIndex = inputs.length - 1;
         this.state = {
             inputs: inputs,
             showDatePicker: false,
@@ -51,7 +51,6 @@ export default class WeightGraph extends Component {
             sliderLeft: 0,
             lineX: 0,
             lineY: 0,
-            hoverIndex: 0,
             windowHeight: 0,
             windowWidth: 0,
             addWeightTop: 0,
@@ -70,10 +69,10 @@ export default class WeightGraph extends Component {
         let weights = this.state.inputs;
         
         let weightsInFrame = weights;
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
+        let frameStartIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame, 0);
 
         if (this.state.daysInFrame < weights.length){
-            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
+            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         }
     
         let frameMax = 1.02 * Math.max(...weightsInFrame);
@@ -87,12 +86,9 @@ export default class WeightGraph extends Component {
         let startDate = moment().subtract(this.props.weights.length, "days");
 
         //Line graph
-        //startingWeightIndex will be one less than the first weight "In the frame" to account for partial scrolls,
-        //Or 0 if the index of the first weight in the frame is 0
-        let startingWeightIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame - 1, 0);
-        let frameStartDate = startDate.add(startingWeightIndex, "days");
+        let frameStartDate = startDate.add(frameStartIndex, "days");
 
-        canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[startingWeightIndex] )/( frameMax - frameMin ));
+        canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[frameStartIndex] )/( frameMax - frameMin ));
         canvas.lineTo(pxPerDay, graphPixelsHeight * ( frameMax - weightsInFrame[0] )/( frameMax - frameMin ) );
 
         weightsInFrame.map((weight, i) => {
@@ -118,7 +114,7 @@ export default class WeightGraph extends Component {
             }
             canvas.fillRect(currLeft, 0, dayMod * pxPerDay - 1, graphPixelsHeight);
 
-            let realWeightIndex = i + (this.state.frameEndIndex - this.state.daysInFrame);
+            let realWeightIndex = i + frameStartIndex;
             //Only draw lines for weights added by user or projected into future
             if (currDate.isAfter(startDate)){
                 canvas.moveTo(currLeft + dayMod * pxPerDay, graphPixelsHeight * ( frameMax - weight )/( frameMax - frameMin ));
@@ -142,11 +138,11 @@ export default class WeightGraph extends Component {
     }
     handleResize = () => {
         let numWeights = this.state.inputs.length;
-        let todayNum = numWeights - this.state.futureProjecting - 1;
-        let endIndex = numWeights;
+        let endIndex = numWeights - 1;
+        let todayIndex = endIndex - this.state.futureProjecting;
 
         //Update slider bar position accordingly
-        let todayPercent = todayNum/numWeights;
+        let todayPercent = todayIndex/numWeights;
         let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
         let pillWidth = 0.05 * barWidth;
         let sliderLeft = Math.round((barWidth - pillWidth) * todayPercent);
@@ -289,8 +285,7 @@ export default class WeightGraph extends Component {
             daysInFrame: daysInFrame,
             showDatePicker: false,
             futureProjecting : futureProjecting,
-            pastProjecting: pastProjecting,
-            hoverIndex: 0,
+            pastProjecting: pastProjecting
         }, () => this.handleResize());
     }
     futureProject(daysToProject){
@@ -382,7 +377,7 @@ export default class WeightGraph extends Component {
     handleInputKey(e, i){
         if (e.key === 'Enter'){
             e.preventDefault();
-            let daysFromNow = this.state.inputs.length - this.state.futureProjecting - i - this.state.pastProjecting;
+            let daysFromNow = this.state.inputs.length - this.state.futureProjecting - i;
             let currDate = moment().subtract(daysFromNow, "days");
             if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
                 //currDate is before first user added weight (i.e. it is in pastWeights)
@@ -395,7 +390,6 @@ export default class WeightGraph extends Component {
                 let id = this.props.ids[index];
                 if (id === null){
                     //Weight was interpolated
-                    console.log(currDate.format("YYYY-MM-DD"))
                     this.props.addWeight(this.convertWeight(newWeight), currDate.format("YYYY-MM-DD"))
                     .then(() => {
                         this.renderGraph();
@@ -476,30 +470,27 @@ export default class WeightGraph extends Component {
     }
     showGraphLines = (e) => {
         let canvasBox = this.canvas.current.getBoundingClientRect();
-        //Mouse position relative to scrolled canvas left
-        let mouseX = e.clientX - canvasBox.left;
-        
+        let mouseX = e.clientX - canvasBox.left; //Mouse position relative to scrolled canvas left
         let weights = this.state.inputs;
 
-        let boundingWidth = this.state.daysInFrame;
-        let weightIndex = Math.max(Math.min(Math.floor(boundingWidth * mouseX/canvasBox.width), weights.length-1), 0);
-        
-        //When past projecting
-        let lineX = canvasBox.width * (weightIndex + 1) / boundingWidth;
+        let frameIndex = Math.max(Math.min(Math.floor(this.state.daysInFrame * mouseX/canvasBox.width), weights.length-1), 0);
+        let weightIndex = frameIndex + this.state.frameEndIndex - this.state.daysInFrame;
+        let lineX = canvasBox.width * (frameIndex + 1) / this.state.daysInFrame;
 
-        let realWeightIndex = weightIndex + (this.state.frameEndIndex - this.state.daysInFrame);
-        let toComp = moment().subtract(this.props.weights.length - realWeightIndex);
+        let toComp = moment().subtract(weights.length - 1 - weightIndex - this.state.futureProjecting, "days");
         let today = moment();
-        if (toComp.isAfter(today) || toComp.isSame(today)){
-            weightIndex -- ;
-            if (today.format("YYYY-MM-DD") === toComp.format("YYYY-MM-DD")){
-                lineX = canvasBox.width * (weightIndex + 2) / boundingWidth
-            }
+
+        if (toComp.isAfter(today)){
+            frameIndex -- ;
+        }
+        if (toComp.add(1, "days").isSame(today)){
+            lineX = canvasBox.width * (frameIndex + 2) / this.state.daysInFrame
         }
 
         let weightsInFrame;
         if (this.state.daysInFrame < this.props.weights.length){
-            weightsInFrame = weights.slice(this.state.frameEndIndex - this.state.daysInFrame, this.state.frameEndIndex);
+            let frameStartIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame, 0);
+            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         } else {
             weightsInFrame = weights.slice(this.state.pastProjecting);
         }
@@ -507,8 +498,8 @@ export default class WeightGraph extends Component {
         let frameMin = 0.98 * Math.min(...weightsInFrame);
 
         let lineY;
-        if (realWeightIndex >= this.state.pastProjecting){
-            lineY = canvasBox.height * (1 - (frameMax - weights[realWeightIndex]) / (frameMax - frameMin));
+        if (weightIndex >= this.state.pastProjecting){
+            lineY = canvasBox.height * (1 - (frameMax - weights[weightIndex]) / (frameMax - frameMin));
         } else {
             lineY = canvasBox.height;
         }
@@ -516,9 +507,10 @@ export default class WeightGraph extends Component {
             lineY = 0;
         }
 
-        if (weightIndex !== this.state.hoverIndex){
-            this.setState({lineX: lineX-1, lineY: lineY, hoverIndex: weightIndex});
-        }
+        this.setState({
+            lineX: lineX-1, 
+            lineY: lineY,
+        });
     }
     dateString(date, pxPerDay, i){
         let markToday = false;
@@ -583,9 +575,8 @@ export default class WeightGraph extends Component {
         let weights = this.state.inputs;
 
         let weightsInFrame;
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame - 1;
-        weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex);
-
+        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
+        weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         let initialWeight = this.props.weights[this.props.startingIndex];
 
         let weightAvgs, numLevels, levelMap;
@@ -807,7 +798,7 @@ export default class WeightGraph extends Component {
                                                 style={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
                                                 type='number' 
                                                 step="0.01"
-                                                defaultValue={weight}
+                                                value={this.state.inputs[i + frameStartIndex]}
                                             />
                                         )
                                     })
@@ -824,37 +815,3 @@ export default class WeightGraph extends Component {
         )
     }
 }
-
-/*this.state.hoverIndex >= this.state.pastProjecting ? 
-
-    <div id='graph-hover'>
-        <div id='graph-hover-weight'>{weightStringFromKg(weights[this.state.hoverIndex], user.weight_units)}</div>
-        <div id='graph-hover-date'>{dates[this.state.hoverIndex]}</div>
-        <div id='graph-hover-level'>{"Level " + level}</div>
-        <div id='graph-hover-allowed'>
-            <div className='graph-hover-allowed-title'>Allowed</div>
-            <div className='graph-hover-icons'>
-                //TODO NOTE TO SELF: If this is needed, just iterate through all levels and use existing icon func, no need for two different functions
-                {this.allowedIcons(level, user.carb_ranks)}
-            </div>
-        </div>
-        <div id='graph-hover-allowed'>
-            <div className='graph-hover-allowed-title'>Not Allowed</div>
-            <div className='graph-hover-icons'>
-                {this.disallowedIcons(level, user.carb_ranks)}
-            </div>
-        </div>
-
-        {
-            ids[this.state.hoverIndex] === null ?
-                <div id='graph-hover-interpolated'>Estimated Weight</div>
-            : null
-        }
-
-    </div>
-:
-    <div id='graph-hover'>
-        <div id='graph-hover-weight'>Empty Weight</div>
-        <div id='graph-hover-date'>{dates[this.state.hoverIndex]}</div>
-        <div id='click-hint'>Click the graph to add a weight</div>
-    </div>*/
