@@ -25,22 +25,19 @@ export default class WeightGraph extends Component {
             //Backfill if there isn't enough data to fill the ui
             pastProjecting += daysInFrame/2 - props.weights.length;
         }
-
         //Filler weights before start
         for (let i = 0; i < pastProjecting; i ++){
             inputs.push(0);
         }
-
         //All added or interpolated weights
         for (let i = 0; i < props.weights.length; i ++){
             inputs.push(weightFromKg(props.weights[i], props.user.weight_units));
         }
-
         //future weights initialized to today's weight
         for (let i = 0; i < projectionData.futureProjecting; i ++){
             inputs.push(weightFromKg(props.weights[props.weights.length-1], props.user.weight_units));
         }
-        let frameEndIndex = inputs.length - 1;
+        let frameEndIndex = inputs.length - 2;
         this.state = {
             inputs: inputs,
             showDatePicker: false,
@@ -53,14 +50,11 @@ export default class WeightGraph extends Component {
             lineY: 0,
             windowHeight: 0,
             windowWidth: 0,
-            addWeightTop: 0,
-            addWeightLeft: 0,
             addWeightIndex: 0
         }
     }
     renderGraph(){
         let graphPixelsWidth = this.canvas.current.width;
-
         let canvas = this.canvas.current.getContext('2d');
         let graphPixelsHeight = this.canvas.current.height;
         canvas.clearRect(0, 0, this.canvas.current.width, graphPixelsHeight);
@@ -68,13 +62,17 @@ export default class WeightGraph extends Component {
 
         let weights = this.state.inputs;
         
-        let weightsInFrame = weights;
-        let frameStartIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame, 0);
+        let daysInFrame = this.state.daysInFrame;
+        //+1 because pure subtraction puts "start" off the frame
+        let frameStartIndex = this.state.frameEndIndex - daysInFrame + 1;
 
-        if (this.state.daysInFrame < weights.length){
-            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        let todayIndex = this.state.inputs.length - this.state.futureProjecting - 1;
+        if (todayIndex >= frameStartIndex && todayIndex <= this.state.frameEndIndex){
+            frameStartIndex ++; //If today is in the frame, select 1 less weight to be in the frame
         }
-    
+
+        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        
         let frameMax = 1.02 * Math.max(...weightsInFrame);
         let frameMin = 0.98 * Math.min(...weightsInFrame.filter(x => x > 0));
         
@@ -83,7 +81,7 @@ export default class WeightGraph extends Component {
         canvas.strokeStyle = "rgb(0, 0, 0)";
         let monthOpacity = ["0.6", "0.9"];
 
-        let startDate = moment().subtract(this.props.weights.length, "days");
+        let startDate = moment().subtract(this.props.weights.length - 1 + this.state.pastProjecting, "days");
 
         //Line graph
         let frameStartDate = startDate.add(frameStartIndex, "days");
@@ -138,7 +136,16 @@ export default class WeightGraph extends Component {
     }
     handleResize = () => {
         let numWeights = this.state.inputs.length;
-        let endIndex = numWeights - 1;
+        
+        //Put today in the center of the screen
+        //The first -1 converts place to index, the second is because today takes up 2 spots
+        //Math.ceil ensures integer with odd days and frame, and shows more future days
+        //Change to floor for less future days instead
+        let endIndex = this.state.inputs.length - 1 - this.state.futureProjecting + Math.ceil(this.state.daysInFrame/2) - 1; 
+
+        if (this.state.inputs.length-1 < endIndex){
+            endIndex = numWeights - 1;
+        }
         let todayIndex = endIndex - this.state.futureProjecting;
 
         //Update slider bar position accordingly
@@ -201,8 +208,7 @@ export default class WeightGraph extends Component {
         //Account for days in frame when calculating percentfromleft
         let percentFromLeft = sliderLeft/(sliderBox.width - 2 * halfSliderPill);
         let mouseIndex = Math.round( ( numWeights - this.state.daysInFrame ) * percentFromLeft );
-        let frameEndIndex = mouseIndex + this.state.daysInFrame;
-
+        let frameEndIndex = mouseIndex + (this.state.daysInFrame - 1);
         this.setState({
             frameEndIndex: frameEndIndex,
             sliderLeft: sliderLeft
@@ -328,7 +334,10 @@ export default class WeightGraph extends Component {
             newInputs[i] = val;
             this.setState({
                 inputs: newInputs
-            }, () => this.renderGraph());
+            }, () => {
+                alert("Weight Submitted!");
+                this.renderGraph();
+            });
 
         } else if (currDate.isAfter(moment())){
             //currDate is in the future
@@ -370,14 +379,18 @@ export default class WeightGraph extends Component {
             this.setState({
                 futureWeights: newProjection,
                 inputs: newInputs
-            }, () => this.renderGraph());
+            }, () => {
+                alert("Weight Submitted!");
+                this.renderGraph();
+            });
             
         }
     }
     handleInputKey(e, i){
         if (e.key === 'Enter'){
             e.preventDefault();
-            let daysFromNow = this.state.inputs.length - this.state.futureProjecting - i;
+            //First -1 converts length to index
+            let daysFromNow = this.state.inputs.length - 1 - this.state.futureProjecting - i;
             let currDate = moment().subtract(daysFromNow, "days");
             if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
                 //currDate is before first user added weight (i.e. it is in pastWeights)
@@ -469,27 +482,41 @@ export default class WeightGraph extends Component {
         }
     }
     showGraphLines = (e) => {
+        let daysInFrame = this.state.daysInFrame;
+
+        //+1 because pure subtraction puts "start" off the frame
+        let frameStartIndex = this.state.frameEndIndex - daysInFrame + 1;
+
+        let todayIndex = this.state.inputs.length - this.state.futureProjecting - 1;
+        if (todayIndex >= frameStartIndex && todayIndex <= this.state.frameEndIndex){
+            frameStartIndex ++; //If today is in the frame, select 1 less weight to be in the frame
+        }
+
         let canvasBox = this.canvas.current.getBoundingClientRect();
         let mouseX = e.clientX - canvasBox.left; //Mouse position relative to scrolled canvas left
         let weights = this.state.inputs;
 
-        let frameIndex = Math.max(Math.min(Math.floor(this.state.daysInFrame * mouseX/canvasBox.width), weights.length-1), 0);
-        let weightIndex = frameIndex + this.state.frameEndIndex - this.state.daysInFrame;
+        let frameIndex = Math.max(Math.min(Math.floor( (this.state.daysInFrame - 1) * mouseX/canvasBox.width), weights.length-1), 0);
+        let mouseIndex = frameIndex + frameStartIndex;
+
+        //frameIndex + 1 pushes the line to the right edge, 
+        //this.state.daysInFrame rather than '' - 1 is because # of days in frame is counted, not indexes
         let lineX = canvasBox.width * (frameIndex + 1) / this.state.daysInFrame;
 
-        let toComp = moment().subtract(weights.length - 1 - weightIndex - this.state.futureProjecting, "days");
-        let today = moment();
-
-        if (toComp.isAfter(today)){
-            frameIndex -- ;
-        }
-        if (toComp.add(1, "days").isSame(today)){
-            lineX = canvasBox.width * (frameIndex + 2) / this.state.daysInFrame
+        if (mouseIndex === todayIndex){
+            //Cursor is in first half of "Today"
+            //push line to the end of today rather than the middle
+            lineX = canvasBox.width * (frameIndex + 2) / this.state.daysInFrame; 
+        } else if (mouseIndex >= todayIndex){
+            //Cursor is in second half of "Today"
+            //Move the index one back so the correct Y can be found
+            mouseIndex --;
         }
 
         let weightsInFrame;
         if (this.state.daysInFrame < this.props.weights.length){
-            let frameStartIndex = Math.max(this.state.frameEndIndex - this.state.daysInFrame, 0);
+            //+1 because pure subtraction puts "start" off the frame
+            let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame + 1;
             weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         } else {
             weightsInFrame = weights.slice(this.state.pastProjecting);
@@ -498,8 +525,8 @@ export default class WeightGraph extends Component {
         let frameMin = 0.98 * Math.min(...weightsInFrame);
 
         let lineY;
-        if (weightIndex >= this.state.pastProjecting){
-            lineY = canvasBox.height * (1 - (frameMax - weights[weightIndex]) / (frameMax - frameMin));
+        if (mouseIndex >= this.state.pastProjecting){
+            lineY = canvasBox.height * (1 - (frameMax - weights[mouseIndex]) / (frameMax - frameMin));
         } else {
             lineY = canvasBox.height;
         }
@@ -573,10 +600,17 @@ export default class WeightGraph extends Component {
     render(){
         let user = this.props.user;
         let weights = this.state.inputs;
+        let daysInFrame = this.state.daysInFrame;
+        //+1 because pure subtraction puts "start" off the frame
+        let frameStartIndex = this.state.frameEndIndex - daysInFrame + 1;
 
-        let weightsInFrame;
-        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
-        weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        let todayIndex = this.state.inputs.length - this.state.futureProjecting - 1;
+        if (todayIndex >= frameStartIndex && todayIndex <= this.state.frameEndIndex){
+            frameStartIndex ++; //If today is in the frame, select 1 less weight to be in the frame
+        }
+
+        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        
         let initialWeight = this.props.weights[this.props.startingIndex];
 
         let weightAvgs, numLevels, levelMap;
@@ -593,7 +627,6 @@ export default class WeightGraph extends Component {
             levelMap.splice(0 , 1);
         }
 
-        let daysInFrame = this.state.daysInFrame;
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
@@ -670,7 +703,7 @@ export default class WeightGraph extends Component {
                         <div id='dates-container' style={{width: canvasWidth}}>
                             {
                                 weightsInFrame.map((weight, i) => {
-                                    let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days").format("YYYY-MM-DD");
+                                    let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days").format("YYYY-MM-DD");
                                     let dateInfo = this.dateString(date, pxPerDay, i + frameStartIndex);
                                     return (
                                         <div key={i} style={date === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} } className={date === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
@@ -690,7 +723,7 @@ export default class WeightGraph extends Component {
                             {
                                 user.mode === "0" ?
                                     weightsInFrame.map((weight, i) => {
-                                        let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days");
+                                        let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
                                         let onMonth = " on-month";
                                         if (date.month() % 2 === 0){
                                             onMonth = " off-month";
@@ -733,7 +766,7 @@ export default class WeightGraph extends Component {
                                 :
                                     weightAvgs.map((weight, i) => {
                                         let onMonth = "on-month";
-                                        let date = moment().subtract(this.props.weights.length - frameStartIndex + i , "days");
+                                        let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
                                         if (date.month() % 2 === 0){
                                             onMonth = "off-month";
                                         }
@@ -788,7 +821,7 @@ export default class WeightGraph extends Component {
                             {
                                 pxPerDay > 45 ?
                                     weightsInFrame.map((weight, i) => {
-                                        let date = moment().subtract(this.props.weights.length - frameStartIndex - i , "days");
+                                        let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
                                         return (
                                             <input
                                                 key={i}
