@@ -496,9 +496,8 @@ export default class WeightGraph extends Component {
         let mouseX = e.clientX - canvasBox.left; //Mouse position relative to scrolled canvas left
         let weights = this.state.inputs;
 
-        let frameIndex = Math.max(Math.min(Math.floor( (this.state.daysInFrame - 1) * mouseX/canvasBox.width), weights.length-1), 0);
+        let frameIndex = Math.max(Math.min(Math.floor( this.state.daysInFrame * mouseX/canvasBox.width), this.state.daysInFrame-1), 0);
         let mouseIndex = frameIndex + frameStartIndex;
-
         //frameIndex + 1 pushes the line to the right edge, 
         //this.state.daysInFrame rather than '' - 1 is because # of days in frame is counted, not indexes
         let lineX = canvasBox.width * (frameIndex + 1) / this.state.daysInFrame;
@@ -506,21 +505,19 @@ export default class WeightGraph extends Component {
         if (mouseIndex === todayIndex){
             //Cursor is in first half of "Today"
             //push line to the end of today rather than the middle
-            lineX = canvasBox.width * (frameIndex + 2) / this.state.daysInFrame; 
+            lineX = canvasBox.width * (frameIndex + 2) / this.state.daysInFrame;
         } else if (mouseIndex >= todayIndex){
             //Cursor is in second half of "Today"
             //Move the index one back so the correct Y can be found
             mouseIndex --;
         }
 
-        let weightsInFrame;
-        if (this.state.daysInFrame < this.props.weights.length){
-            //+1 because pure subtraction puts "start" off the frame
-            let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame + 1;
-            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
-        } else {
-            weightsInFrame = weights.slice(this.state.pastProjecting);
+        if (frameStartIndex < this.state.pastProjecting){
+            //Discount past projected weights, as these will artificially inflate the weight range with 0s
+            frameStartIndex = this.state.pastProjecting;
         }
+
+        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         let frameMax = 1.02 * Math.max(...weightsInFrame);
         let frameMin = 0.98 * Math.min(...weightsInFrame);
 
