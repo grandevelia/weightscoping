@@ -704,12 +704,12 @@ export default class WeightGraph extends Component {
                                     let dateInfo = this.dateString(date, pxPerDay, i + frameStartIndex);
                                     return (
                                         <div key={i} style={date === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} } className={date === moment().format("YYYY-MM-DD") ? 'graph-date level-graph-today' : 'graph-date'}>
-                                            <div className='date-number-area'>{ dateInfo.dateString }</div>
                                             {
                                                 pxPerDay > 15 ?
                                                     <div className='date-letter-area'>{ dateInfo.dateLetter }</div>
                                                 : null
                                             }
+                                            <div className='date-number-area'>{ dateInfo.dateString }</div>
                                         </div>
                                     )
                                 })
