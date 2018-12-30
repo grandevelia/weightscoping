@@ -50,7 +50,6 @@ export default class WeightGraph extends Component {
             lineY: 0,
             windowHeight: 0,
             windowWidth: 0,
-            addWeightIndex: 0
         }
     }
     renderGraph(){
@@ -228,7 +227,7 @@ export default class WeightGraph extends Component {
         if (!future){
             //Scaling graph without changing future projection
             //Use last day of current future projecting as end
-            end = moment().add(this.state.futureProjecting - 1, "days");
+            end = moment().add(this.state.futureProjecting, "days");
             start = end.clone().subtract(n, "days");
         } else {
             //Scaling graph with new future projection
@@ -265,11 +264,16 @@ export default class WeightGraph extends Component {
                 return;
             }
             futureProjecting = data.futureProjecting;
+            data.futureWeights = data.futureWeights.map(x => {
+                return weightFromKg(x, this.props.user.weight_units);
+            });
             futureWeights = data.futureWeights;
         }
 
         if (startDate.isAfter(start)){
-            pastProjecting = Math.floor(startDate.diff(start, "days", true));
+            //Need to backfill days in order to fill screen
+            let nDays = end.diff(start, "days");
+            pastProjecting = nDays - (futureProjecting + this.props.weights.length);
             pastWeights = Array(pastProjecting).fill().map(x => {return 0});
         } else {
             pastProjecting = 0;
@@ -283,8 +287,8 @@ export default class WeightGraph extends Component {
         }
 
         let inputs = this.state.inputs;
-        inputs.splice(inputs.length - this.state.futureProjecting, futureWeights.length, futureWeights);
-        inputs.splice(0, pastWeights.length, pastWeights);
+        inputs.splice(-this.state.futureProjecting, this.state.futureProjecting, ...futureWeights);
+        inputs.splice(0, this.state.pastProjecting, ...pastWeights);
 
         this.setState({
             inputs: inputs,
@@ -292,7 +296,9 @@ export default class WeightGraph extends Component {
             showDatePicker: false,
             futureProjecting : futureProjecting,
             pastProjecting: pastProjecting
-        }, () => this.handleResize());
+        }, () => {
+            this.handleResize()
+        });
     }
     futureProject(daysToProject){
         let weights = this.props.weights;
