@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { iconPaths, carbOrder, carbOptions, weightStringFromKg, weightFromKg, interpolateDates, poundsToKg, maintenanceAvgs, calcAverages } from './utils';
+import FadeInComponent from './FadeInComponent';
 import DatepickerArea from './DatepickerArea';
 import moment from 'moment';
 
@@ -12,6 +13,7 @@ export default class WeightGraph extends Component {
         this.coordX = React.createRef();
         this.coordY = React.createRef();
         this.hover = React.createRef();
+        this.focusedInput = React.createRef();
         this.sliderBar = React.createRef();
         this.showDatePicker = this.showDatePicker.bind(this);
         this.setDateRange = this.setDateRange.bind(this);
@@ -50,6 +52,9 @@ export default class WeightGraph extends Component {
             lineY: 0,
             windowHeight: 0,
             windowWidth: 0,
+            adding: false,
+            focusedInput: null,
+            graphSide: 0
         }
     }
     renderGraph(){
@@ -341,7 +346,6 @@ export default class WeightGraph extends Component {
             this.setState({
                 inputs: newInputs
             }, () => {
-                alert("Weight Submitted!");
                 this.renderGraph();
             });
 
@@ -386,45 +390,57 @@ export default class WeightGraph extends Component {
                 futureWeights: newProjection,
                 inputs: newInputs
             }, () => {
-                alert("Weight Submitted!");
                 this.renderGraph();
             });
             
         }
     }
-    handleInputKey(e, i){
-        if (e.key === 'Enter'){
-            e.preventDefault();
-            //First -1 converts length to index
-            let daysFromNow = this.state.inputs.length - 1 - this.state.futureProjecting - i;
-            let currDate = moment().subtract(daysFromNow, "days");
-            if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
-                //currDate is before first user added weight (i.e. it is in pastWeights)
-                this.props.addWeight(this.convertWeight(e.target.value), currDate.format("YYYY-MM-DD"));
+    handleWeightSubmit(e, i){
+        e.preventDefault();
+        //First -1 converts length to index
+        let daysFromNow = this.state.inputs.length - 1 - this.state.futureProjecting - i;
+        let currDate = moment().subtract(daysFromNow, "days");
+        if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
+            //currDate is before first user added weight (i.e. it is in pastWeights)
+            this.props.addWeight(this.convertWeight(e.target.value), currDate.format("YYYY-MM-DD"));
 
-            } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
-                //currDate is between now and first date (inc)
-                let newWeight = this.state.inputs[i];
-                let index = i - this.state.pastProjecting;
-                let id = this.props.ids[index];
-                if (id === null){
-                    //Weight was interpolated
-                    this.props.addWeight(this.convertWeight(newWeight), currDate.format("YYYY-MM-DD"))
-                    .then(() => {
-                        this.renderGraph();
-                    })
-                } else {
-                    //Weight is being changed
-                    this.props.updateWeight(this.convertWeight(newWeight), id)
-                    .then(() => {
-                        this.renderGraph();
-                    })
-                }
+        } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
+            //currDate is between now and first date (inc)
+            let newWeight = this.state.inputs[i];
+            let index = i - this.state.pastProjecting;
+            let id = this.props.ids[index];
+            this.playSubmissionAnimation(i);
+            if (id === null){
+                //Weight was interpolated
+                this.props.addWeight(this.convertWeight(newWeight), currDate.format("YYYY-MM-DD"))
+                .then(() => {
+                    this.renderGraph();
+                })
             } else {
-                //date is in future
-                console.log("future")
+                //Weight is being changed
+                this.props.updateWeight(this.convertWeight(newWeight), id)
+                .then(() => {
+                    if (moment().format("YYYY-MM-DD") === currDate.format("YYYY-MM-DD") ){
+                        //If date is today, change future projection to match new today weight
+                        let newInputs = this.state.inputs;
+                        for (let i = 0; i < this.state.futureProjecting; i ++){
+                            newInputs[newInputs.length - 1 - i] = newWeight;
+                        }
+                        this.setState({inputs: newInputs}, () => this.renderGraph())
+                    } else {
+                        this.renderGraph();
+                    }
+                })
             }
+        } else {
+            //date is in future
         }
+    }
+    playSubmissionAnimation(i){
+        this.setState({adding: i})
+    }
+    resetSubmissionAnimation = () => {
+        this.setState({adding:false})
     }
 	convertWeight(weight){
 		let weightUnits = this.props.user.weight_units;
@@ -600,6 +616,77 @@ export default class WeightGraph extends Component {
         e.preventDefault();
         this.props.updateUserSettings(key, val);
     }
+    onFocus(e, i){
+        this.setState({focusedInput: i});
+    }
+    handleBlur(){
+        let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
+
+        let todayIndex = this.state.inputs.length - this.state.futureProjecting - 1;
+        if (todayIndex >= frameStartIndex && todayIndex <= this.state.frameEndIndex){
+            frameStartIndex ++; //If today is in the frame, select 1 less weight to be in the frame
+        }
+        let graphSide = 0;
+        if ( this.state.focusedInput - 1 > -1 && this.state.focusedInput === frameStartIndex + 1){
+            // Tabbing left
+
+            // If current focus is not the first input, but is the furthest left on the screen,
+            // Shift the start date 1 day in the future rather than focusing off
+            graphSide = -1
+
+        } else if ( this.state.focusedInput === this.state.frameEndIndex && this.state.focusedInput + 1 < this.state.inputs.length ){
+            // Tabbing right
+            
+            // Currently focused to last input on screen
+            // If this is not the last possible input, scroll the graph
+            // rather than moving off it
+        
+            graphSide = 1
+        }
+
+        if ( graphSide !== 0 ){
+            this.focusedInput.current.focus()
+            this.setState({
+                graphSide: graphSide
+            });
+        }
+    }
+    onKeyUp(e){
+        if (e.key === "Tab" && this.state.graphSide !== 0){
+            //Tab pressed and focused on last input in frame (left or right)
+            let scrollGraphDir = 0;
+            let focusInputUpdate = 0;
+            if (this.state.graphSide === -1){
+                //On the left side
+                if (e.shiftKey){
+                    //tabbing left
+                    scrollGraphDir = -1; //Scroll graph one day back
+                    focusInputUpdate = -1; //Shift focused input one day back
+                } else {
+                    //tabbing right
+                    focusInputUpdate = 1;
+                }
+            } else if (this.state.graphSide === 1){
+                //On the right side
+                if (!e.shiftKey){
+                    //tabbing right
+                    scrollGraphDir = 1; //Scroll graph one day forward
+                    focusInputUpdate = 1; //Shift focused input one day back
+                } else {
+                    //tabbing left
+                    focusInputUpdate = -1;
+                }
+            }
+            this.setState({
+                graphSide: null,
+                frameEndIndex: this.state.frameEndIndex + scrollGraphDir,
+                focusedInput: this.state.focusedInput + focusInputUpdate
+            }, () => {
+                this.focusedInput.current.focus();
+                this.renderGraph();
+            });
+        }
+    }
     render(){
         let user = this.props.user;
         let weights = this.state.inputs;
@@ -633,8 +720,9 @@ export default class WeightGraph extends Component {
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
+
         return (
-            <div id='graph-area' onMouseMove={(e) => this.checkScroll(e)} onTouchEnd={this.scrollRelease} onMouseUp={this.scrollRelease} onMouseLeave={this.scrollRelease}>
+            <div id='graph-area' onMouseMove={(e) => this.checkScroll(e)} onTouchEnd={this.scrollRelease} onMouseUp={this.scrollRelease} onMouseLeave={this.scrollRelease} onKeyUp={e => this.onKeyUp(e)}>
                 <div id='graph-top'>
                     <div id='graph-mode-section'>
                         {
@@ -703,6 +791,11 @@ export default class WeightGraph extends Component {
                 </div>
                 <div className='graph-middle'>
                     <div id='graph-scroller' onMouseMove={(e) => this.showGraphLines(e)}>
+                        {
+                            this.state.adding !== false ? 
+                                <FadeInComponent show={this.state.adding} resetSubmissionAnimation={this.resetSubmissionAnimation} style={ {left: (this.state.adding - frameStartIndex)/daysInFrame * 100 + "%"}}/>
+                            : null
+                        }
                         <div id='dates-container' style={{width: canvasWidth}}>
                             {
                                 weightsInFrame.map((weight, i) => {
@@ -826,16 +919,24 @@ export default class WeightGraph extends Component {
                                     weightsInFrame.map((weight, i) => {
                                         let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
                                         return (
-                                            <input
+                                            <form
                                                 key={i}
-                                                onChange={(e) => this.changeWeight(e, i + frameStartIndex)}
-                                                onKeyPress={e => this.handleInputKey(e, i + frameStartIndex)}
                                                 className={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? 'graph-weight graph-weight-number level-graph-today' : 'graph-weight graph-weight-number'}
                                                 style={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
-                                                type='number' 
-                                                step="0.01"
-                                                value={this.state.inputs[i + frameStartIndex]}
-                                            />
+                                                onSubmit={e => this.handleWeightSubmit(e, i + frameStartIndex)}
+                                            >
+                                                <input
+                                                    ref={i + frameStartIndex === this.state.focusedInput ? this.focusedInput : null}
+                                                    onChange={(e) => this.changeWeight(e, i + frameStartIndex)}
+                                                    className={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? 'graph-weight graph-weight-number level-graph-today' : 'graph-weight graph-weight-number'}
+                                                    style={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? {width: 2*pxPerDay} : {width: pxPerDay} }
+                                                    type='number' 
+                                                    step="0.01"
+                                                    value={this.state.inputs[i + frameStartIndex]}
+                                                    onFocus={(e) => this.onFocus(e, i + frameStartIndex)}
+                                                    onBlur={() => this.handleBlur()}
+                                                />
+                                            </form>
                                         )
                                     })
                                 :
