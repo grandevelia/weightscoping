@@ -1,17 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { auth, weights } from "../actions";
+import { planTitles, weightFromKg, convertWeight } from './utils';
 import '../css/UserDashboard.css';
-import { planTitles } from './utils';
+import CarbOrder from './CarbOrder';
 
 class UserSettings extends Component {
     constructor(props){
         super(props);
-		props.fetchWeights();
+        props.fetchWeights();
+        
         this.state = {
             email: null,
             monetary_value: null,
+            reorderCarbs: false,
+            idealWeightKg: props.auth.user.ideal_weight_kg
         }
+    }
+    updateIdealWeight(e){
+        this.setState({idealWeightKg: convertWeight(e.target.value, this.props.auth.user.weight_units)})
     }
 	updateValue(e){
 		this.setState({monetary_value:e.target.value});
@@ -20,8 +27,11 @@ class UserSettings extends Component {
 		let val = e.target.value;
 		this.setState({email: val})
 	}
-	updateSettings(key, value){
-        this.props.updateUserSettings(key, value);
+	updateSettings = (key, value) => {
+        this.props.updateUserSettings(key, value)
+        if (this.state.reorderCarbs === true){
+            this.setState({reorderCarbs: false})
+        }
         alert("Your settings have been updated.");
     }
     resetLevels(e){
@@ -39,6 +49,16 @@ class UserSettings extends Component {
             }
         }
     }
+    showCarbs(){
+        this.setState({
+            reorderCarbs: true
+        })
+    }
+    cancelCarbChange = () => {
+        this.setState({
+            reorderCarbs: false
+        })
+    }
     render(){
         let user = this.props.auth.user;
         return (
@@ -47,8 +67,10 @@ class UserSettings extends Component {
                     <h4 id='settings-title'>Settings</h4>
                     <div className='settings-option'>
                         <div className='settings-option-title'>Email</div>
-                        <input onChange={(e) => this.updateEmail(e)} type='text' placeholder="Your Email" defaultValue={user.email} />
-                        <button onClick={(e) => this.updateSettings("email", this.state.email)}>Submit</button>
+                        <div>
+                            <input onChange={(e) => this.updateEmail(e)} type='text' placeholder="Your Email" defaultValue={user.email} />
+                            <button onClick={(e) => this.updateSettings("email", this.state.email)}>Submit</button>
+                        </div>
                     </div>
                     <div className='settings-option'>
                         <div className='settings-option-title'>Drink Alcohol?</div>
@@ -56,6 +78,16 @@ class UserSettings extends Component {
                             <option value={true}>Yes</option>
                             <option value={false}>No</option>
                         </select>						
+                    </div>
+                    <div className='settings-option'>
+                        <div className='settings-option-title'>Carb Ranking</div>
+                        <CarbOrder 
+                            user={user}
+                            className={this.state.reorderCarbs === true ? 'show' : ''}
+                            updateSettings={this.updateSettings}
+                            cancelCarbChange={this.cancelCarbChange}
+                        />
+                        <div id='settings-show-carbs' onClick={() => this.showCarbs()}>Change Carb Ranks</div>
                     </div>
                     <div className='settings-option'>
                         <div className='settings-option-title'>Weight Units</div>
@@ -90,9 +122,19 @@ class UserSettings extends Component {
                     </div>
                     <div className='settings-option'>
                         <div className='settings-option-title'>Value</div>
-                        <input onChange={(e) => this.updateValue(e)} defaultValue={user.monetary_value/100} className='settings-option-input' placeholder="Your ideal weight is worth:">
-                        </input>
-                        <button onClick={(e) => this.updateSettings("monetary_value", this.state.monetary_value)}>Submit</button>
+                        <div>
+                            <input onChange={(e) => this.updateValue(e)} defaultValue={user.monetary_value/100} className='settings-option-input' placeholder="Your ideal weight is worth:">
+                            </input>
+                            <button onClick={(e) => this.updateSettings("monetary_value", this.state.monetary_value)}>Submit</button>
+                        </div>    
+                    </div>
+                    <div className='settings-option'>
+                        <div className='settings-option-title'>Ideal Weight</div>
+                        <div>
+                            <input onChange={(e) => this.updateIdealWeight(e)} defaultValue={weightFromKg(user.ideal_weight_kg, user.weight_units)} className='settings-option-input' placeholder="Ideal Weight">
+                            </input>
+                            <button onClick={(e) => this.updateSettings("ideal_weight_kg", this.state.idealWeightKg)}>Submit</button>
+                        </div>    
                     </div>
                     <button id='level-reset-button' onClick={(e) => this.resetLevels(e)}>Reset Levels From Current Weight</button>
                 </div>

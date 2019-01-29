@@ -122,6 +122,14 @@ export function	kgToPounds(kg){
 export function	kgToStone(kg){
 	return kgToPounds(kg)/14;
 }
+export function convertWeight(primary, units, secondary = 0){
+	if (units === "Stones"){
+		return poundsToKg(parseInt(primary,10) * 14 + parseInt(secondary,10));
+	} else if (units === "Pounds"){
+		return poundsToKg(parseInt(primary,10));
+	}
+	return primary;
+}
 export function	idealWeightString(weightUnits, heightUnits, sex, primary, secondary){
 	let heightInches = calcHeightInches(heightUnits, primary, secondary);
 	let weightKg = averageAlgs(heightInches, sex);

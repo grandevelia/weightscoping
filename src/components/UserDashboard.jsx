@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { weights, notifications, auth } from "../actions";
-import { planTitles, weightStringFromKg, allowedCarbs, disallowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions, interpolateDates, guessWeightsToNow } from './utils';
+import { planTitles, weightStringFromKg, allowedCarbs, lossmodeLevel, setupAverages, calcAverages, maintenanceCarbOrder, carbOptions, interpolateDates, guessWeightsToNow } from './utils';
 import PaypalButton from './PaypalButton';
 import WeightGraph from './WeightGraph';
 
@@ -34,6 +34,7 @@ class UserDashboard extends Component {
 		let weights = []
 		let dates = [];
 		let ids = [];
+
 		//Split user weight data into arrays for easier manipulation
 		Object.keys(this.props.weights).map(key => {
 			dates.push(this.props.weights[key]['date_added']);
@@ -56,8 +57,8 @@ class UserDashboard extends Component {
 		dates = interpData.dates;
 		ids = interpData.ids;
 
-        //Ensure weights are present up to current day
-        interpData = guessWeightsToNow(weights, dates, ids);
+		//Ensure weights are present up to current day
+		interpData = guessWeightsToNow(weights, dates, ids);
         weights = interpData.weights;
         dates = interpData.dates;
 		ids = interpData.indexes;

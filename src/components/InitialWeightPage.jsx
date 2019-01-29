@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import InfoLink from './InfoLink';
-import { poundsToKg, weightStringFromKg, allowedCarbs, disallowedCarbs } from './utils';
+import { weightStringFromKg, allowedCarbs, disallowedCarbs, convertWeight } from './utils';
 export default class InitialWeightPage extends Component {
 	state={
 		primary: "",
@@ -18,16 +18,8 @@ export default class InitialWeightPage extends Component {
 			});
 		}
 	}
-	convertWeight(){
-		if (this.props.weightUnits === "Stones"){
-			return poundsToKg(parseInt(this.state.primary,10) * 14 + parseInt(this.state.secondary,10));
-		} else if (this.props.weightUnits === "Pounds"){
-			return poundsToKg(parseInt(this.state.primary,10));
-		}
-		return this.state.primary;
-	}
 	render(){
-		let currentWeight = this.convertWeight();
+		let currentWeight = convertWeight(this.state.primary, this.props.user.weight_units, this.state.secondary);
 		let toLoseKg = currentWeight - this.props.idealWeightKg;
 		let incrementKg = toLoseKg/7;
 		let carbRanks =  this.props.carbRanks;
@@ -152,7 +144,7 @@ export default class InitialWeightPage extends Component {
 								</div>
 							</div>
 			        	</div>
-				        <div onClick={() => this.props.updateIntroState({initialWeight: this.convertWeight()})} className='intro-nav'>NEXT: Make it real</div>
+				        <div onClick={() => this.props.updateIntroState({initialWeight: convertWeight(this.state.primary, this.props.user.weight_units, this.state.secondary)})} className='intro-nav'>NEXT: Make it real</div>
 					</div> : null
 				}
 				</div>

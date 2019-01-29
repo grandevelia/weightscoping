@@ -483,7 +483,6 @@ body {
 	position: relative;
 	background: rgba(215,215,215,0.9);
 }
-
 .icon img{
 	position: absolute; 
 	left: 15%;
@@ -549,14 +548,14 @@ body {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
 }
 #settings-area{
-	width: 80%;
+	margin-top: 5%;
+	width: 70%;
 	border: 1px solid rgb(57, 192, 228);
 	padding: 1.25%;
-	margin-top: 2.5%;
-	margin-right: 2.5%;
-	align-self: flex-end;
 	display: flex;
 	flex-direction: column;
 }
@@ -572,16 +571,22 @@ body {
 	white-space: nowrap;
 	font-weight: bold;
 	font-size: 0.9em;
-	flex: 1;
 	margin-right: 2.5%;
 }
 .settings-option{
 	white-space: nowrap;
 }
+.settings-option > div:last-child, .settings-option > select:last-child{
+	height: 1.5rem;
+}
+.settings-option > div:last-child{
+	display: flex;
+}
 .settings-option button{
 	border-radius: 0;
 	border:none;
-	color: rgb(245,245,245);
+	color: white;
+	font-weight: bold;
 	background-color: rgb(57, 192, 228);
 	outline: none;
 }
@@ -590,20 +595,92 @@ body {
 	cursor: pointer;
 	transition: ease-in-out 0.125s;
 }
+#settings-show-carbs{
+	font-size: 0.8em;
+	border-radius: 5px;
+	padding: 0.5% 2.5%;
+	border: none;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	color: white;
+	font-weight: bold;
+	background-color: rgb(57, 145, 228);
+	outline: none;
+	transition: ease-in-out 0.125s;
+}
+#settings-show-carbs:hover{
+	cursor: pointer;
+	background-color: rgb(45, 105, 162);
+	transition: ease-in-out 0.125s;
+}
+#change-carbs-area{
+	position: absolute;
+	width: 70%;
+	padding: 2.5%;
+	z-index: 999;
+	box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
+	background-color: white;
+	top: 100%;
+	visibility: hidden;
+	opacity: 0;
+	left: 15%;
+	transition: top 0.5s ease 0s, visibility 1s ease 0s, opacity 1s ease 0s;
+}
+#change-carbs-area.show{
+	visibility: visible;
+	opacity: 1;
+	top: 1.5rem;
+	transition: top 0.5s ease 0s;
+}
+#update-carb-ranks-submit{
+	padding: 2.4%;
+	color: white;
+	font-weight: bold;
+	background-color: rgb(30, 201, 243);
+	width: 40%;
+	display: inline-block;
+	margin-right: 5%;
+	transition: ease-in-out 0.125s;
+}
+#update-carb-ranks-submit:hover{
+	cursor: pointer;
+	background-color: rgba(44, 75, 220);
+	transition: ease-in-out 0.125s;
+	width: 42%;
+	padding: 2.5%;
+}
+#update-carb-ranks-cancel{
+	padding: 2.4%;
+	color: white;
+	font-weight: bold;
+	background-color: rgba(255, 86, 98);
+	width: 40%;
+	display: inline-block;
+}
+#update-carb-ranks-cancel:hover{
+	cursor: pointer;
+	background-color: rgba(220, 44, 75);
+	transition: ease-in-out 0.25s;
+	width: 42%;
+	padding: 2.5%;
+	transition: ease-in-out 0.125s;
+}
 #level-reset-button{
 	width: 50%;
 	padding: 2%;
 	margin-top: 2.5%;
 	font-size: 0.9em;
 	align-self: flex-end;
-	color: rgb(245,245,245);
+	color: white;
+	font-weight: bold;
 	background-color: rgb(57, 192, 228);
 	outline: none;
 }
 #level-reset-button:hover{
 	background-color: rgb(27, 152, 188);
 	cursor: pointer;
-	transition: ease-in-out 0.125s;
+	transition: ease-in-out 0.25s;
 }
 #graph-container{
 	display: flex;
@@ -687,6 +764,34 @@ body {
 }
 .horizontal-scroll-bar:hover{
 	cursor: pointer;
+}
+.graph-arrow{
+	position: absolute;
+	z-index: 99;
+	top: 35%;
+	transform: translateY(-50%);
+	border-radius: 50%;
+	width: 2rem;
+	height: 2rem;
+	font-weight: bold;
+	font-size: 1.5rem;
+}
+#graph-arrow-right{
+	right: -1rem;
+}
+#graph-arrow-left{
+	left: -1rem;
+}
+graph-arrow .fa{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateY(-50%) translateX(-50%);
+}
+.graph-arrow:hover{
+	background-color: rgba(255,255,255,0.95);
+	cursor: pointer;
+	transition: ease-in-out 0.125s;
 }
 @media only screen and (max-width: 775px){
 	#weightloss-tab-y-labels, #tab-y-labels{

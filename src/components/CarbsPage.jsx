@@ -4,13 +4,18 @@ import InteractionArea from './InteractionArea';
 export default  class CarbsPage extends Component {
 	constructor(props){
 		super(props);
-		let carbLength = 7;
-		if (this.props.alcohol){
-			carbLength = 9;
-		}
-		let carbRanks = [];
-		for (let i = 0; i < carbLength; i ++){
-			carbRanks.push(null);
+		let carbRanks;
+		if (props.carbRanks.indexOf(null) >= 0){
+			let carbLength = 7;
+			if (this.props.alcohol){
+				carbLength = 9;
+			}
+			carbRanks = [];
+			for (let i = 0; i < carbLength; i ++){
+				carbRanks.push(null);
+			}
+		} else {
+			carbRanks = props.carbRanks
 		}
 		this.state = {
 			carbRanks: carbRanks
@@ -70,6 +75,9 @@ export default  class CarbsPage extends Component {
 		}
 		this.setState({carbRanks: positions});
 	}
+	updateSettings(){
+		this.props.updateSettings("carb_ranks",this.state.carbRanks)
+	}
 	render(){
 		let carbOptions;
 		if (this.props.alcohol){
@@ -86,10 +94,19 @@ export default  class CarbsPage extends Component {
 				<InteractionArea options={carbOptions} positions={positions} moveOption={(optionId, toId) => this.moveOption(optionId, toId)}/>
 				{
 					positions.indexOf(null) < 0 ?
-					<p onClick={() => this.props.updateIntroState({carbRanks: positions})} className='intro-nav'>NEXT: Find Your Ideal Weight</p>
+					
+						this.props.intro !== false ?
+							<p onClick={() => this.props.updateIntroState({carbRanks: positions})} className='intro-nav'>NEXT: Find Your Ideal Weight</p>
+						:
+							<div id='update-carb-ranks-submit' onClick={() => this.updateSettings()}>Submit</div>
 					: null
 				}
-				<p onClick={() => this.props.updateIntroState({alcohol: null})} className='intro-nav back'>Back</p>
+				{	
+					this.props.intro !== false ?
+						<p onClick={() => this.props.updateIntroState({alcohol: null})} className='intro-nav back'>Back</p>
+					:
+						<div id='update-carb-ranks-cancel' onClick={() => this.props.cancelCarbChange()}>Cancel</div>
+				}
 			</div>
 		)
 	}

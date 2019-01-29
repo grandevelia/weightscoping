@@ -150,13 +150,11 @@ export default class WeightGraph extends Component {
         if (this.state.inputs.length-1 < endIndex){
             endIndex = numWeights - 1;
         }
-        let todayIndex = endIndex - this.state.futureProjecting;
 
         //Update slider bar position accordingly
-        let todayPercent = todayIndex/numWeights;
         let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
         let pillWidth = 0.05 * barWidth;
-        let sliderLeft = Math.round((barWidth - pillWidth) * todayPercent);
+        let sliderLeft = Math.round((barWidth - pillWidth) * endIndex/numWeights);
 
         //let percentFromLeft = sliderLeft/(barWidth - 2 * halfSliderPill);
         //let mouseIndex = Math.round( ( numWeights - this.state.daysInFrame ) * percentFromLeft );
@@ -420,16 +418,20 @@ export default class WeightGraph extends Component {
                 //Weight is being changed
                 this.props.updateWeight(this.convertWeight(newWeight), id)
                 .then(() => {
+                    let newInputs = this.state.inputs;
                     if (moment().format("YYYY-MM-DD") === currDate.format("YYYY-MM-DD") ){
                         //If date is today, change future projection to match new today weight
-                        let newInputs = this.state.inputs;
                         for (let i = 0; i < this.state.futureProjecting; i ++){
                             newInputs[newInputs.length - 1 - i] = newWeight;
                         }
-                        this.setState({inputs: newInputs}, () => this.renderGraph())
                     } else {
-                        this.renderGraph();
+                        console.log("Here")
+                        newInputs[i] = newWeight;
                     }
+                    //Need to re-interpolate to the end if last added, or re interpolated to next added if not
+                    //TODO call function in parent to initialize weight props. This will allow weight updates to be standardized across dashboard
+                    //Will need to hold weights in parent state (or at least something to tell all children to re-render)
+                    this.setState({inputs: newInputs}, () => this.renderGraph())
                 })
             }
         } else {
@@ -619,6 +621,13 @@ export default class WeightGraph extends Component {
     onFocus(e, i){
         this.setState({focusedInput: i});
     }
+    handleInputClick(i){
+        //This is necessary because if the last input in the frame (either side) is focused,
+        //  it will not be possible to click off of it
+        this.setState({focusedInput: i}, () => {
+            this.focusedInput.current.focus();
+        })
+    }
     handleBlur(){
         let frameStartIndex = this.state.frameEndIndex - this.state.daysInFrame;
 
@@ -643,7 +652,6 @@ export default class WeightGraph extends Component {
         
             graphSide = 1
         }
-
         if ( graphSide !== 0 ){
             this.focusedInput.current.focus()
             this.setState({
@@ -677,19 +685,49 @@ export default class WeightGraph extends Component {
                     focusInputUpdate = -1;
                 }
             }
+            let newEndIndex = this.state.frameEndIndex + scrollGraphDir;
+            let startIndex = newEndIndex - this.state.daysInFrame + 1;
+            //Update slider bar position
+            let todayPercent = startIndex/(this.state.inputs.length-this.state.daysInFrame);
+            let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
+            let pillWidth = 0.05 * barWidth;
+            let sliderLeft = Math.round((barWidth - pillWidth) * todayPercent);
+
             this.setState({
                 graphSide: null,
-                frameEndIndex: this.state.frameEndIndex + scrollGraphDir,
-                focusedInput: this.state.focusedInput + focusInputUpdate
+                frameEndIndex: newEndIndex,
+                focusedInput: this.state.focusedInput + focusInputUpdate,
+                sliderLeft: sliderLeft
             }, () => {
                 this.focusedInput.current.focus();
                 this.renderGraph();
             });
         }
     }
+    scrollGraph(dir){
+        let newEndIndex = this.state.frameEndIndex + dir;
+        
+        let startIndex = newEndIndex - this.state.daysInFrame + 1;
+        if (startIndex < 0 || newEndIndex > this.state.inputs.length - 1){
+            return
+        }
+        //Update slider bar position
+        let todayPercent = startIndex/(this.state.inputs.length-this.state.daysInFrame);
+        let barWidth =  this.sliderBar.current.getBoundingClientRect().width;
+        let pillWidth = 0.05 * barWidth;
+        let sliderLeft = Math.round((barWidth - pillWidth) * todayPercent);
+
+        this.setState({
+            frameEndIndex: newEndIndex,
+            sliderLeft: sliderLeft
+        }, () => {
+            this.renderGraph();
+        });
+    }
     render(){
         let user = this.props.user;
         let weights = this.state.inputs;
+
         let daysInFrame = this.state.daysInFrame;
         //+1 because pure subtraction puts "start" off the frame
         let frameStartIndex = this.state.frameEndIndex - daysInFrame + 1;
@@ -790,6 +828,8 @@ export default class WeightGraph extends Component {
                     </div>
                 </div>
                 <div className='graph-middle'>
+                    <div className='graph-arrow' id='graph-arrow-left' onClick={() => this.scrollGraph(-1)}><i className='fa fa-angle-left' /></div>
+                    <div className='graph-arrow' id='graph-arrow-right' onClick={() => this.scrollGraph(1)}><i className='fa fa-angle-right' /></div>   
                     <div id='graph-scroller' onMouseMove={(e) => this.showGraphLines(e)}>
                         {
                             this.state.adding !== false ? 
@@ -935,6 +975,7 @@ export default class WeightGraph extends Component {
                                                     value={this.state.inputs[i + frameStartIndex]}
                                                     onFocus={(e) => this.onFocus(e, i + frameStartIndex)}
                                                     onBlur={() => this.handleBlur()}
+                                                    onClick={() => this.handleInputClick(i + frameStartIndex)}
                                                 />
                                             </form>
                                         )
