@@ -782,16 +782,16 @@ body {
 #graph-arrow-left{
 	left: -1rem;
 }
-graph-arrow .fa{
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translateY(-50%) translateX(-50%);
-}
 .graph-arrow:hover{
 	background-color: rgba(255,255,255,0.95);
 	cursor: pointer;
 	transition: ease-in-out 0.125s;
+}
+.interpolated .weight-ok{
+	background-color: rgb(11, 75, 121);
+}
+.interpolated .weight-not-ok{
+	background-color: rgb(117, 8, 17);
 }
 @media only screen and (max-width: 775px){
 	#weightloss-tab-y-labels, #tab-y-labels{

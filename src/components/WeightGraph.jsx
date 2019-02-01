@@ -90,7 +90,11 @@ export default class WeightGraph extends Component {
         //Line graph
         let frameStartDate = startDate.add(frameStartIndex, "days");
 
-        canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[frameStartIndex] )/( frameMax - frameMin ));
+        if (frameStartIndex > 0){
+            canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[frameStartIndex-1] )/( frameMax - frameMin ));
+        } else {
+            canvas.moveTo(0, graphPixelsHeight * ( frameMax - weights[frameStartIndex] )/( frameMax - frameMin ));
+        }
         canvas.lineTo(pxPerDay, graphPixelsHeight * ( frameMax - weightsInFrame[0] )/( frameMax - frameMin ) );
 
         weightsInFrame.map((weight, i) => {
@@ -404,7 +408,7 @@ export default class WeightGraph extends Component {
 
         } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
             //currDate is between now and first date (inc)
-            let newWeight = this.state.inputs[i];
+            let newWeight = parseInt(this.state.inputs[i], 10);
             let index = i - this.state.pastProjecting;
             let id = this.props.ids[index];
             this.playSubmissionAnimation(i);
@@ -419,24 +423,74 @@ export default class WeightGraph extends Component {
                 this.props.updateWeight(this.convertWeight(newWeight), id)
                 .then(() => {
                     let newInputs = this.state.inputs;
-                    if (moment().format("YYYY-MM-DD") === currDate.format("YYYY-MM-DD") ){
-                        //If date is today, change future projection to match new today weight
-                        for (let i = 0; i < this.state.futureProjecting; i ++){
-                            newInputs[newInputs.length - 1 - i] = newWeight;
+                    newInputs[i] = newWeight;
+
+                    //Find last added weight
+                    let diff = 1;
+                    for (let j = i - 1 - this.state.pastProjecting; j > -1; j --){
+                        if (this.props.ids[j] !== null){
+                            break
                         }
-                    } else {
-                        console.log("Here")
-                        newInputs[i] = newWeight;
+                        diff ++;
                     }
-                    //Need to re-interpolate to the end if last added, or re interpolated to next added if not
-                    //TODO call function in parent to initialize weight props. This will allow weight updates to be standardized across dashboard
-                    //Will need to hold weights in parent state (or at least something to tell all children to re-render)
+
+                    //If more than one day between added weights, update interpolation
+                    let interpWeights = [];
+                    if (diff > 1){
+                        interpWeights = this.getWeightsBetween(this.state.inputs[i-diff], newWeight, diff);
+                    }
+
+                    for (let j = 0; j < interpWeights.length; j ++){
+                        newInputs[i - diff + 1 + j] = interpWeights[j]
+                    }
+
+                    //Find next added weight
+                    diff = 1;
+                    for (let j = i + 1 - this.state.pastProjecting; j < this.props.ids.length; j ++){
+                        if (this.props.ids[j] !== null){
+                            break
+                        }
+                        diff ++;
+                    }
+                    if (diff > 1){
+                        //Weight changed in the past, but is the most recent change
+                        //Fill weights with this value up to today
+                        let nextWeight = newWeight
+                        if (i + diff < this.state.inputs.length - this.state.futureProjecting){
+                            nextWeight = this.state.inputs[i + diff];
+                        }
+                        interpWeights = this.getWeightsBetween(newWeight, nextWeight, diff);
+                    }
+                    
+                    for (let j = 1; j <= interpWeights.length; j ++){
+                        newInputs[i + j] = interpWeights[j-1]
+                    }
+
+                    //If changing last added weight, update all future weights
+                    if (i + diff < this.state.inputs.length){
+                        for (let j = 0; j < this.state.futureProjecting; j ++){
+                            newInputs[newInputs.length - 1 - j] = newWeight;
+                        }
+                    }
                     this.setState({inputs: newInputs}, () => this.renderGraph())
                 })
             }
         } else {
             //date is in future
         }
+    }
+    getWeightsBetween(startWeight, endWeight, diff){
+        let newWeights = [];
+        if (diff < 2){
+            return newWeights;
+        }
+
+        let weightDiff = endWeight - startWeight;
+        let perDay = weightDiff/diff;
+        for (let i = 1; i < diff; i ++){
+            newWeights.push(startWeight + i * perDay);
+        }
+        return newWeights;
     }
     playSubmissionAnimation(i){
         this.setState({adding: i})
@@ -728,6 +782,9 @@ export default class WeightGraph extends Component {
         let user = this.props.user;
         let weights = this.state.inputs;
 
+        //Note that all indexes into ids will need to have this.state.pastProjecting added in order to correspond to the correct input index
+        let ids = this.props.ids;
+
         let daysInFrame = this.state.daysInFrame;
         //+1 because pure subtraction puts "start" off the frame
         let frameStartIndex = this.state.frameEndIndex - daysInFrame + 1;
@@ -875,8 +932,11 @@ export default class WeightGraph extends Component {
                                         let currClassName = "level-graph-date";
                                         let currWidth = pxPerDay;
                                         if (date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD")){
-                                            currClassName = "level-graph-date level-graph-today";
+                                            currClassName += " level-graph-today";
                                             currWidth = 2 * pxPerDay;
+                                        }
+                                        if (i >= this.state.pastProjecting && ids[i - this.state.pastProjecting + frameStartIndex] === null){
+                                            currClassName += " interpolated";
                                         }
                                         return (
                                             <div key={i} className={currClassName} style={{width: currWidth, padding: paddingStyle}}>
