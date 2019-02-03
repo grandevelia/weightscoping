@@ -402,12 +402,15 @@ export default class WeightGraph extends Component {
         //First -1 converts length to index
         let daysFromNow = this.state.inputs.length - 1 - this.state.futureProjecting - i;
         let currDate = moment().subtract(daysFromNow, "days");
-        if (moment().subtract(this.props.weights.length, "days").isAfter(currDate)){
-            //currDate is before first user added weight (i.e. it is in pastWeights)
-            this.props.addWeight(this.convertWeight(e.target.value), currDate.format("YYYY-MM-DD"));
-
-        } else if (moment().isAfter(currDate) || moment().isSame(currDate)){
-            //currDate is between now and first date (inc)
+        if (i < this.state.pastProjecting){
+            //In pastWeights
+            let newWeight = this.convertWeight(e.target.value)
+            this.props.addWeight(newWeight, currDate.format("YYYY-MM-DD"))
+            .then(() => {
+                this.updateWeights(i, newWeight);
+            })
+        } else if (i < this.state.inputs.length - this.state.futureProjecting){
+            //Not in future
             let newWeight = parseInt(this.state.inputs[i], 10);
             let index = i - this.state.pastProjecting;
             let id = this.props.ids[index];
@@ -416,63 +419,13 @@ export default class WeightGraph extends Component {
                 //Weight was interpolated
                 this.props.addWeight(this.convertWeight(newWeight), currDate.format("YYYY-MM-DD"))
                 .then(() => {
-                    this.renderGraph();
+                    this.updateWeights(i, newWeight);
                 })
             } else {
                 //Weight is being changed
                 this.props.updateWeight(this.convertWeight(newWeight), id)
                 .then(() => {
-                    let newInputs = this.state.inputs;
-                    newInputs[i] = newWeight;
-
-                    //Find last added weight
-                    let diff = 1;
-                    for (let j = i - 1 - this.state.pastProjecting; j > -1; j --){
-                        if (this.props.ids[j] !== null){
-                            break
-                        }
-                        diff ++;
-                    }
-
-                    //If more than one day between added weights, update interpolation
-                    let interpWeights = [];
-                    if (diff > 1){
-                        interpWeights = this.getWeightsBetween(this.state.inputs[i-diff], newWeight, diff);
-                    }
-
-                    for (let j = 0; j < interpWeights.length; j ++){
-                        newInputs[i - diff + 1 + j] = interpWeights[j]
-                    }
-
-                    //Find next added weight
-                    diff = 1;
-                    for (let j = i + 1 - this.state.pastProjecting; j < this.props.ids.length; j ++){
-                        if (this.props.ids[j] !== null){
-                            break
-                        }
-                        diff ++;
-                    }
-                    if (diff > 1){
-                        //Weight changed in the past, but is the most recent change
-                        //Fill weights with this value up to today
-                        let nextWeight = newWeight
-                        if (i + diff < this.state.inputs.length - this.state.futureProjecting){
-                            nextWeight = this.state.inputs[i + diff];
-                        }
-                        interpWeights = this.getWeightsBetween(newWeight, nextWeight, diff);
-                    }
-                    
-                    for (let j = 1; j <= interpWeights.length; j ++){
-                        newInputs[i + j] = interpWeights[j-1]
-                    }
-
-                    //If changing last added weight, update all future weights
-                    if (i + diff < this.state.inputs.length){
-                        for (let j = 0; j < this.state.futureProjecting; j ++){
-                            newInputs[newInputs.length - 1 - j] = newWeight;
-                        }
-                    }
-                    this.setState({inputs: newInputs}, () => this.renderGraph())
+                    this.updateWeights(i, newWeight);
                 })
             }
         } else {
@@ -491,6 +444,59 @@ export default class WeightGraph extends Component {
             newWeights.push(startWeight + i * perDay);
         }
         return newWeights;
+    }
+    updateWeights(i, newWeight){
+        let newInputs = this.state.inputs;
+        newInputs[i] = newWeight;
+
+        //Find last added weight
+        let diff = 1;
+        for (let j = i - 1 - this.state.pastProjecting; j > -1; j --){
+            if (this.props.ids[j] !== null){
+                break
+            }
+            diff ++;
+        }
+
+        //If more than one day between added weights, update interpolation
+        let interpWeights = [];
+        if (diff > 1){
+            interpWeights = this.getWeightsBetween(this.state.inputs[i-diff], newWeight, diff);
+        }
+
+        for (let j = 0; j < interpWeights.length; j ++){
+            newInputs[i - diff + 1 + j] = interpWeights[j]
+        }
+
+        //Find next added weight
+        diff = 1;
+        for (let j = i + 1 - this.state.pastProjecting; j < this.props.ids.length; j ++){
+            if (this.props.ids[j] !== null){
+                break
+            }
+            diff ++;
+        }
+        if (diff > 1){
+            //Weight changed in the past, but is the most recent change
+            //Fill weights with this value up to today
+            let nextWeight = newWeight
+            if (i + diff < this.state.inputs.length - this.state.futureProjecting){
+                nextWeight = this.state.inputs[i + diff];
+            }
+            interpWeights = this.getWeightsBetween(newWeight, nextWeight, diff);
+        }
+        
+        for (let j = 1; j <= interpWeights.length; j ++){
+            newInputs[i + j] = interpWeights[j-1]
+        }
+
+        //If changing last added weight, update all future weights
+        if (i + diff < this.state.inputs.length){
+            for (let j = 0; j < this.state.futureProjecting; j ++){
+                newInputs[newInputs.length - 1 - j] = newWeight;
+            }
+        }
+        this.setState({inputs: newInputs}, () => this.renderGraph())
     }
     playSubmissionAnimation(i){
         this.setState({adding: i})
@@ -793,15 +799,13 @@ export default class WeightGraph extends Component {
         if (todayIndex >= frameStartIndex && todayIndex <= this.state.frameEndIndex){
             frameStartIndex ++; //If today is in the frame, select 1 less weight to be in the frame
         }
-
-        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
         
         let initialWeight = this.props.weights[this.props.startingIndex];
 
         let weightAvgs, numLevels, levelMap;
         if (user.mode === "1"){
             numLevels = maintenanceAvgs.length;
-            weightAvgs = calcAverages(0, weightsInFrame);
+            weightAvgs = calcAverages(0, weights);
             levelMap = Array( numLevels ).fill().map((x,i) => i);
         } else {
             let kgPerSection = (initialWeight - user.ideal_weight_kg)/8;
@@ -815,6 +819,8 @@ export default class WeightGraph extends Component {
         let canvasWidth = window.innerWidth * 0.975 * 0.975;
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
+
+        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
 
         return (
             <div id='graph-area' onMouseMove={(e) => this.checkScroll(e)} onTouchEnd={this.scrollRelease} onMouseUp={this.scrollRelease} onMouseLeave={this.scrollRelease} onKeyUp={e => this.onKeyUp(e)}>
@@ -830,7 +836,7 @@ export default class WeightGraph extends Component {
                                 <div className='mode-switch'>
                                     <div className='mode-indicator'>Mode: Weight Loss</div>
                                     {
-                                        weights[weights.length - 1] <= user.ideal_weight_kg ?
+                                        weights[weights.length - 1] <= weightFromKg(user.ideal_weight_kg, user.weight_units) ?
                                             <div className='mode-switch-button' onClick={(e) => this.updateSettings(e, "mode", "1")}>Switch to Maintenance</div>
                                         :
                                              null
@@ -939,7 +945,10 @@ export default class WeightGraph extends Component {
                                             currClassName += " interpolated";
                                         }
                                         return (
-                                            <div key={i} className={currClassName} style={{width: currWidth, padding: paddingStyle}}>
+                                            <div 
+                                                key={i} 
+                                                className={currClassName} 
+                                                style={{width: currWidth, padding: paddingStyle}}>
                                                 {
                                                     levelMap.map((levelWeight, j) => {
                                                         let weightOk = this.convertWeight(weight) < levelWeight;
@@ -961,15 +970,32 @@ export default class WeightGraph extends Component {
                                     })
                                 :
                                     weightAvgs.map((weight, i) => {
-                                        let onMonth = "on-month";
                                         let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
+                                        let onMonth = " on-month";
                                         if (date.month() % 2 === 0){
-                                            onMonth = "off-month";
+                                            onMonth = " off-month";
+                                        }
+                                        let paddingStyle;
+                                        if (daysInFrame < 30){
+                                            paddingStyle = "0 2px";
+                                        } else if (daysInFrame < 50){
+                                            paddingStyle =  "0 1px";
+                                        } else {
+                                            paddingStyle = "0 0";
+                                        }
+                                        let currClassName = "level-graph-date";
+                                        let currWidth = pxPerDay;
+                                        if (date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD")){
+                                            currClassName += " level-graph-today";
+                                            currWidth = 2 * pxPerDay;
+                                        }
+                                        if (i >= this.state.pastProjecting && ids[i - this.state.pastProjecting + frameStartIndex] === null){
+                                            currClassName += " interpolated";
                                         }
                                         return (
                                             <div key={i} 
-                                                className={date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD") ? 'level-graph-date level-graph-today' : 'level-graph-date'} 
-                                                style={daysInFrame < 30 ? {padding: "0 2px"} : daysInFrame < 50 ? {padding: "0 1px"} : {padding: "0 0"}}>
+                                                className={currClassName} 
+                                                style={{width: currWidth, padding: paddingStyle}}>
                                                 {
                                                     levelMap.map(i => {
                                                         let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
@@ -993,7 +1019,9 @@ export default class WeightGraph extends Component {
                                                             weightString = "n/a";
                                                         }
                                                         return (
-                                                            <div key={"inner"+i} className={weightOk === null ? 'avg-section no-data ' + onMonth : weightOk === true ? 'avg-section weight-ok ' + onMonth : 'avg-section weight-not-ok ' + onMonth }> 
+                                                            <div 
+                                                                key={"inner"+i} 
+                                                                className={weightOk === null ? 'avg-section no-data ' + onMonth : weightOk === true ? 'avg-section weight-ok ' + onMonth : 'avg-section weight-not-ok ' + onMonth }> 
                                                                     {pxPerDay > 30 ? weightString : null}
                                                             </div>
                                                         )

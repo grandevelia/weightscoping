@@ -147,6 +147,7 @@ body {
 	padding: 1em 1em;
 	margin: 0 0 2.5% 0;
 	border-radius: 5px;
+	transition: ease-in-out 0.1s;
 }
 .mode-indicator{
 	display: flex;
@@ -157,6 +158,8 @@ body {
 }
 .mode-switch-button:hover{
 	cursor: pointer;
+	background-color: rgba(0, 162, 255, 0.8);
+	transition: ease-in-out 0.1s;
 }
 #graph-view-options{
 	display: flex;
