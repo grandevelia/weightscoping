@@ -125,7 +125,7 @@ export const updateWeight = (weight_kg, id) => {
 		}
 
 		let body = JSON.stringify({weight_kg});
-		return fetch('/api/weights/' + id + "/", {headers, method: "PUT", body})
+		return fetch('api/weights/' + id + "/update_weight/", {headers, method: "PATCH", body})
 		.then(res => {
 			if (res.status < 500) {
 				return res.json().then(data => {

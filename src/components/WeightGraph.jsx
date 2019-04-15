@@ -820,8 +820,12 @@ export default class WeightGraph extends Component {
         let canvasHeight = window.innerHeight * 0.9 * 0.275;
         let pxPerDay = canvasWidth/daysInFrame;
 
-        let weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
-
+        let weightsInFrame;
+        if (user.mode === "1"){
+            weightsInFrame = weightAvgs.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        } else {
+            weightsInFrame = weights.slice(frameStartIndex, this.state.frameEndIndex + 1);
+        }
         return (
             <div id='graph-area' onMouseMove={(e) => this.checkScroll(e)} onTouchEnd={this.scrollRelease} onMouseUp={this.scrollRelease} onMouseLeave={this.scrollRelease} onKeyUp={e => this.onKeyUp(e)}>
                 <div id='graph-top'>
@@ -969,7 +973,7 @@ export default class WeightGraph extends Component {
                                         )
                                     })
                                 :
-                                    weightAvgs.map((weight, i) => {
+                                    weightsInFrame.map((weight, i) => {
                                         let date = moment().subtract(this.props.weights.length - 1 - frameStartIndex - i + this.state.pastProjecting, "days");
                                         let onMonth = " on-month";
                                         if (date.month() % 2 === 0){
@@ -1001,7 +1005,7 @@ export default class WeightGraph extends Component {
                                                         let currAvg = maintenanceAvgs[maintenanceAvgs.length -1 - i];
                                                         let weightOk = null;
                                                         if (currAvg in weight){
-                                                            if (weight[currAvg] < user.ideal_weight_kg){
+                                                            if (weight[currAvg] < weightFromKg(user.ideal_weight_kg, user.weight_units)){
                                                                 weightOk = true;
                                                             } else {
                                                                 weightOk = false;
@@ -1009,12 +1013,7 @@ export default class WeightGraph extends Component {
                                                         }
                                                         let weightString;
                                                         if (!isNaN(weight[currAvg])){
-                                                            weightString = weightStringFromKg(weight[currAvg], user.weight_units);
-                                                            if (user.weight_units === "Pounds"){
-                                                                weightString = weightString.substring(0, weightString.length - 7);
-                                                            } else if (user.weight_units === "Kilograms"){
-                                                                weightString = weightString.substring(0, weightString.length - 10);
-                                                            }
+                                                            weightString = parseFloat(Math.round(weight[currAvg]*100)/100).toFixed(2);
                                                         } else {
                                                             weightString = "n/a";
                                                         }

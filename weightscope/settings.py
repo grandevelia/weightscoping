@@ -25,15 +25,12 @@ SECRET_KEY = '^2xvl3%y=22!11ntr6l%8xzns9gq&i6$%x_n=mn6-90+ki6320'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-'''EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'app105410228@heroku.com'
-EMAIL_HOST_PASSWORD = 'uj4uvxrj9262'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-'''
-ALLOWED_HOSTS = ['weightscoping.herokuapp.com', '127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = [
+    'weightscoping.herokuapp.com', 
+    '127.0.0.1:8000', 
+    'localhost', 
+    '127.0.0.1'
+]
 
 
 # Application definition
@@ -95,7 +92,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'weightscope.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
@@ -135,7 +131,9 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
 }
-
+REST_KNOX = {
+    'TOKEN_TTL': None
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
