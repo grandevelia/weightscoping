@@ -17,6 +17,5 @@ urlpatterns = [
 	url(r'^auth/confirm-registration/$', UserAPI.as_view({'post': 'confirm_registration'})),
 	url(r'^auth/forgot-password/$', UserAPI.as_view({'post': 'forgot_password'})),
 	url(r'^auth/confirm-password-reset/$', UserAPI.as_view({'post': 'confirm_password_reset'})),
-	url(r'^auth/update-password/$', UserAPI.as_view({'post': 'update_password'})),
-	#url(r'^update-weight/{id}$', WeightViewSet.as_view({'patch': 'update_weight'})),
+	url(r'^auth/update-password/$', UserAPI.as_view({'post': 'update_password'}))
 ]
