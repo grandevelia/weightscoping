@@ -32,6 +32,7 @@ class UserAPI(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='delete-all', url_name='delete_all')
     def delete_all(self, request, *args, **kwargs):
+        
         Profile.objects.all().delete()
         return Response({
             "status": True
@@ -40,8 +41,8 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
         data = request.data
-        
         initial_weight_kg = data['weight_kg']
+        data['starting_weight'] = initial_weight_kg
         del data['weight_kg']
 
         salt = hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()[:5]
@@ -58,11 +59,12 @@ class UserAPI(viewsets.ModelViewSet):
         send_email(data)
         user = serializer.create(data=serializer.validated_data)
         WeightInput.objects.create(user=user, weight_kg=initial_weight_kg, date_added=datetime.datetime.today())
-
+        
         return Response({
             "user": UserSerializer(user).data,
             "token": AuthToken.objects.create(user),
             "email": data['email'],
+            "activation_key": data['activation_key']
         })
 
     @action(detail=True, methods=['post'], url_path='confirm-registration', url_name='confirm_registration')
@@ -80,6 +82,7 @@ class UserAPI(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         test = serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)
