@@ -147,7 +147,9 @@ class WeightViewSet(viewsets.ModelViewSet):
         return self.request.user.weights.all().order_by('date_added')
 
     def create(self, request):
+        print("Creating weirhgt")
         data = request.data
+        print(data)
         data['user'] = request.user.id
         serializer = self.get_serializer(data=data)
         serializer.is_valid()
