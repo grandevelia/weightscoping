@@ -101,7 +101,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'reductiscope',
-        'USER': 'grandevelia',
+        'USER': 'grandevelia1',
         'PASSWORD': 'Fr3ncht04$T',
         'HOST': 'localhost',
         'PORT': '5432',

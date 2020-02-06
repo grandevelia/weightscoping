@@ -40,26 +40,30 @@ class UserAPI(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
+        print("got request")
         data = request.data
+        print(data)
         initial_weight_kg = data['weight_kg']
         data['starting_weight'] = initial_weight_kg
         del data['weight_kg']
 
         salt = hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()[:5]
         email_salt = data['email']
-
+        print("Made email and pass salt")
         data['activation_key'] = hashlib.sha1((salt + email_salt).encode('utf-8')).hexdigest()
         data['key_expires'] = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=2), "%Y-%m-%d %H:%M:%S")
         data['email_path'] = "/ActivationEmail"
         data['email_subject'] = "Reductiscope Account Activation"
-        
+        print("finished setting data attributes")
         serializer = self.get_serializer(data=data)
+        print("got serializer")
         serializer.is_valid(raise_exception=True)
-
-        send_email(data)
+        print("serializer is valid")
+        #send_email(data)
         user = serializer.create(data=serializer.validated_data)
+        print("successfully made user")
         WeightInput.objects.create(user=user, weight_kg=initial_weight_kg, date_added=datetime.datetime.today())
-        
+        print("successfully made first weight")
         return Response({
             "user": UserSerializer(user).data,
             "token": AuthToken.objects.create(user),
