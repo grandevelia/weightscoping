@@ -37,7 +37,6 @@ djangorestframework==3.11.0
 docutils==0.15.2
 entrypoints==0.3
 fastprogress==0.2.2
-gensim==3.8.2
 gunicorn==19.7.1
 h11==0.9.0
 httptools==0.1.1
@@ -92,7 +91,6 @@ pycparser==2.19
 Pygments==2.6.1
 PyJWT==1.7.1
 pylint==2.4.4
-pynvx==1.0.0
 pyOpenSSL==19.1.0
 pyparsing==2.4.6
 pyrsistent==0.15.7
