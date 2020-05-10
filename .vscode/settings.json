@@ -1,4 +1,5 @@
 {
-    "python.pythonPath": "/Users/grandevelia1/Documents/programming/weightscoping/env/bin/python3.7",
-    "git.ignoreLimitWarning": true
+    "python.pythonPath": "/usr/local/opt/python/bin/python3.7",
+    "git.ignoreLimitWarning": true,
+    "python.linting.enabled": false
 }

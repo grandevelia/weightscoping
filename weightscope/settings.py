@@ -25,16 +25,22 @@ SECRET_KEY = '^2xvl3%y=22!11ntr6l%8xzns9gq&i6$%x_n=mn6-90+ki6320'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 ALLOWED_HOSTS = [
-    'weightscoping.herokuapp.com', 
-    '127.0.0.1:8000', 
-    'localhost', 
-    '127.0.0.1',
-    'exp.host/@grandevelia/reductiscope',
-    'expo.io/@grandevelia/reductiscope',
+    '*'
 ]
 
 
+'''
+'weightscoping.herokuapp.com',
+'127.0.0.1:8000',
+'localhost',
+'127.0.0.1',
+'exp.host/@grandevelia/reductiscope',
+'expo.io/@grandevelia/reductiscope',
+'http://192.168.1.5',
+'http://192.168.1.5:19000',
+'''
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,9 +64,9 @@ INSTALLED_APPS = [
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-            'BUNDLE_DIR_NAME': 'bundles/',
-            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
-        }
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+    }
 }
 
 MIDDLEWARE = [
