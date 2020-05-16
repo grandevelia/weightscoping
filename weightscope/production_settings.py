@@ -22,11 +22,12 @@ SECRET_KEY = '^2xvl3%y=22!11ntr6l%8xzns9gq&i6$%x_n=mn6-90+ki6320'
 DEBUG = False
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'app105410228@heroku.com'
-EMAIL_HOST_PASSWORD = 'F4!lr0ck3Ts'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
+
 SENDGRID_KEY = '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'
 ALLOWED_HOSTS = ['weightscoping.herokuapp.com',
                  'weightscope.com', '127.0.0.1:8000', 'localhost',
