@@ -27,20 +27,14 @@ DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ALLOWED_HOSTS = [
-    '*'
+    'weightscoping.herokuapp.com',
+    'localhost',
+    '127.0.0.1',
+    'exp.host/@grandevelia/reductiscope',
+    'expo.io/@grandevelia/reductiscope',
+    'http://192.168.1.5',
+    '192.168.0.11'
 ]
-
-
-'''
-'weightscoping.herokuapp.com',
-'127.0.0.1:8000',
-'localhost',
-'127.0.0.1',
-'exp.host/@grandevelia/reductiscope',
-'expo.io/@grandevelia/reductiscope',
-'http://192.168.1.5',
-'http://192.168.1.5:19000',
-'''
 # Application definition
 
 INSTALLED_APPS = [

@@ -48,9 +48,7 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         initial_weight_kg = data['weight_kg']
-        print(initial_weight_kg)
         data['initial_weight_kg'] = initial_weight_kg
         del data['weight_kg']
 
@@ -76,7 +74,6 @@ class UserAPI(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='confirm-registration', url_name='confirm_registration')
     def confirm_registration(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.get_serializer(data=request.data)
         user = serializer.is_valid(raise_exception=True)
         return Response({
@@ -99,6 +96,7 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='forgot-password', url_name='forgot_password')
     def forgot_password(self, request, *args, **kwargs):
         email = request.data['email']
+        print(email)
         data = {"email": email}
         salt = hashlib.sha1(
             str(random.random()).encode('utf-8')).hexdigest()[:5]
@@ -110,8 +108,9 @@ class UserAPI(viewsets.ModelViewSet):
         serializer.initiate_password_reset(email=data['email'], key=key)
         email_data = {"email": data['email'], "activation_key": key,
                       "email_path": "/ResetPassword", "email_subject": "Reductiscope Password Reset"}
+        print("about to send email")
         send_email(email_data)
-
+        print('sent email')
         return Response({
             "email": data['email']
         })
