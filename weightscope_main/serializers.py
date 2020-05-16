@@ -14,7 +14,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('email', 'password',
                   'alcohol', 'amount_paid', 'carb_ranks',
-                  'weight_units', 'height_units', 'height_inches',
+                  'weight_units', 'height_units', 'height_inches', 'initial_weight_kg',
                   'ideal_weight_kg', 'monetary_value', 'sex', 'payment_option')
 
         extra_kwargs = {'password': {'write_only': True}}
@@ -25,7 +25,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             alcohol=data['alcohol'], carb_ranks=data['carb_ranks'],
             weight_units=data['weight_units'], height_units=data['height_units'],
             height_inches=data['height_inches'], ideal_weight_kg=data['ideal_weight_kg'],
-            monetary_value=data['monetary_value'], sex=data['sex'],
+            monetary_value=data['monetary_value'], sex=data['sex'], initial_weight_kg=data['initial_weight_kg'],
             payment_option=3)
 
         user.set_password(data['password'])
@@ -43,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 'alcohol', 'amount_paid',
             'carb_ranks', 'weight_units', 'height_units',
             'height_inches', 'ideal_weight_kg', 'monetary_value',
-            'sex', 'payment_option', 'starting_weight', 'available_invites', 'friendship_creator_set')
+            'sex', 'payment_option', 'initial_weight_kg', 'available_invites', 'friendship_creator_set')
 
     def initiate_password_reset(self, email, key):
         try:
@@ -69,7 +69,6 @@ class UserSerializer(serializers.ModelSerializer):
     def reset_password(self, data):
         email = data['email']
         key = data['key']
-        print(email, key)
         new_password = data['password']
         try:
             profile = Profile.objects.get(email=email, password_key=key)
@@ -92,7 +91,7 @@ class UserSerializer(serializers.ModelSerializer):
             if (key == 'amount_paid'):
                 already_paid = profile.amount_paid
                 value = value + already_paid
-            elif (key == 'starting_weight'):
+            elif (key == 'initial_weight_kg'):
                 weight_count = WeightInput.objects.filter(
                     user=request.user).count()
                 if (value < 0 or value >= weight_count):

@@ -48,9 +48,10 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
         data = request.data
-
+        print(data)
         initial_weight_kg = data['weight_kg']
-        data['starting_weight'] = initial_weight_kg
+        print(initial_weight_kg)
+        data['initial_weight_kg'] = initial_weight_kg
         del data['weight_kg']
 
         salt = hashlib.sha1(

@@ -39,7 +39,7 @@ class Profile(AbstractUser):
         choices=HEIGHT_UNIT_CHOICES,
         default='Feet / Inches',
     )
-    height_inches = models.IntegerField()
+    height_inches = models.FloatField()
     ideal_weight_kg = models.FloatField()
     monetary_value = models.IntegerField()
     amount_paid = models.IntegerField(default=0)
@@ -63,7 +63,7 @@ class Profile(AbstractUser):
         choices=PAYMENT_CHOICES,
         default='3'
     )
-    starting_weight = models.IntegerField(
+    initial_weight_kg = models.FloatField(
         default=0, validators=[MinValueValidator(0)])
     available_invites = models.IntegerField(default=5)
 
