@@ -28,7 +28,7 @@ EMAIL_HOST_PASSWORD = 'F4!lr0ck3Ts'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'weightscope.com', '127.0.0.1:8000', 'localhost']
+#ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'weightscope.com', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition
@@ -54,9 +54,9 @@ INSTALLED_APPS = [
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-            'BUNDLE_DIR_NAME': 'bundles/',
-            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
-        }
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+    }
 }
 
 MIDDLEWARE = [
@@ -160,7 +160,7 @@ STATICFILES_DIRS = [
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-            'BUNDLE_DIR_NAME': 'bundles/',
-            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.prod.json'),
-        }
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.prod.json'),
+    }
 }

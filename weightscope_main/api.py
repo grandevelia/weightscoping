@@ -96,7 +96,6 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='forgot-password', url_name='forgot_password')
     def forgot_password(self, request, *args, **kwargs):
         email = request.data['email']
-        print(email)
         data = {"email": email}
         salt = hashlib.sha1(
             str(random.random()).encode('utf-8')).hexdigest()[:5]
@@ -108,9 +107,8 @@ class UserAPI(viewsets.ModelViewSet):
         serializer.initiate_password_reset(email=data['email'], key=key)
         email_data = {"email": data['email'], "activation_key": key,
                       "email_path": "/ResetPassword", "email_subject": "Reductiscope Password Reset"}
-        print("about to send email")
         send_email(email_data)
-        print('sent email')
+
         return Response({
             "email": data['email']
         })
