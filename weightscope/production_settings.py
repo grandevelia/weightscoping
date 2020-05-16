@@ -27,8 +27,9 @@ EMAIL_HOST_USER = 'app105410228@heroku.com'
 EMAIL_HOST_PASSWORD = 'F4!lr0ck3Ts'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-#ALLOWED_HOSTS = ['weightscoping.herokuapp.com', 'weightscope.com', '127.0.0.1:8000', 'localhost']
+SENDGRID_KEY = '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'
+ALLOWED_HOSTS = ['weightscoping.herokuapp.com',
+                 'weightscope.com', '127.0.0.1:8000', 'localhost']
 
 
 # Application definition

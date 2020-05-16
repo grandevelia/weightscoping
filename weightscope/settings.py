@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [
     'exp.host/@grandevelia/reductiscope',
     'expo.io/@grandevelia/reductiscope',
     'http://192.168.1.5',
-    '192.168.0.11'
+    '192.168.0.11',
 ]
 # Application definition
 

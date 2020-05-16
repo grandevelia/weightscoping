@@ -61,7 +61,7 @@ class UserAPI(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        # send_email(data)
+
         user = serializer.create(data=serializer.validated_data)
         WeightInput.objects.create(
             user=user, weight_kg=initial_weight_kg, date_added=datetime.datetime.today())
