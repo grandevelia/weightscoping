@@ -29,7 +29,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 SENDGRID_KEY = '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'
 ALLOWED_HOSTS = ['weightscoping.herokuapp.com',
-                 'weightscope.com', '127.0.0.1:8000', 'localhost']
+                 'weightscope.com', '127.0.0.1:8000', 'localhost',
+                 'exp.host/@grandevelia/reductiscope',
+                 'expo.io/@grandevelia/reductiscope']
 
 
 # Application definition
