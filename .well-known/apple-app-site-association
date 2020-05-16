@@ -2,7 +2,7 @@
   "applinks": {
     "apps": [],
     "details": [{
-      "appID": "LKWJEF.herokuapp.weightscoping",
+      "appID": "LKWJEF.com.reductiscope",
       "paths": ["/invites/*"]
     }]
   }

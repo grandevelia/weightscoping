@@ -8,43 +8,45 @@ import thunk from 'redux-thunk';
 import { auth, weights } from "./actions";
 import weightScoping from './reducers';
 
+import Layout from './components/Layout';
+import NotFound from './components/NotFound';
+import ResetPassword from './components/ResetPassword';
+import Main from './components/Main';
+/*
 import Intro from './components/Intro';
 import Home from './components/Home';
 
 import RegistrationConfirmation from './components/RegistrationConfirmation';
 import CompleteRegistration from './components/CompleteRegistration';
 
-import Layout from './components/Layout';
-import NotFound from './components/NotFound';
-import ForgotPassword from './components/ForgotPassword';
-import ResetPassword from './components/ResetPassword';
 import Login from './components/Login';
-import Main from './components/Main';
-
+import ForgotPassword from './components/ForgotPassword';
 import Contact from './components/Contact';
 import TermsOfUse from './components/TermsOfUse';
 import Privacy from './components/Privacy';
 import FAQ from './components/FAQ';
 import About from './components/About';
-
+*/
 let store = createStore(weightScoping, applyMiddleware(thunk))
 
 class RootContainerComponent extends Component {
-  componentDidMount(){
+  componentDidMount() {
     this.props.loadUser();
     this.props.fetchWeights();
   }
-  render(){
+  render() {
     return (
       <BrowserRouter>
         <Layout>
           <Switch>
-              <Route path="/Home" render={() => <Home weights={ this.props.weights } />} />
+            <Route path="/ResetPassword" component={ResetPassword} />
+            {/*
+              <Route path="/Home" render={() => <Home weights={this.props.weights} />} />
+
               <Route path="/Intro" render={ () => <Intro auth={ this.props.auth } />} />
 
               <Route path='/Login' component={ Login } />
               <Route path="/ForgotPassword" component={ ForgotPassword } />
-              <Route path="/ResetPassword" component={ ResetPassword } />
 
               <Route path="/RegistrationConfirmation" component={ RegistrationConfirmation } />
               <Route path="/CompleteRegistration" component={ CompleteRegistration } />
@@ -54,9 +56,9 @@ class RootContainerComponent extends Component {
               <Route exact path="/Contact" component={ Contact } />
               <Route exact path="/TermsOfUse" component={ TermsOfUse } />
               <Route exact path="/Privacy" component={ Privacy } />
-
-              <Route exact path="/" component ={ Main }/>
-              <Route component={ NotFound } />
+            */}
+            <Route exact path="/" component={Main} />
+            <Route component={NotFound} />
           </Switch>
         </Layout>
       </BrowserRouter>
@@ -75,7 +77,7 @@ const mapDispatchToProps = dispatch => {
     loadUser: () => {
       return dispatch(auth.loadUser());
     },
-    fetchWeights: () =>{
+    fetchWeights: () => {
       return dispatch(weights.fetchWeights());
     }
   }
@@ -83,7 +85,7 @@ const mapDispatchToProps = dispatch => {
 let RootContainer = connect(mapStateToProps, mapDispatchToProps)(RootContainerComponent);
 
 export default class App extends Component {
-  render(){
+  render() {
     return (
       <Provider store={store}>
         <RootContainer {...this.props.auth} />

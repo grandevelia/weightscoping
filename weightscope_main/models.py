@@ -15,7 +15,6 @@ class Profile(AbstractUser):
     username = None
     USERNAME_FIELD = 'email'
     email = models.EmailField(max_length=512, unique=True)
-    is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     alcohol = models.BooleanField(default=True)
     carb_ranks = ArrayField(models.IntegerField(), size=9)

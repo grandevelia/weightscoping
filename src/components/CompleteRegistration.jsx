@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import '../css/RegistrationConfirmation.css';
 
 class CompleteRegistration extends Component {
-	render(){
-		if (this.props.auth.isAuthenticated && this.props.auth.userConfirmed){
+	render() {
+		if (this.props.auth.isAuthenticated) {
 			return <Redirect to="/UserDashboard" />
 		}
 		return (

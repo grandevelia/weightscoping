@@ -12,7 +12,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('email', 'password', 'is_active',
+        fields = ('email', 'password',
                   'alcohol', 'amount_paid', 'carb_ranks',
                   'weight_units', 'height_units', 'height_inches',
                   'ideal_weight_kg', 'monetary_value', 'sex', 'payment_option')
@@ -21,7 +21,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     def create(self, data):
         user = Profile.objects.create(
-            email=data['email'], is_active=False, amount_paid=0,
+            email=data['email'], amount_paid=0,
             alcohol=data['alcohol'], carb_ranks=data['carb_ranks'],
             weight_units=data['weight_units'], height_units=data['height_units'],
             height_inches=data['height_inches'], ideal_weight_kg=data['ideal_weight_kg'],
@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            'email', 'is_active', 'alcohol', 'amount_paid',
+            'email', 'alcohol', 'amount_paid',
             'carb_ranks', 'weight_units', 'height_units',
             'height_inches', 'ideal_weight_kg', 'monetary_value',
             'sex', 'payment_option', 'starting_weight', 'available_invites', 'friendship_creator_set')
@@ -48,12 +48,9 @@ class UserSerializer(serializers.ModelSerializer):
     def initiate_password_reset(self, email, key):
         try:
             profile = Profile.objects.get(email=email)
-            if profile.is_active == True:
-                profile.password_key = key
-                profile.save()
-                return profile
-            else:
-                raise serializers.ValidationError("Inactive Account")
+            profile.password_key = key
+            profile.save()
+            return profile
 
         except Profile.DoesNotExist:
             raise serializers.ValidationError(
@@ -72,11 +69,11 @@ class UserSerializer(serializers.ModelSerializer):
     def reset_password(self, data):
         email = data['email']
         key = data['key']
+        print(email, key)
         new_password = data['password']
-
         try:
             profile = Profile.objects.get(email=email, password_key=key)
-            profile.password = new_password
+            profile.set_password(new_password)
             profile.save()
             return profile
 

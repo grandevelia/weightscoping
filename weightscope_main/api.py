@@ -75,8 +75,9 @@ class UserAPI(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='confirm-registration', url_name='confirm_registration')
     def confirm_registration(self, request, *args, **kwargs):
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
-        user = serializer.check_activation(data=request.data)
+        user = serializer.is_valid(raise_exception=True)
         return Response({
             "user": UserSerializer(data=request.data).initial_data,
             "token": AuthToken.objects.create(user),
@@ -96,7 +97,7 @@ class UserAPI(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='forgot-password', url_name='forgot_password')
     def forgot_password(self, request, *args, **kwargs):
-        email = request.data
+        email = request.data['email']
         data = {"email": email}
         salt = hashlib.sha1(
             str(random.random()).encode('utf-8')).hexdigest()[:5]
@@ -115,7 +116,7 @@ class UserAPI(viewsets.ModelViewSet):
         })
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='confirm-password-reset', url_name='confirm_password_reset')
-    def confirm_password_rest(self, request, *args, **kwargs):
+    def confirm_password_reset(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.confirm_password_reset(data=request.data)
         return Response({

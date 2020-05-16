@@ -12,71 +12,71 @@ const initialState = {
 	errors: {},
 };
 
-export default function auth(state=initialState, action){
+export default function auth(state = initialState, action) {
 	switch (action.type) {
 		case 'USER_LOADING':
-			return {...state, isLoading: true};
+			return { ...state, isLoading: true };
 
 		case 'USER_LOADED':
-			return {...state, isAuthenticated: true, userConfirmed: action.user.is_active, isLoading: false, user: action.user};
+			return { ...state, isAuthenticated: true, isLoading: false, user: action.user };
 
 		case 'LOGIN_SUCCESSFUL':
 			localStorage.setItem("token", action.data.token);
-			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
+			return { ...state, ...action.data, isAuthenticated: true, isLoading: false, errors: null };
 
 		case 'CONFIRMATION_SUCCESSFUL':
 			localStorage.setItem("token", action.data.token);
-			return {...state, ...action.data, userConfirmed: true, isAuthenticated: true, isLoading: false, errors:null};
+			return { ...state, ...action.data, isAuthenticated: true, isLoading: false, errors: null };
 
 		case 'CONFIRMATION_FAILED':
-			return {...state, errors: action.data}
+			return { ...state, errors: action.data }
 
 		case 'AUTHENTICATION_ERROR':
-			if (localStorage.getItem("token") !== null){
+			if (localStorage.getItem("token") !== null) {
 				localStorage.removeItem("token");
 			}
-			return {...state}
+			return { ...state }
 
 		case 'LOGIN_FAILED':
-			return {...state, errors: action.data}
+			return { ...state, errors: action.data }
 
 		case 'LOGOUT_SUCCESSFUL':
 			localStorage.removeItem("token");
-			return {...initialState};	
+			return { ...initialState };
 
 		case 'REGISTRATION_SUCCESSFUL':
 			localStorage.setItem("token", action.data.token);
-    		return {...state, userConfirmed: false, email:action.data.email, confirmationSent:true, isAuthenticated: true};
+			return { ...state, userConfirmed: false, email: action.data.email, confirmationSent: true, isAuthenticated: true };
 
 		case 'REGISTRATION_ERROR':
 			let errorKey = Object.keys(action.data)[0];
-			if (errorKey === 'email'){
+			if (errorKey === 'email') {
 				action.data['email'] = "That email is already being used"
 			}
-    		return {...state, errors: action.data, token:null, user:null, isAuthenticated:false, isLoading: false}
+			return { ...state, errors: action.data, token: null, user: null, isAuthenticated: false, isLoading: false }
 
 		case 'REGISTRATION_FAILED':
-			return {...state, errors: action.data}
+			return { ...state, errors: action.data }
 
 		case 'SETTING_CHANGE':
-			return {...state, ...action.user}
+			return { ...state, ...action.user }
 
 		case 'RESET_PASSWORD':
 			let key = "";
-			if (action.key){
+			if (action.key) {
 				key = action.key;
 			}
-			return {...state, reset: action.status, email: action.email, key:key}
+			return { ...state, reset: action.status, email: action.email, key: key }
 
 		case 'CONFIRM_RESET':
-			return {...state, reset: action.status}
-		
+			return { ...state, reset: action.status }
+
 		case 'UPDATE_PASSWORD':
 			let errors = {};
-			if (action.reason){
-				errors = {error: action.reason[0]};
+			if (action.reason) {
+				errors = { error: action.reason[0] };
 			}
-			return {...state, reset: action.status, errors:errors}
+			return { ...state, reset: action.status, errors: errors }
 
 		default:
 			return state;
