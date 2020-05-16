@@ -19,11 +19,14 @@ def send_email(data):
         BASE + "/templates/" + data['email_path'] + ".txt", c)
     msg_html = render_to_string(
         BASE + "/templates/" + data['email_path'] + ".html", c)
-
+    print("before")
     print(subject, msg_txt, from_email, to_email)
-    print(msg_html)
-    send_mail(subject, msg_txt, from_email, [
-              to_email], html_message=msg_html, fail_silently=False)
+    print("after")
+    try:
+        send_mail(subject, msg_txt, from_email, [
+            to_email], html_message=msg_html, fail_silently=False)
+    except Exception as e:
+        print(e)
     print("10")
 
 
