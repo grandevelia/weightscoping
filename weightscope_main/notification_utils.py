@@ -2,6 +2,7 @@ from django.conf import settings
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from smtplib import SMTPException
 BASE = getattr(settings, "BASE_DIR", None)
 EMAIL_BASE = getattr(settings, "EMAIL_BASE", None)
 
@@ -21,8 +22,8 @@ def send_email(data):
         BASE + "/templates/" + data['email_path'] + ".html", c)
     try:
         send_mail(subject, msg_txt, from_email, [
-            to_email], html_message=msg_html, fail_silently=False)
-    except Exception as e:
+                  to_email], html_message=msg_html, fail_silently=False)
+    except SMTPException as e:
         print("EXCEPTION")
         print(e)
 

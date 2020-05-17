@@ -35,7 +35,6 @@ class UserAPI(viewsets.ModelViewSet):
 
         return super(UserAPI, self).get_serializer_class()
 
-    '''
     @action(detail=False, methods=['post'], url_path='delete-all', url_name='delete_all')
     def delete_all(self, request, *args, **kwargs):
 
@@ -43,7 +42,6 @@ class UserAPI(viewsets.ModelViewSet):
         return Response({
             "status": True
         })
-    '''
 
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
