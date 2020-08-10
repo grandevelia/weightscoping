@@ -43,7 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 'alcohol', 'amount_paid',
             'carb_ranks', 'weight_units', 'height_units',
             'height_inches', 'ideal_weight_kg', 'monetary_value',
-            'sex', 'payment_option', 'initial_weight_kg', 'available_invites', 'friendship_creator_set')
+            'sex', 'payment_option', 'initial_weight_kg', 'allergy_warning_date',
+            'available_invites', 'friendship_creator_set')
 
     def initiate_password_reset(self, email, key):
         try:

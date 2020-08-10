@@ -133,6 +133,9 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
 }
+REST_KNOX = {
+    'TOKEN_TTL': None,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/

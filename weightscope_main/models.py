@@ -10,6 +10,11 @@ from django.core.exceptions import ValidationError
 from datetime import datetime, date
 from django.utils import timezone
 
+def ensure_past(input_day):
+    today = date.today()
+    if input_day > today:
+        raise ValidationError("Date can't be in the future")
+
 
 class Profile(AbstractUser):
     username = None
@@ -19,6 +24,7 @@ class Profile(AbstractUser):
     alcohol = models.BooleanField(default=True)
     carb_ranks = ArrayField(models.IntegerField(), size=9)
     password_key = models.CharField(max_length=40, default="")
+    allergy_warning_date = models.DateField(validators=[ensure_past], default=datetime.min)
 
     WEIGHT_UNIT_CHOICES = (
         ('Kilograms', 'Kilograms'),
@@ -71,12 +77,6 @@ class Profile(AbstractUser):
 
     def get_username(self):
         return self.email
-
-
-def ensure_past(input_day):
-    today = date.today()
-    if input_day > today:
-        raise ValidationError("Date can't be in the future")
 
 
 class WeightInput(models.Model):
