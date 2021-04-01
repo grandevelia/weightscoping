@@ -28,10 +28,12 @@ EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
 EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-ALLOWED_HOSTS = ['weightscoping.herokuapp.com',
-                 'weightscope.com', '127.0.0.1:8000', 'localhost',
-                 'exp.host/@grandevelia/reductiscope',
-                 'expo.io/@grandevelia/reductiscope']
+ALLOWED_HOSTS = 
+    ['weightscoping.herokuapp.com',
+    'https://www.reductiscope.com',
+    'exp.host/@grandevelia/reductiscope',
+    'expo.io/@grandevelia/reductiscope',
+]
 
 
 # Application definition

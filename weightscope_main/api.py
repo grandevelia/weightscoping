@@ -25,7 +25,8 @@ class UserAPI(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     action_serializers = {
         'register': CreateUserSerializer,
-        'login': LoginUserSerializer
+        'login': LoginUserSerializer,
+        'delete_account': LoginUserSerializer
     }
 
     def get_serializer_class(self):
@@ -35,15 +36,17 @@ class UserAPI(viewsets.ModelViewSet):
 
         return super(UserAPI, self).get_serializer_class()
 
-    '''
-    @action(detail=False, methods=['post'], url_path='delete-all', url_name='delete_all')
-    def delete_all(self, request, *args, **kwargs):
-
-        Profile.objects.all().delete()
+    
+    @action(detail=True, methods=['post'], url_path='delete-account', url_name='delete_account')
+    def delete_account(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        out = Profile.objects.get(email=request.data['email']).delete()
         return Response({
             "status": True
         })
-    '''
+    
 
     @action(detail=True, methods=['post'], url_path='register', url_name='register')
     def register(self, request, *args, **kwargs):
@@ -126,7 +129,7 @@ class UserAPI(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.reset_password(data=request.data)
         return Response({"status": True})
-
+    
     @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated], url_path='update-user', url_name='partial_update')
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -135,7 +138,7 @@ class UserAPI(viewsets.ModelViewSet):
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         })
-
+    
     def get_object(self):
         return self.request.user
 

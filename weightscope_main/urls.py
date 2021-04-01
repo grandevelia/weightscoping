@@ -10,7 +10,7 @@ router.register('notifications', NotificationViewSet, 'notifications')
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^auth/user-info/$', RetrieveUserAPI.as_view()),
-    url(r'^auth/admin-delete', UserAPI.as_view({'post': 'delete_all'})),
+    url(r'^auth/delete-account/', UserAPI.as_view({'post': 'delete_account'})),
     url(r'^auth/register/$', UserAPI.as_view({'post': 'register'})),
     url(r'^auth/login/$', UserAPI.as_view({'post': 'login'})),
     url(r'^auth/update-user/$', UserAPI.as_view({'patch': 'partial_update'})),
